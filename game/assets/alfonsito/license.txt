@@ -1,0 +1,11 @@
+Model Information:
+* title:	Estatua de Alfonso X  - José Alcoverro (1892)
+* source:	https://sketchfab.com/3d-models/estatua-de-alfonso-x-jose-alcoverro-1892-55660469343a4d0e871f6553908bb10c
+* author:	PAR - Arqueología y Patrimonio Virtual (https://sketchfab.com/archeo_pablo)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Estatua de Alfonso X  - José Alcoverro (1892)" (https://sketchfab.com/3d-models/estatua-de-alfonso-x-jose-alcoverro-1892-55660469343a4d0e871f6553908bb10c) by PAR - Arqueología y Patrimonio Virtual (https://sketchfab.com/archeo_pablo) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
