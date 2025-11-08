@@ -26,15 +26,16 @@ public class Main extends ApplicationAdapter {
     private SceneAsset sceneAsset;
     private Scene scene;
     private Camera camera;
-    private Vector3 playerPos = new Vector3(0,2,5);
+    private Vector3 playerPos = new Vector3(0,5, 20);
     private AnimationController animationController;
+    private Spirit alfonso;
+    private PhysicsWorld physicsWorld;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         image = new Texture("libgdx.png");
         camera = new PerspectiveCamera(70, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(0, 2, 5);
         camera.lookAt(0, 0, 0);
         camera.update();
         sceneManager = new SceneManager(256);
@@ -43,26 +44,35 @@ public class Main extends ApplicationAdapter {
         scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
         animationController = new AnimationController(scene.modelInstance);
-
+        physicsWorld = new PhysicsWorld();
+        physicsWorld.create();
+        physicsWorld.createGround();
+        alfonso = new Spirit(scene, new Vector3[]{
+            new Vector3(0,3,0),
+            new Vector3(10,3,10),
+            new Vector3(0,3,10),
+        });
+        physicsWorld.getDynamicsWorld().addRigidBody(alfonso.getRigidBody());
     }
 
     @Override
     public void render() {
         float delta = Gdx.graphics.getDeltaTime();
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        physicsWorld.update();
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             playerPos.z -= delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             playerPos.z += delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             playerPos.x += delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             playerPos.x -= delta;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.E)) {
             playerPos.y += delta;
-        } else  if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        } else  if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
             playerPos.y -= delta;
         }
-
+        alfonso.update(delta);
         camera.position.set(playerPos.x, playerPos.y, playerPos.z);
         camera.lookAt(0,0,0);
         camera.up.set(Vector3.Y);
@@ -74,6 +84,7 @@ public class Main extends ApplicationAdapter {
         camera.update();
         sceneManager.update(delta);
         sceneManager.render();
+        physicsWorld.renderDebug(camera);
     }
 
     @Override
@@ -82,5 +93,6 @@ public class Main extends ApplicationAdapter {
         image.dispose();
         sceneManager.dispose();
         sceneAsset.dispose();
+        physicsWorld.dispose();
     }
 }
