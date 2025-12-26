@@ -1,0 +1,30 @@
+[
+    {
+        "id": "0",
+        "name": "Tumblestone",
+        "desc": "This mysterious stone can draw out the properties required to forge a pokeball",
+        "isMaterial": "true",
+        "icon": "textures/tumblestone.png",
+        "type": "MATERIAL"
+    },
+    {
+        "id": "1",
+        "name": "Pokeball",
+        "desc": "Basic pokeball used to catch wild pokemon",
+        "isMaterial": "false",
+        "icon": "textures/pokeball.png",
+        "type": "POKEBALL"
+    },
+    {
+        "id": "2",
+        "name": "Oran Berry",
+        "desc": "Restores 25% HP",
+        "isMaterial": "true",
+        "icon": "textures/oranberry.png",
+        "type": "CONSUMABLE",
+        "effect": {
+            "type": "HEAL",
+            "value": "20"
+        }
+    }
+]
