@@ -21,11 +21,13 @@ public class Consumable extends Item {
 
     public Consumable (JsonValue data){
         super(data);
-        if (data.getString("type").equals("HEAL")){
-            this.effect = new HealEffect(data.getInt("value"));
+        if (data.get("effect").getString("type").equals("HEAL")){
+            this.effect = new HealEffect(data.get("effect").getInt("value"));
+            System.out.println(((HealEffect)this.effect).value);
         }
     }
 
+    @Override
     public void useItem(Entity target){
         effect.apply((Pokemon) target);
     }

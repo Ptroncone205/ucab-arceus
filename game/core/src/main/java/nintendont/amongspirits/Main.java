@@ -39,6 +39,7 @@ import nintendont.amongspirits.entities.items.MaterialItem;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InteractionScanner;
 import nintendont.amongspirits.managers.InventoryManager;
+import nintendont.amongspirits.managers.ItemFactory;
 import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
@@ -152,18 +153,16 @@ public class Main extends ApplicationAdapter
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
 
-
+		ItemFactory.init();
 		// item build
 		for (int i = 0; i<30; i++){
 			Item testItem;
 			if (i > 10){
-				testItem = new Consumable(0, "Oran Berry", "Heals 20 HP", true);
-
-			} else { testItem = new MaterialItem(1, "Tumblestone", "Mysterious red stone used to craft pokeballs");}
+				testItem = ItemFactory.createItem("0");
+			} else { testItem = ItemFactory.createItem("2"); }
 			testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
 			items.add(testItem);
 			sceneManager.addScene(testItem.getScene());
-
 		}
 
 		cl = new MyContactListener();

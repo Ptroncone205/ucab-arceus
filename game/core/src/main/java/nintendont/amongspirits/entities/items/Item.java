@@ -58,6 +58,7 @@ public class Item extends Entity{
         Pixmap tmp = new Pixmap(Gdx.files.internal(data.getString("icon")));
         this.icon = new Texture(tmp);
         tmp.dispose();
+        System.out.println(this.name + " created: " + Gdx.files.internal(data.getString("icon")));
     }
 
     public void create(Vector3 pos, float width, float height, float depth){

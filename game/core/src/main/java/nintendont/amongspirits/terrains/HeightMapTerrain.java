@@ -60,7 +60,7 @@ public class HeightMapTerrain implements Disposable{
         for (int z = 0; z < length; z++) {
             for (int x = 0; x < width; x++) {
                 int pixel = pixmap.getPixel(x, z);
-                int r = (pixel & 0xff000000) >>> 24;
+                int r = (pixel & 0xff000000) >>> 24; // extraer rojo
                 float height = (r / 255f) * maxHeight;
                 heightData[z * width + x] = height;
             }

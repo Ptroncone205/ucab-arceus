@@ -15,6 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import nintendont.amongspirits.Const;
+import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InventoryManager;
 
@@ -26,8 +29,7 @@ public class GUIManager implements Disposable{
     private boolean isPaused = false;
     private boolean isInventoryOpen = false;
 
-    public enum UIState{ INGAME, INVENTORY, PAUSE, SELECT_ITEM, SELECT_PKMN }
-    private UIState currentState = UIState.INGAME;
+    // public enum UIState{ INGAME, INVENTORY, PAUSE, SELECT_ITEM, SELECT_PKMN }
 
     public GUIManager (SpriteBatch batch, InventoryManager inventoryManager, CraftManager craftManager){
         stage =new Stage(new ScreenViewport(), batch);
@@ -51,36 +53,72 @@ public class GUIManager implements Disposable{
         inventoryMenu.update(skin);
     }
 
-    public void setState(UIState state){
-        currentState = state;
+    public void setState(GameState state){
+        Const.currentState = state;
         System.out.println(state);
     }
 
     public void togglePause() {
-        Gdx.input.setCursorCatched(!Gdx.input.isCursorCatched());
-        if (isInventoryOpen) {
-            isInventoryOpen = false;
-            inventoryMenu.setVisible(false);
-            return;
+
+        switch (Const.currentState){
+            case INGAME:
+                Const.currentState = GameState.PAUSE;
+                //pauseMenu.setiVisible(true);
+                Gdx.input.setCursorCatched(false);
+                break;
+            case PAUSE:
+                Const.currentState = GameState.INGAME;
+                //pauseMenu.setiVisible(false);
+                
+                Gdx.input.setCursorCatched(true);
+                break;
+            case INVENTORY:
+                Const.currentState = GameState.INGAME;
+                inventoryMenu.setVisible(false);
+                Gdx.input.setCursorCatched(true);
+                break;
+            case SELECT_ITEM:
+                Const.currentState = GameState.INVENTORY;
+                break;
+            case SELECT_PKMN:
+                Const.currentState = GameState.INVENTORY;
+                break;
         }
-
-        isPaused = !isPaused;
-        // pauseMenu.setVisible(isPaused);
-
-        // TODO: pausar juego
+        update();
     }
 
     public void toggleInventory() {
-        if (isPaused) return;
-
-        isInventoryOpen = !isInventoryOpen;
-        inventoryMenu.setVisible(isInventoryOpen);
-        Gdx.input.setCursorCatched(!Gdx.input.isCursorCatched());
+        switch (Const.currentState) {
+            case INGAME:
+                Const.currentState = GameState.INVENTORY;
+                inventoryMenu.setVisible(true);
+                Gdx.input.setCursorCatched(false);
+                break;
+        
+            case INVENTORY:
+                Const.currentState = GameState.INGAME;
+                inventoryMenu.setVisible(false);
+                Gdx.input.setCursorCatched(true);
+                break;
+            case SELECT_ITEM:
+                Const.currentState = GameState.INGAME;
+                inventoryMenu.setVisible(false);
+                Gdx.input.setCursorCatched(true);
+                break;
+            case SELECT_PKMN:
+                Const.currentState = GameState.INGAME;
+                inventoryMenu.setVisible(false);
+                Gdx.input.setCursorCatched(true);
+                break;
+            case PAUSE:
+                break;
+        }
+        update();
     }
 
     public void hideAll(){
         inventoryMenu.setVisible(false);
-        currentState = UIState.INGAME;
+        Const.currentState = GameState.INGAME;
     }
 
 

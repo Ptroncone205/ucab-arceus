@@ -3,7 +3,7 @@ package nintendont.amongspirits.entities.items.effects;
 import nintendont.amongspirits.entities.Pokemon;
 
 public class HealEffect implements ItemEffect{
-    private int value;
+    public int value;
     public HealEffect (int value){
         this.value = value;
     }

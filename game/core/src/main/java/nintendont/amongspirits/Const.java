@@ -1,6 +1,9 @@
 package nintendont.amongspirits;
 
 public class Const {
+    // game states
+    public static enum GameState{ INGAME, INVENTORY, PAUSE, SELECT_ITEM, SELECT_PKMN }
+    public static GameState currentState = GameState.INGAME;
     //todo
     public static float CAMERA_DEFAULT_PITCH = 0f;
     public static float CAMERA_MIN_PITCH = 1f;
@@ -14,4 +17,5 @@ public class Const {
     public static short PF_PLAYER = 1 << 0;
     public static short PF_ITEM   = 1 << 1;
     public static short PF_GROUND = 1 << 2;
+
 }

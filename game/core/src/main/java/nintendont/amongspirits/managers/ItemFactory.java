@@ -6,7 +6,10 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+
+import nintendont.amongspirits.entities.items.Consumable;
 import nintendont.amongspirits.entities.items.Item;
+import nintendont.amongspirits.entities.items.MaterialItem;
 import nintendont.amongspirits.entities.items.Pokeball;
 
 /**
@@ -28,6 +31,8 @@ public class ItemFactory {
             items.add(j);
         }
         registry.put("POKEBALL", Pokeball::new);
+        registry.put("MATERIAL", MaterialItem::new);
+        registry.put("CONSUMABLE", Consumable::new);
     }
 
     public static Item createItem(String id){

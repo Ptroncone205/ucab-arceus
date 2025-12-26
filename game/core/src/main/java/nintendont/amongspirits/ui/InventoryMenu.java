@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -19,6 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+
+import nintendont.amongspirits.Const.GameState;
+import nintendont.amongspirits.Const;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.managers.CraftManager;
@@ -27,6 +31,7 @@ import nintendont.amongspirits.managers.InventoryManager;
 public class InventoryMenu extends Table{
     private InventoryManager invManager;
     private CraftManager craftManager;
+    public GameState currentState;
     private Table grid;
     private Table team;
     private Label title;
@@ -36,10 +41,6 @@ public class InventoryMenu extends Table{
     private ItemStack itemA;
     private ItemStack itemB;
 
-    private enum State {
-        VIEW, SEL_MATERIAL, SEL_PKMN
-    }
-    private State currentState = State.VIEW;
 
     public InventoryMenu (InventoryManager invManager, CraftManager craftManager, Skin skin){
         this.invManager = invManager;
@@ -98,6 +99,7 @@ public class InventoryMenu extends Table{
 
     public void update(Skin skin){
         grid.clear();
+        // System.out.println(Const.currentState);
 
         int cols = 0;
 
@@ -120,12 +122,23 @@ public class InventoryMenu extends Table{
         for (ItemStack item : removeItems){
             invManager.getItems().remove(item);
         }
+
+        switch (Const.currentState) {
+            case SELECT_ITEM:
+                desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDesc());
+                break;
+        
+            default:
+                desc.setText("select item");
+                break;
+        }
     }
 
     private Actor createSlot(Skin skin, final ItemStack stack) {
         Stack slotStack = new Stack();
 
         Image bg = new Image(skin.newDrawable("white", Color.DARK_GRAY));
+        bg.setTouchable(Touchable.disabled);
         slotStack.add(bg);
 
         if (stack == null) return slotStack;
@@ -151,18 +164,17 @@ public class InventoryMenu extends Table{
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (stack.getItem().isMaterial()){
-                    if (currentState == State.VIEW){
+                    if (Const.currentState == Const.GameState.INVENTORY){
                         itemA = stack;
-                        currentState = State.SEL_MATERIAL;
-                    } else if (currentState == State.SEL_MATERIAL) {
+                        Const.currentState = Const.GameState.SELECT_ITEM;
+                    } else if (Const.currentState == Const.GameState.SELECT_ITEM) {
                         itemB = stack;
                         Item output = craftManager.craft(itemA.getItem(), itemB.getItem());
                         if (output != null){
                             invManager.addItem(output);
                             itemA.count--; itemB.count--;
-                            update(skin);
                         }
-                        currentState = State.VIEW;
+                        Const.currentState = Const.GameState.INVENTORY;
                     }
                 }
 
@@ -177,7 +189,9 @@ public class InventoryMenu extends Table{
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                desc.setText("select item");
+                System.out.println("exit from " + stack.item.name);
+                update(skin);
+                
             }
         });
 
@@ -199,5 +213,9 @@ public class InventoryMenu extends Table{
         t.add(title).left().grow().padTop(10);
 
         return t;
+    }
+
+    public Table contextMenu(boolean isMaterial){
+        return null;
     }
 }
