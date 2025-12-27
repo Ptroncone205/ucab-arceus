@@ -22,7 +22,7 @@ public class Player implements Disposable{
     private Scene scene;
     private MotionState motionState;
     private btRigidBody rigidBody;
-    private btCapsuleShape capsuleShape;
+    private btCapsuleShape shape;
     private float angle;
 
     private Matrix4 playerTransform = new Matrix4();
@@ -43,10 +43,10 @@ public class Player implements Disposable{
 
         tempVec = new Vector3();
         inertia = new Vector3();
-        capsuleShape = new btCapsuleShape(0.5f, 2f);
-        capsuleShape.calculateLocalInertia(54f, inertia);
+        shape = new btCapsuleShape(0.5f, 2f);
+        shape.calculateLocalInertia(54f, inertia);
 
-        btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(1f,motionState,capsuleShape,inertia);
+        btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(1f,motionState,shape,inertia);
         rigidBody = new btRigidBody(info);
         info.dispose();
         rigidBody.setAngularFactor(0);
@@ -110,6 +110,7 @@ public class Player implements Disposable{
     @Override
     public void dispose() {
         rigidBody.dispose();
+        shape.dispose();
         scene.modelInstance.model.dispose();
     }
 }

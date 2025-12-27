@@ -15,16 +15,15 @@ public class InventoryManager {
 
     public boolean addItem(Item item){
         if (items.size() >= slots){
-            System.out.println(items.size());
             return false;
         }
 
-        for (int i = 0; i < items.size(); i++){
-            if ((items.get(i).item).getClass().equals(item.getClass())){
-                items.get(i).count++;
-                return true;
-            }
-        }
+        // for (int i = 0; i < items.size(); i++){
+        //     if ((items.get(i).item).getClass().equals(item.getClass())){
+        //         items.get(i).count++;
+        //         return true;
+        //     }
+        // }
         items.add(new ItemStack(item));
         return true;
     }

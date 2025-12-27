@@ -193,7 +193,8 @@ public class Main extends ApplicationAdapter
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		// updates
 		physicsWorld.update();
-		processInput(deltaTime);
+		handleInput(deltaTime);
+		// processInput(deltaTime);
 		player.update();
 		sceneManager.update(deltaTime);
 		updateCamera();
@@ -208,8 +209,6 @@ public class Main extends ApplicationAdapter
 				focusedItem.dispose();
 				sceneManager.removeScene(focusedItem.getScene());
 				focusedItem = null;
-			} else {
-				System.out.println("nuh uh");
 			}
         }
 
@@ -217,7 +216,7 @@ public class Main extends ApplicationAdapter
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
-		// physicsWorld.renderDebug(camera);
+		physicsWorld.renderDebug(camera);
 
 		// UI
 		batch.begin();
@@ -282,6 +281,17 @@ public class Main extends ApplicationAdapter
 		return (float) (distanceFromPlayer * Math.cos(Math.toRadians(camPitch)));
 	}
 
+	private void handleInput (float deltaTime){
+		switch (Const.currentState) {
+			case INGAME:
+				processInput(deltaTime);
+				break;
+			case INVENTORY:
+				guiManager.handleInput();
+			default:
+				break;
+		}
+	}
 	private void processInput (float deltaTime) {
 		playerTransform.set(playerScene.modelInstance.transform);
 
@@ -292,6 +302,7 @@ public class Main extends ApplicationAdapter
         Vector3 camRight = camera.direction.cpy().crs(camera.up);
         camRight.y = 0;
         camRight.nor();
+
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
 			player.jump(physicsWorld);
 		}

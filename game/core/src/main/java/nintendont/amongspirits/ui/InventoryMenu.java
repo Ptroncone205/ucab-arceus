@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import javax.swing.UIManager;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -36,15 +38,24 @@ public class InventoryMenu extends Table{
     private Table team;
     private Label title;
     private Label desc;
+    private Skin skin;
+
+    private final int ROWS = 5;
+    private final int COLS = 4;
+    private int rows = 0;
+    private int cols = 0;
 
     // selected items for crafting
     private ItemStack itemA;
     private ItemStack itemB;
 
+    private int selected = 0;
+
 
     public InventoryMenu (InventoryManager invManager, CraftManager craftManager, Skin skin){
         this.invManager = invManager;
         this.craftManager = craftManager;
+        this.skin = skin;
         this.setFillParent(true);
 
         this.setBackground(skin.newDrawable("white", 0, 0, 0, 0.85f));
@@ -91,53 +102,75 @@ public class InventoryMenu extends Table{
         body.add(team).width(Value.percentWidth(0.45f, body)).expandY().fillY();
 
         this.add(body).expand().fill();
-
-        update(skin);
+        this.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int key){
+                return hadleInput(key);
+            }
+        });
+        refresh();
 
         // this.setDebug(true);
     }
-
-    public void update(Skin skin){
-        grid.clear();
-        // System.out.println(Const.currentState);
-
-        int cols = 0;
-
-        ArrayList<ItemStack> removeItems = new ArrayList<>();
-        for ( ItemStack stack : invManager.getItems()){
-            if (stack.count <= 0){
-                removeItems.add(stack); // no se puede remover items mientras recorro el arreglo lol
-                continue;
-            }
-            Actor slot = createSlot(skin, stack);
-
-            grid.add(slot).size(70).pad(15);
-            cols++;
-
-            if ( cols > 4){
-                grid.row();
-                cols = 0;
-            }
-        }
-        for (ItemStack item : removeItems){
-            invManager.getItems().remove(item);
-        }
-
+    public void updateDesc(){
+        // solo porque me molestabaa tener que actualioxar todo
+        // actualizar descripcion
         switch (Const.currentState) {
             case SELECT_ITEM:
                 desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDesc());
                 break;
         
             default:
-                desc.setText("select item");
+                if (invManager.getItems().isEmpty()){
+                    desc.setText("No items :(");
+                } else {
+                    desc.setText(invManager.getItems().get(selected).getItem().getDesc());
+                }
                 break;
         }
     }
 
-    private Actor createSlot(Skin skin, final ItemStack stack) {
-        Stack slotStack = new Stack();
+    public void update(){
+        // TODO actualiza las pistas visuales del menu (item/pokemon seleccionado)
+        // se llama cada vez que cambia la seleccion actual
 
-        Image bg = new Image(skin.newDrawable("white", Color.DARK_GRAY));
+    }
+    public void refresh(){ // construye el menu, se llama al agregar o eliminar un item
+        grid.clear();
+
+        int cols = 0;
+        int sel = 0;
+        Actor slot;
+        ArrayList<ItemStack> removeItems = new ArrayList<>();
+        for ( ItemStack stack : invManager.getItems()){
+            if (stack.count <= 0){
+                removeItems.add(stack); // no se puede remover items mientras recorro el arreglo lol
+                continue;
+            }
+            slot = createSlot(skin, stack, sel);
+
+            grid.add(slot).size(70).pad(15);
+            cols++;
+
+            if ( cols > COLS){
+                grid.row();
+                cols = 0;
+            }
+            sel++;
+        }
+        for (ItemStack item : removeItems){
+            invManager.getItems().remove(item);
+        }
+        
+        updateDesc();
+    }
+
+    private Actor createSlot(Skin skin, final ItemStack stack, int sel) {
+        Stack slotStack = new Stack();
+        Image bg;
+        if (sel == selected){
+            bg = new Image(skin.newDrawable("white", Color.LIGHT_GRAY));
+        } else {bg = new Image(skin.newDrawable("white", Color.DARK_GRAY)); }
         bg.setTouchable(Touchable.disabled);
         slotStack.add(bg);
 
@@ -160,40 +193,28 @@ public class InventoryMenu extends Table{
             slotStack.add(countLabel);
         }
 
-        slotStack.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (stack.getItem().isMaterial()){
-                    if (Const.currentState == Const.GameState.INVENTORY){
-                        itemA = stack;
-                        Const.currentState = Const.GameState.SELECT_ITEM;
-                    } else if (Const.currentState == Const.GameState.SELECT_ITEM) {
-                        itemB = stack;
-                        Item output = craftManager.craft(itemA.getItem(), itemB.getItem());
-                        if (output != null){
-                            invManager.addItem(output);
-                            itemA.count--; itemB.count--;
-                        }
-                        Const.currentState = Const.GameState.INVENTORY;
-                    }
-                }
+        int index = invManager.getItems().indexOf(stack);
+        // slotStack.addListener(new ClickListener() {
+        //     @Override
+        //     public void clicked(InputEvent event, float x, float y) {
+        //         selected = index;
+        //         onClick(stack);
+        //         // System.out.println("Clicked: " + stack.getItem().getName());
+        //     }
 
-                update(skin);
-                // System.out.println("Clicked: " + stack.getItem().getName());
-            }
+        //     @Override
+        //     public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+        //         selected = index;
+        //         desc.setText(stack.getItem().getName() + ": " + stack.getCount() + "\n" + stack.item.desc);
+        //     }
 
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                desc.setText(stack.getItem().getName() + ": " + stack.getCount() + "\n" + stack.item.desc);
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                System.out.println("exit from " + stack.item.name);
-                update(skin);
+        //     @Override
+        //     public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+        //         System.out.println("exit from " + stack.item.name);
+        //         updateDesc();
                 
-            }
-        });
+        //     }
+        // });
 
         return slotStack;
     }
@@ -217,5 +238,49 @@ public class InventoryMenu extends Table{
 
     public Table contextMenu(boolean isMaterial){
         return null;
+    }
+
+    public void onClick(ItemStack stack){
+        if (stack.getItem().isMaterial()){
+                    if (Const.currentState == Const.GameState.INVENTORY){
+                        itemA = stack;
+                        Const.currentState = Const.GameState.SELECT_ITEM;
+                    } else if (Const.currentState == Const.GameState.SELECT_ITEM) {
+                        itemB = stack;
+                        Item output = craftManager.craft(itemA.getItem(), itemB.getItem());
+                        if (output != null){
+                            invManager.addItem(output);
+                            itemA.count--; itemB.count--;
+                        }
+                        Const.currentState = Const.GameState.INVENTORY;
+                    }
+                }
+
+                refresh();
+    }
+
+    public boolean hadleInput (int key){
+        int size = invManager.getItems().size();
+        if (size == 0 ) return false;
+        System.out.println( "stat" + " " + selected+ " " + Keys.W+ " " + key);
+            switch (key) {
+                case Keys.W:
+                    if (selected - ROWS >= 0 ) selected -= ROWS;
+                    break;
+                case Keys.S:
+                    if (selected + ROWS < size ) selected += ROWS;
+                    break;
+                case Keys.A:
+                    if (selected - 1 >= 0 ) selected -= 1;
+                    break;
+                case Keys.D:
+                    if (selected + 1 < size ) selected += 1;
+                    break;
+                case Keys.ENTER:
+                    onClick(invManager.getItems().get(selected));
+                    break;
+            }
+        update();
+        return true;
     }
 }

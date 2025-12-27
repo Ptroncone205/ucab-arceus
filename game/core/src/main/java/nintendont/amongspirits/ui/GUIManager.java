@@ -1,6 +1,8 @@
 package nintendont.amongspirits.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -33,7 +35,6 @@ public class GUIManager implements Disposable{
 
     public GUIManager (SpriteBatch batch, InventoryManager inventoryManager, CraftManager craftManager){
         stage =new Stage(new ScreenViewport(), batch);
-        Gdx.input.setInputProcessor(stage);
 
         createBasicSkin();
         inventoryMenu = new InventoryMenu(inventoryManager, craftManager, skin);
@@ -45,12 +46,13 @@ public class GUIManager implements Disposable{
     }
 
     public void render(float delta){
+        inventoryMenu.refresh();
         stage.act(delta);
         stage.draw();
     }
 
     public void update(){
-        inventoryMenu.update(skin);
+        // inventoryMenu.update();
     }
 
     public void setState(GameState state){
@@ -153,5 +155,9 @@ public class GUIManager implements Disposable{
     public void dispose() {
         skin.dispose();
         stage.dispose();
+    }
+
+    public void handleInput() {
+        
     }
 }

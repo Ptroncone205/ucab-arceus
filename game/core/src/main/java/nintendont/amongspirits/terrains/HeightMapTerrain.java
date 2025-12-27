@@ -43,6 +43,7 @@ public class HeightMapTerrain implements Disposable{
     private int width, length;
     private float maxHeight;
     private float[] heightData;
+    private FloatBuffer heightBuffer;
     private HeightField field;
     private final float scale;
 
@@ -69,7 +70,7 @@ public class HeightMapTerrain implements Disposable{
 
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(heightData.length * 4);
         byteBuffer.order(ByteOrder.nativeOrder());
-        FloatBuffer heightBuffer = byteBuffer.asFloatBuffer();
+        heightBuffer = byteBuffer.asFloatBuffer();
         heightBuffer.put(heightData);
         heightBuffer.position(0);
 
@@ -167,8 +168,9 @@ public class HeightMapTerrain implements Disposable{
 
     @Override
     public void dispose() {
-        body.dispose();
+        System.err.println("terrain diposed");
         terrainShape.dispose();
+        body.dispose();
         model.dispose();
         texture.dispose();
     }

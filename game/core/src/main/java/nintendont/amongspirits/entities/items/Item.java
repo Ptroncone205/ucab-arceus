@@ -74,9 +74,10 @@ public class Item extends Entity{
         modelInstance = new ModelInstance(mb.end());
         scene = new Scene(modelInstance);
 
-        btBoxShape shape = new btBoxShape(new Vector3(width/2, height/2, depth/2));
+        shape = new btBoxShape(new Vector3(width/2, height/2, depth/2));
         btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(0, null, shape, Vector3.Zero);
         body = new btRigidBody(info);
+        info.dispose();
         body.setWorldTransform(modelInstance.transform);
         body.setUserValue(Const.PF_ITEM);
 
