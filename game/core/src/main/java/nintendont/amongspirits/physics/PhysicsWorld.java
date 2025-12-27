@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.Disposable;
 import java.util.ArrayList;
 
 public class PhysicsWorld implements Disposable {
-    private btDiscreteDynamicsWorld dynamicsWorld;
+    private static btDiscreteDynamicsWorld dynamicsWorld;
     private btDefaultCollisionConfiguration collisionConfig;
     private btCollisionDispatcher collDispatcher;
     private btBroadphaseInterface broadphase;
@@ -25,8 +25,8 @@ public class PhysicsWorld implements Disposable {
     private ArrayList<Disposable> disposables = new ArrayList<>();
 
     // Debug drawing ray casts
-    private final Vector3 lastRayFrom = new Vector3();
-    private final Vector3 lastRayTo = new Vector3();
+    private static final Vector3 lastRayFrom = new Vector3();
+    private static final Vector3 lastRayTo = new Vector3();
 
     public void create() {
         Bullet.init();
@@ -73,7 +73,7 @@ public class PhysicsWorld implements Disposable {
         info.dispose();
     }
 
-    public void raycast(Vector3 from, Vector3 to, RayResultCallback callback) {
+    public static void raycast(Vector3 from, Vector3 to, RayResultCallback callback) {
         lastRayFrom.set(from).sub(0, 5f, 0f);
 
         dynamicsWorld.rayTest(from, to, callback);

@@ -289,7 +289,7 @@ public class ExploreMain extends ApplicationAdapter
         camRight.y = 0;
         camRight.nor();
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-			player.jump(physicsWorld);
+			player.jump();
 		}
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {

@@ -105,7 +105,7 @@ public class InventoryMenu extends Table{
         this.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int key){
-                return hadleInput(key);
+                return handleInput(key);
             }
         });
         refresh();
@@ -259,7 +259,7 @@ public class InventoryMenu extends Table{
                 refresh();
     }
 
-    public boolean hadleInput (int key){
+    public boolean handleInput (int key){
         int size = invManager.getItems().size();
         if (size == 0 ) return false;
         System.out.println( "stat" + " " + selected+ " " + Keys.W+ " " + key);

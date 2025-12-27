@@ -84,14 +84,14 @@ public class Player implements Disposable{
         // System.out.println(vel);
     }
 
-    public void jump (PhysicsWorld pw){
-        if (isGrounded(pw)){
+    public void jump (){
+        if (isGrounded()){
             tempVec.set(rigidBody.getLinearVelocity());
             tempVec.y = 30f;
             rigidBody.setLinearVelocity(tempVec); }
     }
 
-    private boolean isGrounded(PhysicsWorld pw) {
+    private boolean isGrounded() {
         // Reset out callback
         callback.setClosestHitFraction(1.0f);
         callback.setCollisionObject(null);
@@ -99,7 +99,7 @@ public class Player implements Disposable{
         // System.out.println(playerPos);
         // The position we are casting a ray to, slightly below the players current position.
         tmpPosition.set(playerPos).sub(0, 1.6f, 0);
-        pw.raycast(playerPos, tmpPosition, callback);
+        PhysicsWorld.raycast(playerPos, tmpPosition, callback);
         return callback.hasHit();
     }
 

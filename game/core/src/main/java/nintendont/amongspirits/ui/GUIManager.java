@@ -1,9 +1,6 @@
 package nintendont.amongspirits.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -16,8 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.managers.CraftManager;
@@ -157,7 +152,11 @@ public class GUIManager implements Disposable{
         stage.dispose();
     }
 
-    public void handleInput() {
-        
+    public boolean handleInput (int keycode) {
+        switch (Const.currentState){
+            case INVENTORY:
+                return inventoryMenu.handleInput(keycode);
+            default: return false;
+        }
     }
 }

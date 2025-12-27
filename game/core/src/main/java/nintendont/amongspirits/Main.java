@@ -7,6 +7,7 @@ import java.util.List;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -31,7 +32,8 @@ import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
-
+import nintendont.amongspirits.controllers.GUIController;
+import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.items.Consumable;
 import nintendont.amongspirits.entities.items.Item;
@@ -59,6 +61,10 @@ public class Main extends ApplicationAdapter
 	private SceneSkybox skybox;
 	private DirectionalLightEx light;
 
+	// input
+	private InputMultiplexer multiplexer;
+	private PlayerController playerController;
+	private GUIController guiController;
 	// movement
 	private Player player;
 	private Matrix4 playerTransform = new Matrix4();
@@ -112,7 +118,23 @@ public class Main extends ApplicationAdapter
 		physicsWorld = new PhysicsWorld();
 		physicsWorld.create();
 
+		multiplexer = new InputMultiplexer();
+		Gdx.input.setInputProcessor(multiplexer);
+
+		// text
+		batch = new SpriteBatch();
+		font = new BitmapFont();
+
+		inventory = new InventoryManager();
+		crafting = new CraftManager();
+		guiManager = new GUIManager(batch, inventory, crafting);
+		
+		guiController = new GUIController(guiManager);
+		multiplexer.addProcessor(guiController);
+
 		player  = new Player(playerScene, new Vector3(0,15,0));
+		playerController = new PlayerController(player, camera);
+		multiplexer.addProcessor(playerController);
 		physicsWorld.getDynamicsWorld().addRigidBody(player.getRigidBody(), Const.PF_PLAYER, Const.PF_GROUND | Const.PF_ITEM);
 
 		// setup light
@@ -145,13 +167,6 @@ public class Main extends ApplicationAdapter
 
 		buildTerrain();
 
-		// text
-		batch = new SpriteBatch();
-		font = new BitmapFont();
-
-		inventory = new InventoryManager();
-		crafting = new CraftManager();
-		guiManager = new GUIManager(batch, inventory, crafting);
 
 		ItemFactory.init();
 		// item build
@@ -193,7 +208,8 @@ public class Main extends ApplicationAdapter
 		float deltaTime = Gdx.graphics.getDeltaTime();
 		// updates
 		physicsWorld.update();
-		handleInput(deltaTime);
+		playerController.update(deltaTime);
+		// handleInput(deltaTime);
 		// processInput(deltaTime);
 		player.update();
 		sceneManager.update(deltaTime);
@@ -216,9 +232,9 @@ public class Main extends ApplicationAdapter
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
-		physicsWorld.renderDebug(camera);
+		// physicsWorld.renderDebug(camera);
 
-		// UI
+		// HUD
 		batch.begin();
 		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond() + "\ndelta: " + deltaTime, 20, Gdx.graphics.getHeight() - 20);
 		if (focusedItem != null){ // TODO
@@ -286,9 +302,8 @@ public class Main extends ApplicationAdapter
 			case INGAME:
 				processInput(deltaTime);
 				break;
-			case INVENTORY:
-				guiManager.handleInput();
 			default:
+				// guiManager.handleInput();
 				break;
 		}
 	}
@@ -302,32 +317,32 @@ public class Main extends ApplicationAdapter
         Vector3 camRight = camera.direction.cpy().crs(camera.up);
         camRight.y = 0;
         camRight.nor();
+		
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+			moveDirection.add(camForward);
+        }
+		
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+			moveDirection.sub(camForward);
+        }
+		
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+			moveDirection.sub(camRight);
+        }
+		
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+			moveDirection.add(camRight);
+        }
+		
+        if (moveDirection.len2() > 0) {
+			moveDirection.nor();
+        }
+		
+		player.move(moveDirection, deltaTime);
 
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
-			player.jump(physicsWorld);
+			player.jump();
 		}
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            moveDirection.add(camForward);
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            moveDirection.sub(camForward);
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            moveDirection.sub(camRight);
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            moveDirection.add(camRight);
-        }
-
-        if (moveDirection.len2() > 0) {
-            moveDirection.nor();
-        }
-
-		player.move(moveDirection, deltaTime);
 
     moveDirection.set(0, 0, 0);
 	}
