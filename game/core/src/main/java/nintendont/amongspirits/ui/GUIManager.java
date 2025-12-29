@@ -23,8 +23,6 @@ public class GUIManager implements Disposable{
     private InventoryMenu inventoryMenu;
     private Skin skin;
     // private PauseMenu pauseMenu
-    private boolean isPaused = false;
-    private boolean isInventoryOpen = false;
 
     // public enum UIState{ INGAME, INVENTORY, PAUSE, SELECT_ITEM, SELECT_PKMN }
 
@@ -33,7 +31,6 @@ public class GUIManager implements Disposable{
 
         createBasicSkin();
         inventoryMenu = new InventoryMenu(inventoryManager, craftManager, skin);
-
         stage.addActor(inventoryMenu);
 
         hideAll();
@@ -41,13 +38,12 @@ public class GUIManager implements Disposable{
     }
 
     public void render(float delta){
-        inventoryMenu.refresh();
         stage.act(delta);
         stage.draw();
     }
 
     public void update(){
-        // inventoryMenu.update();
+        inventoryMenu.refresh();
     }
 
     public void setState(GameState state){
@@ -155,6 +151,8 @@ public class GUIManager implements Disposable{
     public boolean handleInput (int keycode) {
         switch (Const.currentState){
             case INVENTORY:
+            case SELECT_ITEM:
+            case SELECT_PKMN:
                 return inventoryMenu.handleInput(keycode);
             default: return false;
         }

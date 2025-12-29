@@ -32,6 +32,7 @@ import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.GUIController;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.entities.Player;
@@ -131,6 +132,7 @@ public class Main extends ApplicationAdapter
 		
 		guiController = new GUIController(guiManager);
 		multiplexer.addProcessor(guiController);
+		multiplexer.addProcessor(guiManager.stage);
 
 		player  = new Player(playerScene, new Vector3(0,15,0));
 		playerController = new PlayerController(player, camera);
@@ -213,7 +215,8 @@ public class Main extends ApplicationAdapter
 		// processInput(deltaTime);
 		player.update();
 		sceneManager.update(deltaTime);
-		updateCamera();
+		if (Const.currentState == GameState.INGAME)
+			updateCamera();
 
 		focusedItem = iScan.findTarget(player.playerPos, camera, items);
 

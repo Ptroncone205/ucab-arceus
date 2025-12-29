@@ -59,8 +59,8 @@ public class PlayerController extends InputAdapter{
 
     @Override
     public boolean keyDown(int keycode) {
-        System.out.println("reached");
         if (Const.currentState != Const.GameState.INGAME) return false;
+        System.out.println("reached");
         switch (keycode) {
             case Keys.W: up = true;  break;
             case Keys.S: down = true; break;

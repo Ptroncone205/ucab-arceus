@@ -18,12 +18,12 @@ public class InventoryManager {
             return false;
         }
 
-        // for (int i = 0; i < items.size(); i++){
-        //     if ((items.get(i).item).getClass().equals(item.getClass())){
-        //         items.get(i).count++;
-        //         return true;
-        //     }
-        // }
+        for (int i = 0; i < items.size(); i++){
+            if ((items.get(i).item).getClass().equals(item.getClass())){
+                items.get(i).count++;
+                return true;
+            }
+        }
         items.add(new ItemStack(item));
         return true;
     }

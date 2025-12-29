@@ -1,6 +1,7 @@
 package nintendont.amongspirits.ui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.UIManager;
 
@@ -9,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -39,11 +41,11 @@ public class InventoryMenu extends Table{
     private Label title;
     private Label desc;
     private Skin skin;
+    private Image cursor;
+    Vector2 cursorPos = new Vector2();
 
     private final int ROWS = 5;
     private final int COLS = 4;
-    private int rows = 0;
-    private int cols = 0;
 
     // selected items for crafting
     private ItemStack itemA;
@@ -60,6 +62,13 @@ public class InventoryMenu extends Table{
 
         this.setBackground(skin.newDrawable("white", 0, 0, 0, 0.85f));
         this.top();
+
+        cursor = new Image(skin.newDrawable("white", new Color(1, 1, 1, 0.5f)));
+        cursor.setSize(70, 70);
+        this.addActor(cursor);
+        cursor.toFront();
+        cursor.setTouchable(Touchable.disabled);
+        updateCursor();
 
         // top bar
         Table header = new Table();
@@ -96,81 +105,93 @@ public class InventoryMenu extends Table{
         // contenedor de equipos (aqui salen los pokemon o lo q sea)
         team = new Table();
         team.top().padTop(20);
-        team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.5f));
+        team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.2f));
 
         body.add(leftPanel).width(Value.percentWidth(0.55f, body)).expandY().fillY();
         body.add(team).width(Value.percentWidth(0.45f, body)).expandY().fillY();
 
         this.add(body).expand().fill();
-        this.addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int key){
-                return handleInput(key);
-            }
-        });
         refresh();
 
+        // this.addListener(new ClickListener());
         // this.setDebug(true);
     }
+    private ItemStack selItem;
     public void updateDesc(){
         // solo porque me molestabaa tener que actualioxar todo
         // actualizar descripcion
         switch (Const.currentState) {
             case SELECT_ITEM:
-                desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDesc());
+                desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDesc() + "\n selected");
                 break;
         
             default:
                 if (invManager.getItems().isEmpty()){
                     desc.setText("No items :(");
                 } else {
-                    desc.setText(invManager.getItems().get(selected).getItem().getDesc());
+                    // selected = selected >= invManager.getItems().size() ? invManager.getItems().size()-1 : selected;
+                    selItem = invManager.getItems().get(selected);
+                    desc.setText( selItem.getItem().getName() + ": "+ selItem.getCount() + "\n" + selItem.getItem().getDesc());
                 }
                 break;
         }
     }
 
-    public void update(){
-        // TODO actualiza las pistas visuales del menu (item/pokemon seleccionado)
-        // se llama cada vez que cambia la seleccion actual
-
+    public void updateCursor(){
+        if (invManager.getItems().isEmpty()) {
+            cursorPos.set(0,0);
+            cursor.setVisible(false);
+            return;
+        } else cursor.setVisible(true);
+        
+        if (selected < invManager.getItems().size()){
+            System.err.println(selected + "  " + invManager.getItems().size());
+            grid.getChildren().get(selected).localToActorCoordinates(cursor, cursorPos);
+        } else {
+            grid.getChildren().get(invManager.getItems().size()-1).localToActorCoordinates(cursor, cursorPos);
+        }
+        cursor.setPosition(cursorPos.x,cursorPos.y);
+        cursor.toFront();
     }
     public void refresh(){ // construye el menu, se llama al agregar o eliminar un item
         grid.clear();
-
         int cols = 0;
         int sel = 0;
         Actor slot;
-        ArrayList<ItemStack> removeItems = new ArrayList<>();
-        for ( ItemStack stack : invManager.getItems()){
-            if (stack.count <= 0){
-                removeItems.add(stack); // no se puede remover items mientras recorro el arreglo lol
+
+        Iterator<ItemStack> it = invManager.getItems().iterator();
+        ItemStack stack;
+        while (it.hasNext()){
+            stack = it.next();
+
+            if (stack.getCount() <= 0){
+                it.remove();
                 continue;
             }
+
             slot = createSlot(skin, stack, sel);
-
             grid.add(slot).size(70).pad(15);
-            cols++;
 
+            cols++;
+            
             if ( cols > COLS){
                 grid.row();
                 cols = 0;
             }
             sel++;
         }
-        for (ItemStack item : removeItems){
-            invManager.getItems().remove(item);
-        }
         
+        this.validate();
         updateDesc();
+        updateCursor();
     }
 
-    private Actor createSlot(Skin skin, final ItemStack stack, int sel) {
+    private Actor createSlot(Skin skin, ItemStack stack, int sel) {
         Stack slotStack = new Stack();
         Image bg;
-        if (sel == selected){
-            bg = new Image(skin.newDrawable("white", Color.LIGHT_GRAY));
-        } else {bg = new Image(skin.newDrawable("white", Color.DARK_GRAY)); }
+        
+        bg = new Image(skin.newDrawable("white", Color.DARK_GRAY));
+
         bg.setTouchable(Touchable.disabled);
         slotStack.add(bg);
 
@@ -185,36 +206,38 @@ public class InventoryMenu extends Table{
 
         Table iconContainer = new Table();
         iconContainer.add(icon).size(50);
+
+        iconContainer.setTouchable(Touchable.disabled); 
+        icon.setTouchable(Touchable.disabled);
+
         slotStack.add(iconContainer);
 
         if (stack.getCount() > 1) {
             Label countLabel = new Label(String.valueOf(stack.getCount()), skin);
             countLabel.setAlignment(Align.bottomRight);
             slotStack.add(countLabel);
+            countLabel.setTouchable(Touchable.disabled);
         }
 
         int index = invManager.getItems().indexOf(stack);
-        // slotStack.addListener(new ClickListener() {
-        //     @Override
-        //     public void clicked(InputEvent event, float x, float y) {
-        //         selected = index;
-        //         onClick(stack);
-        //         // System.out.println("Clicked: " + stack.getItem().getName());
-        //     }
+        
+        slotStack.setTouchable(Touchable.enabled);
+        slotStack.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("touched stack");
+                // selected = index;
+                onClick(stack);
+            }
 
-        //     @Override
-        //     public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-        //         selected = index;
-        //         desc.setText(stack.getItem().getName() + ": " + stack.getCount() + "\n" + stack.item.desc);
-        //     }
-
-        //     @Override
-        //     public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-        //         System.out.println("exit from " + stack.item.name);
-        //         updateDesc();
-                
-        //     }
-        // });
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                System.err.println(index);
+                selected = index;
+                updateDesc(); // error line
+                updateCursor();
+            }
+        });
 
         return slotStack;
     }
@@ -242,45 +265,48 @@ public class InventoryMenu extends Table{
 
     public void onClick(ItemStack stack){
         if (stack.getItem().isMaterial()){
-                    if (Const.currentState == Const.GameState.INVENTORY){
-                        itemA = stack;
-                        Const.currentState = Const.GameState.SELECT_ITEM;
-                    } else if (Const.currentState == Const.GameState.SELECT_ITEM) {
-                        itemB = stack;
-                        Item output = craftManager.craft(itemA.getItem(), itemB.getItem());
-                        if (output != null){
-                            invManager.addItem(output);
-                            itemA.count--; itemB.count--;
-                        }
-                        Const.currentState = Const.GameState.INVENTORY;
-                    }
+            if (Const.currentState == Const.GameState.INVENTORY){
+                    itemA = stack;
+                    Const.currentState = Const.GameState.SELECT_ITEM;
+                    updateDesc();
+            } else if (Const.currentState == Const.GameState.SELECT_ITEM) {
+                itemB = stack;
+                Item output = craftManager.craft(itemA.getItem(), itemB.getItem());
+                if (output != null){
+                    invManager.addItem(output);
+                    selected = selected <= 0 ? 0 : selected - 1;
+                    itemA.count--; itemB.count--;
+                    refresh();
                 }
-
-                refresh();
+                Const.currentState = Const.GameState.INVENTORY;
+            }
+        }
     }
 
     public boolean handleInput (int key){
         int size = invManager.getItems().size();
         if (size == 0 ) return false;
         System.out.println( "stat" + " " + selected+ " " + Keys.W+ " " + key);
-            switch (key) {
-                case Keys.W:
-                    if (selected - ROWS >= 0 ) selected -= ROWS;
-                    break;
-                case Keys.S:
-                    if (selected + ROWS < size ) selected += ROWS;
-                    break;
-                case Keys.A:
-                    if (selected - 1 >= 0 ) selected -= 1;
-                    break;
-                case Keys.D:
-                    if (selected + 1 < size ) selected += 1;
-                    break;
-                case Keys.ENTER:
-                    onClick(invManager.getItems().get(selected));
-                    break;
-            }
-        update();
+        switch (key) {
+            case Keys.W:
+                if (selected - ROWS >= 0 ) selected -= ROWS;
+                break;
+            case Keys.S:
+                if (selected + ROWS < size ) selected += ROWS;
+                break;
+            case Keys.A:
+                if (selected - 1 >= 0 ) selected -= 1;
+                break;
+            case Keys.D:
+                if (selected + 1 < size ) selected += 1;
+                break;
+            case Keys.ENTER:
+                System.out.println("clicked");
+                onClick(invManager.getItems().get(selected));
+                break;
+        }
+        updateDesc();
+        updateCursor();
         return true;
     }
 }
