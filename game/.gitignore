@@ -1,3 +1,6 @@
+## Local
+data/
+
 ## Gradle:
 .gradle/
 gradle-app.setting
