@@ -2,6 +2,7 @@ package nintendont.amongspirits.ui;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 
+import nintendont.amongspirits.Const;
+import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.data.savedata.SaveEventListener;
 
 public class PauseMenu extends Table {
@@ -86,16 +89,16 @@ public class PauseMenu extends Table {
 
 
     public void onResume(){
-        System.out.println("on resume");
+        Const.currentState = GameState.INGAME;
+        this.setVisible(false);
+        Gdx.input.setCursorCatched(true);
     }
 
     public void onSave(){
-        System.out.println("on save");
         if (saveListener != null) saveListener.onSaveRequest();
     }
 
     public void onQuit(){
-        System.out.println("on quit");
         if (saveListener != null) saveListener.onLoadRequest();
     }
 
