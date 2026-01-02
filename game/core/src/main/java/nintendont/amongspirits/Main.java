@@ -35,13 +35,16 @@ import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.GUIController;
 import nintendont.amongspirits.controllers.PlayerController;
+import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.savedata.SaveEventListener;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.items.Consumable;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.entities.items.MaterialItem;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InteractionScanner;
-import nintendont.amongspirits.managers.InventoryManager;
+import nintendont.amongspirits.managers.Satchel;
+import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.managers.ItemFactory;
 import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
@@ -89,7 +92,7 @@ public class Main extends ApplicationAdapter
 	private BitmapFont font;
 
 	private GUIManager guiManager;
-	private InventoryManager inventory;
+	private Satchel inventory;
 	private CraftManager crafting;
 
 	MyContactListener cl;
@@ -126,15 +129,31 @@ public class Main extends ApplicationAdapter
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 
-		inventory = new InventoryManager();
+		inventory = new Satchel();
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
+		guiManager.getPauseMenu().setSaveListener(new SaveEventListener() {
+			@Override
+			public void onSaveRequest(){
+				SaveManager.saveGame(player, items);
+			}
+			@Override
+			public void onLoadRequest(){
+				SaveData data = SaveManager.loadGame();
+				inventory.setItems(data.inventory);
+				items = data.items;
+				player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory);
+			}
+		});
 		
 		guiController = new GUIController(guiManager);
 		multiplexer.addProcessor(guiController);
 		multiplexer.addProcessor(guiManager.stage);
 
-		player  = new Player(playerScene, new Vector3(0,15,0));
+		if (player == null){
+			player  = new Player("player", playerScene, new Vector3(0,15,0), inventory);
+		}
+		
 		playerController = new PlayerController(player, camera);
 		multiplexer.addProcessor(playerController);
 		physicsWorld.getDynamicsWorld().addRigidBody(player.getRigidBody(), Const.PF_PLAYER, Const.PF_GROUND | Const.PF_ITEM);
@@ -172,14 +191,16 @@ public class Main extends ApplicationAdapter
 
 		ItemFactory.init();
 		// item build
-		for (int i = 0; i<30; i++){
-			Item testItem;
-			if (i > 10){
-				testItem = ItemFactory.createItem("0");
-			} else { testItem = ItemFactory.createItem("2"); }
-			testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
-			items.add(testItem);
-			sceneManager.addScene(testItem.getScene());
+		if (items.isEmpty()){
+			for (int i = 0; i<30; i++){
+				Item testItem;
+				if (i > 10){
+					testItem = ItemFactory.createItem(0);
+				} else { testItem = ItemFactory.createItem(2); }
+				testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
+				items.add(testItem);
+				sceneManager.addScene(testItem.getScene());
+			}
 		}
 
 		cl = new MyContactListener();

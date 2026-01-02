@@ -31,7 +31,7 @@ import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.entities.items.MaterialItem;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InteractionScanner;
-import nintendont.amongspirits.managers.InventoryManager;
+import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
@@ -76,7 +76,7 @@ public class ExploreMain extends ApplicationAdapter
 	private BitmapFont font;
 
 	private GUIManager guiManager;
-	private InventoryManager inventory;
+	private Satchel inventory;
 	private CraftManager crafting;
 
 	MyContactListener cl;
@@ -106,7 +106,10 @@ public class ExploreMain extends ApplicationAdapter
 		physicsWorld = new PhysicsWorld();
 		physicsWorld.create();
 
-		player  = new Player(playerScene, new Vector3(0,15,0));
+		
+		inventory = new Satchel();
+
+		player  = new Player("player", playerScene, new Vector3(0,15,0), inventory);
 		physicsWorld.getDynamicsWorld().addRigidBody(player.getRigidBody(), Const.PF_PLAYER, Const.PF_GROUND | Const.PF_ITEM);
 
 		// setup light
@@ -143,7 +146,6 @@ public class ExploreMain extends ApplicationAdapter
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 
-		inventory = new InventoryManager();
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
 

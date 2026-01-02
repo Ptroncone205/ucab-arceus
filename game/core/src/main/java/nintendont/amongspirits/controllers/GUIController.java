@@ -16,7 +16,6 @@ public class GUIController extends InputAdapter {
     @Override
     public boolean keyDown(int keycode){
         if (Const.currentState == GameState.INGAME) return false;
-        System.out.println("gui reached");
         return gui.handleInput(keycode);
     }
 }

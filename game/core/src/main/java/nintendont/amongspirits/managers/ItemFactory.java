@@ -35,8 +35,8 @@ public class ItemFactory {
         registry.put("CONSUMABLE", Consumable::new);
     }
 
-    public static Item createItem(String id){
-        JsonValue data = items.get(Integer.parseInt(id));
+    public static Item createItem(Integer id){
+        JsonValue data = items.get(id);
         ItemCreator r = registry.get(data.getString("type"));
         return r.create(data);
     }

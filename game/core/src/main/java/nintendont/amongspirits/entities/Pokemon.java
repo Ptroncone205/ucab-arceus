@@ -1,14 +1,14 @@
 package nintendont.amongspirits.entities;
 
 public class Pokemon extends Entity {
-    protected String name;
+    public String name;
     public String nick;
     //stats
-    protected int atk;
-    protected int def;
-    protected int spAtk;
-    protected int spDef;
-    protected int speed;
+    public int atk;
+    public int def;
+    public int spAtk;
+    public int spDef;
+    public int speed;
     public Pokemon (){
 
         loadModel();

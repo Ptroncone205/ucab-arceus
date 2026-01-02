@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.items.Item;
 
-public class InventoryManager {
+public class Satchel {
     private ArrayList<ItemStack> items;
-    private int slots = 20;
+    private final int SLOTS = 20;
 
-    public InventoryManager (){
+    public Satchel (){
         this.items = new ArrayList<>();
     }
 
     public boolean addItem(Item item){
-        if (items.size() >= slots){
+        if (items.size() >= SLOTS){
             return false;
         }
 
@@ -41,5 +41,9 @@ public class InventoryManager {
         if (item.count == 0){
             items.remove(item);
         }
+    }
+
+    public void setItems(ArrayList<ItemStack> items){
+        this.items = items;
     }
 }

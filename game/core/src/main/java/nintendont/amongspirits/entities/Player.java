@@ -10,15 +10,19 @@ import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Disposable;
 import nintendont.amongspirits.Const;
+import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
-
-
+import nintendont.amongspirits.ui.InventoryMenu;
 import net.mgsx.gltf.scene3d.scene.Scene;
 
 public class Player implements Disposable{
+    private final String name;
     private final ClosestNotMeRayResultCallback callback;
     private final Vector3 tmpPosition = new Vector3();
+
+    private Satchel satchel;
+
     private Scene scene;
     private MotionState motionState;
     private btRigidBody rigidBody;
@@ -33,7 +37,9 @@ public class Player implements Disposable{
     private float maxSpeed;
     private Vector3 tempVec;
 
-    public Player (Scene scene, Vector3 position){
+    public Player (String name, Scene scene, Vector3 position, Satchel satchel){
+        this.name = name;
+        this.satchel = satchel;
         callback = new ClosestNotMeRayResultCallback(rigidBody);
         this.scene = scene;
         this.scene.modelInstance.transform.scale(0.1f, 0.1f, 0.1f);
@@ -105,6 +111,14 @@ public class Player implements Disposable{
 
     public btRigidBody getRigidBody() {
         return rigidBody;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public Satchel getSatchel(){
+        return satchel;
     }
 
     @Override

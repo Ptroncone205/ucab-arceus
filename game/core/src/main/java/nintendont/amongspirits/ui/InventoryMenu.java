@@ -28,12 +28,13 @@ import com.badlogic.gdx.utils.Align;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.entities.items.Consumable;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.InventoryManager;
+import nintendont.amongspirits.managers.Satchel;
 
 public class InventoryMenu extends Table{
-    private InventoryManager invManager;
+    private Satchel invManager;
     private CraftManager craftManager;
     public GameState currentState;
     private Table grid;
@@ -54,7 +55,7 @@ public class InventoryMenu extends Table{
     private int selected = 0;
 
 
-    public InventoryMenu (InventoryManager invManager, CraftManager craftManager, Skin skin){
+    public InventoryMenu (Satchel invManager, CraftManager craftManager, Skin skin){
         this.invManager = invManager;
         this.craftManager = craftManager;
         this.skin = skin;
@@ -129,7 +130,7 @@ public class InventoryMenu extends Table{
                 if (invManager.getItems().isEmpty()){
                     desc.setText("No items :(");
                 } else {
-                    // selected = selected >= invManager.getItems().size() ? invManager.getItems().size()-1 : selected;
+                    selected = selected >= invManager.getItems().size() ? invManager.getItems().size()-1 : selected;
                     selItem = invManager.getItems().get(selected);
                     desc.setText( selItem.getItem().getName() + ": "+ selItem.getCount() + "\n" + selItem.getItem().getDesc());
                 }
@@ -145,7 +146,6 @@ public class InventoryMenu extends Table{
         } else cursor.setVisible(true);
         
         if (selected < invManager.getItems().size()){
-            System.err.println(selected + "  " + invManager.getItems().size());
             grid.getChildren().get(selected).localToActorCoordinates(cursor, cursorPos);
         } else {
             grid.getChildren().get(invManager.getItems().size()-1).localToActorCoordinates(cursor, cursorPos);
@@ -184,7 +184,7 @@ public class InventoryMenu extends Table{
         this.validate();
         updateDesc();
         updateCursor();
-    }
+    } 
 
     private Actor createSlot(Skin skin, ItemStack stack, int sel) {
         Stack slotStack = new Stack();
@@ -225,16 +225,13 @@ public class InventoryMenu extends Table{
         slotStack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("touched stack");
-                // selected = index;
                 onClick(stack);
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                System.err.println(index);
                 selected = index;
-                updateDesc(); // error line
+                updateDesc();
                 updateCursor();
             }
         });
@@ -280,13 +277,19 @@ public class InventoryMenu extends Table{
                 }
                 Const.currentState = Const.GameState.INVENTORY;
             }
+        } else 
+        if (stack.getItem() instanceof Consumable){
+            if (Const.currentState == Const.GameState.INVENTORY){
+                itemA = stack;
+                Const.currentState = Const.GameState.SELECT_PKMN;
+                refresh();
+            }
         }
     }
 
     public boolean handleInput (int key){
         int size = invManager.getItems().size();
         if (size == 0 ) return false;
-        System.out.println( "stat" + " " + selected+ " " + Keys.W+ " " + key);
         switch (key) {
             case Keys.W:
                 if (selected - ROWS >= 0 ) selected -= ROWS;

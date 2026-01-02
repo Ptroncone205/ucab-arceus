@@ -16,21 +16,22 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.InventoryManager;
+import nintendont.amongspirits.managers.Satchel;
 
 public class GUIManager implements Disposable{
     public Stage stage;
     private InventoryMenu inventoryMenu;
     private Skin skin;
-    // private PauseMenu pauseMenu
+    private PauseMenu pauseMenu;
 
-    // public enum UIState{ INGAME, INVENTORY, PAUSE, SELECT_ITEM, SELECT_PKMN }
-
-    public GUIManager (SpriteBatch batch, InventoryManager inventoryManager, CraftManager craftManager){
+    public GUIManager (SpriteBatch batch, Satchel satchel, CraftManager craftManager){
         stage =new Stage(new ScreenViewport(), batch);
 
-        createBasicSkin();
-        inventoryMenu = new InventoryMenu(inventoryManager, craftManager, skin);
+        createSkin();
+        inventoryMenu = new InventoryMenu(satchel, craftManager, skin);
+        pauseMenu = new PauseMenu(skin);
+
+        stage.addActor(pauseMenu);
         stage.addActor(inventoryMenu);
 
         hideAll();
@@ -46,22 +47,17 @@ public class GUIManager implements Disposable{
         inventoryMenu.refresh();
     }
 
-    public void setState(GameState state){
-        Const.currentState = state;
-        System.out.println(state);
-    }
-
     public void togglePause() {
 
         switch (Const.currentState){
             case INGAME:
                 Const.currentState = GameState.PAUSE;
-                //pauseMenu.setiVisible(true);
+                pauseMenu.setVisible(true);
                 Gdx.input.setCursorCatched(false);
                 break;
             case PAUSE:
                 Const.currentState = GameState.INGAME;
-                //pauseMenu.setiVisible(false);
+                pauseMenu.setVisible(false);
                 
                 Gdx.input.setCursorCatched(true);
                 break;
@@ -71,8 +67,6 @@ public class GUIManager implements Disposable{
                 Gdx.input.setCursorCatched(true);
                 break;
             case SELECT_ITEM:
-                Const.currentState = GameState.INVENTORY;
-                break;
             case SELECT_PKMN:
                 Const.currentState = GameState.INVENTORY;
                 break;
@@ -94,28 +88,25 @@ public class GUIManager implements Disposable{
                 Gdx.input.setCursorCatched(true);
                 break;
             case SELECT_ITEM:
-                Const.currentState = GameState.INGAME;
-                inventoryMenu.setVisible(false);
-                Gdx.input.setCursorCatched(true);
-                break;
             case SELECT_PKMN:
                 Const.currentState = GameState.INGAME;
                 inventoryMenu.setVisible(false);
                 Gdx.input.setCursorCatched(true);
                 break;
-            case PAUSE:
-                break;
+            default:
+                return;
         }
         update();
     }
 
     public void hideAll(){
         inventoryMenu.setVisible(false);
+        pauseMenu.setVisible(false);
         Const.currentState = GameState.INGAME;
     }
 
 
-    private void createBasicSkin() {
+    private void createSkin() {
         skin = new Skin();
 
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -130,9 +121,9 @@ public class GUIManager implements Disposable{
         skin.add("default", labelStyle);
 
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.over = skin.newDrawable("white", Color.WHITE);
+        textButtonStyle.up = skin.newDrawable("white", new Color(0.4f, 0.4f, 0.4f, 1));
+        textButtonStyle.down = skin.newDrawable("white", new Color(49f/255f, 142f/255f, 148f/255f, 1));
+        textButtonStyle.over = skin.newDrawable("white", new Color(0.2f, 0.8f, 0.9f, 1));
         textButtonStyle.font = skin.getFont("default");
         skin.add("default", textButtonStyle);
 
@@ -155,6 +146,12 @@ public class GUIManager implements Disposable{
             case SELECT_PKMN:
                 return inventoryMenu.handleInput(keycode);
             default: return false;
+            case PAUSE:
+                return pauseMenu.handleInput(keycode);
         }
+    }
+
+    public PauseMenu getPauseMenu(){
+        return pauseMenu;
     }
 }

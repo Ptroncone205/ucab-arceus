@@ -1,6 +1,6 @@
 [
     {
-        "id": "0",
+        "id": 0,
         "name": "Tumblestone",
         "desc": "This mysterious stone can draw out the properties required to forge a pokeball",
         "isMaterial": "true",
@@ -8,7 +8,7 @@
         "type": "MATERIAL"
     },
     {
-        "id": "1",
+        "id": 1,
         "name": "Pokeball",
         "desc": "Basic pokeball used to catch wild pokemon",
         "isMaterial": "false",
@@ -16,7 +16,7 @@
         "type": "POKEBALL"
     },
     {
-        "id": "2",
+        "id": 2,
         "name": "Oran Berry",
         "desc": "Restores 25% HP",
         "isMaterial": "true",

@@ -11,6 +11,11 @@ public class ItemStack {
         this.count = 1;
     }
 
+    public ItemStack (Item item, int count){
+        this.item = item;
+        this.count = count;
+    }
+
     public Item getItem (){
         return item;
     }
