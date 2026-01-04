@@ -4,7 +4,7 @@ import com.badlogic.gdx.InputAdapter;
 
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
-import nintendont.amongspirits.ui.GUIManager;
+import nintendont.amongspirits.ui.game.GUIManager;
 
 public class GUIController extends InputAdapter {
     GUIManager gui;

@@ -13,7 +13,6 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
-import nintendont.amongspirits.ui.InventoryMenu;
 import net.mgsx.gltf.scene3d.scene.Scene;
 
 public class Player implements Disposable{

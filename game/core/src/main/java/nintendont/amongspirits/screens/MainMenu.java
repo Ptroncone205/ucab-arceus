@@ -4,16 +4,26 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import nintendont.amongspirits.Main;
-import nintendont.amongspirits.ui.MenuUI;
+import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.savedata.SaveEventListener;
+import nintendont.amongspirits.managers.SaveManager;
+import nintendont.amongspirits.ui.menu.MenuUI;
 
 public class MainMenu implements Screen{
     private InputMultiplexer multiplexer;
     private MenuUI menuUI;
     private Main game;
+    // private SaveData data;
 
     public MainMenu(Main game){
         this.game = game;
         menuUI = new MenuUI(game);
+        menuUI.setSaveListener(new SaveEventListener(){
+            @Override
+            public void onLoadRequest(){
+                loadGame();
+            }
+        });
 
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
@@ -30,6 +40,10 @@ public class MainMenu implements Screen{
     public void render(float delta) {
         menuUI.render(delta);
         
+    }
+
+    public void loadGame(){
+        game.newGame(true);
     }
 
     @Override

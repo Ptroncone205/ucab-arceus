@@ -12,7 +12,6 @@ import nintendont.amongspirits.entities.items.Item;
 public final class CraftManager {
     private final HashMap<String, Integer> recipes = new HashMap<>();
     public CraftManager(){
-        ItemFactory.init();
         this.load();
     }
 

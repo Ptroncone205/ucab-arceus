@@ -17,9 +17,9 @@ public class Satchel {
         if (items.size() >= SLOTS){
             return false;
         }
-
+        
         for (int i = 0; i < items.size(); i++){
-            if ((items.get(i).item).getClass().equals(item.getClass())){
+            if ((items.get(i).item).name.equals(item.name)){
                 items.get(i).count++;
                 return true;
             }

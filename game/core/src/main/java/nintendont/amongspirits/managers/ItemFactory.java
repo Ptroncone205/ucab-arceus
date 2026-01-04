@@ -29,6 +29,7 @@ public class ItemFactory {
         JsonValue data = json.parse(Gdx.files.internal("data/items.json"));
         for (JsonValue j : data){
             items.add(j);
+            System.out.println("size of items"+items.size());
         }
         registry.put("POKEBALL", Pokeball::new);
         registry.put("MATERIAL", MaterialItem::new);

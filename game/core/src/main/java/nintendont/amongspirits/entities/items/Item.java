@@ -22,13 +22,13 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 // TODO entity
 public class Item extends Entity{
     public static final float PICKUP_DIST = 3f;
-
+    public String iconPath;
     public final int id;
     public final String name;
     public final String desc;
     public final boolean isMaterial;
     public Texture icon;
-    // sprite para el inventario(?)
+    // textura para el inventario(?)
     public Scene scene;
     public Vector3 pos;
 
@@ -45,13 +45,13 @@ public class Item extends Entity{
         this.name = data.getString("name");
         this.desc = data.getString("desc");
         this.isMaterial = data.getBoolean("isMaterial");
-        Pixmap tmp = new Pixmap(Gdx.files.internal(data.getString("icon")));
-        this.icon = new Texture(tmp);
-        tmp.dispose();
+        this.icon = Const.get().getAssetManager().get(data.getString("icon"),Texture.class);
+        iconPath = data.getString("icon");
         System.out.println(this.name + " created: " + Gdx.files.internal(data.getString("icon")));
     }
 
     public void create(Vector3 pos, float width, float height, float depth){
+        // TODO read model path
         this.pos = pos;
         ModelBuilder mb = new ModelBuilder();
         mb.begin();
@@ -108,6 +108,5 @@ public class Item extends Entity{
     @Override
     public void dispose(){
         super.dispose();
-        this.icon.dispose();
     }
 }

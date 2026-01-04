@@ -1,4 +1,4 @@
-package nintendont.amongspirits.ui;
+package nintendont.amongspirits.ui.menu;
 
 import java.util.ArrayList;
 
@@ -33,6 +33,9 @@ public class MenuUI implements Disposable {
 
     private Main game;
     public Stage stage;
+    private Table root;
+    private Table options;
+    private Table account;
     private Skin skin;
     private ArrayList<TextButton> buttons = new ArrayList<>();
     private int selected = 0;
@@ -53,7 +56,7 @@ public class MenuUI implements Disposable {
 
     private void create() {
         // Title
-        Table root = new Table();
+        root = new Table();
         root.setFillParent(true);
         root.setBackground(skin.newDrawable("white", 0,0,0, 1f));
         
@@ -124,16 +127,17 @@ public class MenuUI implements Disposable {
 
 
     public void newGame(){
-        Const.currentState = GameState.INGAME;
         game.newGame();
     }
 
     public void loadGame(){
-        if (saveListener != null) saveListener.onSaveRequest();
+        if (saveListener != null) saveListener.onLoadRequest();
     }
 
     public void options(){
-        if (saveListener != null) saveListener.onLoadRequest();
+        // TODO me doy cuenta que debo separar menuui del menu prinicpal
+        // y el menu de opciones
+        // es como guimanager 2 en todos los sentidos
     }
 
     public void onClick(){

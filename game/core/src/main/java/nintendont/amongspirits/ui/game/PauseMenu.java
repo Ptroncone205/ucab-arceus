@@ -1,4 +1,4 @@
-package nintendont.amongspirits.ui;
+package nintendont.amongspirits.ui.game;
 
 import java.util.ArrayList;
 

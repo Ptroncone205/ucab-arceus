@@ -43,7 +43,7 @@ import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
 import nintendont.amongspirits.terrains.HeightMapTerrain;
-import nintendont.amongspirits.ui.GUIManager;
+import nintendont.amongspirits.ui.game.GUIManager;
 import nintendont.amongspirits.utils.AssetUtils;
 
 public class GameScreen implements Screen{
@@ -93,23 +93,33 @@ public class GameScreen implements Screen{
 	private Item focusedItem;
 	private ArrayList<Item> items = new ArrayList<>();
 
-    public GameScreen(Main game){
+    public GameScreen(Main game, boolean load){
+
         this.game = game;
 
         Bullet.init();
         context.init();
+		ItemFactory.init();
 
+		System.out.println("init just called");
+
+		// cargar todos los assets usados por el juego incluyendo texturas y modelos
         AssetUtils.loadGLTF(context.getAssetManager(), "models/mc/lukitm501.gltf");
-		System.out.println("start loading");
-        context.getAssetManager().finishLoading();
-        System.out.println("finish loading");
+		context.loadAsset("textures/oranberry.png", Texture.class);
+		context.loadAsset("textures/pokeball.png", Texture.class);
+		context.loadAsset("textures/tumblestone.png", Texture.class);
+		
+		context.getAssetManager().finishLoading();
+
+		sceneManager = new SceneManager(new CustomShaderProvider(), PBRShaderProvider.createDefaultDepth(24));
+
 		// create player scene
 		sceneAsset = context.getAssetManager().get("models/mc/lukitm501.gltf", SceneAsset.class);
 		playerScene = new Scene(sceneAsset.scene);
 		float scale_factor = 0.2f;
 		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
-		sceneManager = new SceneManager(new CustomShaderProvider(), PBRShaderProvider.createDefaultDepth(24));
 		sceneManager.addScene(playerScene);
+
 
 		camera = new PerspectiveCamera(67f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.near = 0.1f;
@@ -127,8 +137,8 @@ public class GameScreen implements Screen{
 		// text
 		batch = new SpriteBatch();
 		font = new BitmapFont();
-
 		inventory = new Satchel();
+		
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
 		guiManager.getPauseMenu().setSaveListener(new SaveEventListener() {
@@ -136,22 +146,18 @@ public class GameScreen implements Screen{
 			public void onSaveRequest(){
 				SaveManager.saveGame(player, items);
 			}
-			@Override
-			public void onLoadRequest(){
-				SaveData data = SaveManager.loadGame();
-				inventory.setItems(data.inventory);
-				items = data.items;
-				player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory);
-			}
 		});
+
+		if (load){
+			loadData();
+		} else {
+			createData();
+		}
+		
 		
 		guiController = new GUIController(guiManager);
 		multiplexer.addProcessor(guiController);
 		multiplexer.addProcessor(guiManager.stage);
-
-		if (player == null){
-			player  = new Player("player", playerScene, new Vector3(0,15,0), inventory);
-		}
 		
 		playerController = new PlayerController(player, camera);
 		multiplexer.addProcessor(playerController);
@@ -187,28 +193,40 @@ public class GameScreen implements Screen{
 
 		buildTerrain();
 
-
-		ItemFactory.init();
-		// item build
-		if (items.isEmpty()){
-			for (int i = 0; i<30; i++){
-				Item testItem;
-				if (i > 10){
-					testItem = ItemFactory.createItem(0);
-				} else { testItem = ItemFactory.createItem(2); }
-				testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
-				items.add(testItem);
-				sceneManager.addScene(testItem.getScene());
-			}
-		}
-
 		cl = new MyContactListener();
 		iScan = new InteractionScanner();
 		focusedItem = null;
 
     }
 
-    private void buildTerrain() {
+    private void loadData() {
+		// load assets
+        SaveData data = SaveManager.loadGame();
+		inventory.setItems(data.inventory);
+		items = data.items;
+		for (Item item : items){
+			item.create(item.pos, 2f, 2f, 2f);
+			sceneManager.addScene(item.getScene());
+		}
+		player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory);
+		
+	}
+
+	private void createData() {
+		// load assets
+		player = new Player("player", playerScene, new Vector3(0,15,0), inventory);
+		for (int i = 0; i<30; i++){
+			Item testItem;
+			if (i > 10){
+				testItem = ItemFactory.createItem(0);
+			} else { testItem = ItemFactory.createItem(2); }
+			testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
+			items.add(testItem);
+			sceneManager.addScene(testItem.getScene());
+		}
+	}
+
+	private void buildTerrain() {
 		if (terrain != null){
 			terrain.dispose();
 			sceneManager.removeScene(terrainScene);
@@ -222,6 +240,7 @@ public class GameScreen implements Screen{
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
+		System.out.println("assets laodesd"+ context.getAssetManager().getLoadedAssets());
         
     }
     

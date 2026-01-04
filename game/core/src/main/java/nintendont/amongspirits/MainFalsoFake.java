@@ -35,7 +35,7 @@ import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
 import nintendont.amongspirits.terrains.HeightMapTerrain;
-import nintendont.amongspirits.ui.GUIManager;
+import nintendont.amongspirits.ui.game.GUIManager;
 import nintendont.amongspirits.utils.AssetUtils;
 
 public class MainFalsoFake extends ApplicationAdapter
