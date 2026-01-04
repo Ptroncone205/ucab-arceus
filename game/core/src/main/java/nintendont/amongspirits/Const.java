@@ -1,8 +1,29 @@
 package nintendont.amongspirits;
 
-public class Const {
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.badlogic.gdx.utils.Disposable;
+
+import net.mgsx.gltf.scene3d.scene.Scene;
+import net.mgsx.gltf.scene3d.scene.SceneManager;
+/**GameContext class
+ * along with utils
+ * easier to manage dont question it
+ */
+public class Const implements Disposable {
+    //singleton jeje
+    public static Const hola;
     // game states
-    public static enum GameState{ INGAME, INVENTORY, PAUSE, SELECT_ITEM, SELECT_PKMN }
+    public static enum GameState{ 
+        INGAME,         // 0
+        INVENTORY,      // 1
+        PAUSE,          // 2
+        SELECT_ITEM,    // 3
+        SELECT_PKMN,    // 4
+        BATTLE          // 5
+    }
     public static GameState currentState = GameState.INGAME;
     //todo
     public static float CAMERA_DEFAULT_PITCH = 0f;
@@ -18,4 +39,68 @@ public class Const {
     public static short PF_ITEM   = 1 << 1;
     public static short PF_GROUND = 1 << 2;
 
+    // stuff
+    private PhysicsWorld physicsWorld;
+    private AssetManager assetManager;
+    private SpriteBatch spriteBatch;
+    private SceneManager sceneManager;
+
+    private Const(){}
+
+    public static Const get(){
+        if (hola == null){
+            hola = new Const();
+        }
+        return hola;
+    }
+
+    public void init(){
+        physicsWorld = new PhysicsWorld();
+        physicsWorld.create();
+
+        assetManager = new AssetManager();
+        spriteBatch = new SpriteBatch();
+        sceneManager = new SceneManager();
+    }
+
+    public void setState(GameState state){
+        Const.currentState = state;
+    }
+
+    public void addRigidBody(btRigidBody body){
+        physicsWorld.getDynamicsWorld().addRigidBody(body);
+    }
+    
+    public void addScene(Scene scene){
+        sceneManager.addScene(scene);
+    }
+
+    public <T> void loadAsset(String path, Class<T> type){
+        assetManager.load(path, type);
+    }
+    
+    public btDiscreteDynamicsWorld getDynamicsWorld(){
+        return physicsWorld.getDynamicsWorld();
+    }
+
+    public PhysicsWorld getPhysicsWorld(){
+        return this.physicsWorld;
+    }
+    public SceneManager getSceneManager(){
+        return this.sceneManager;
+    }
+    public AssetManager getAssetManager(){
+        return this.assetManager;
+    }
+    public SpriteBatch getSpriteBatch(){
+        return this.spriteBatch;
+    }
+    
+    @Override
+    public void dispose() {
+        sceneManager.dispose();
+        assetManager.dispose();
+        spriteBatch.dispose();
+        physicsWorld.dispose();
+    }
 }

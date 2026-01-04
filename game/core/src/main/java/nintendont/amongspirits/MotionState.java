@@ -2,9 +2,8 @@ package nintendont.amongspirits;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
-import com.badlogic.gdx.utils.Disposable;
 
-public class MotionState extends btMotionState implements Disposable {
+public class MotionState extends btMotionState {
     private Matrix4 transform;
 
     public MotionState(Matrix4 transform) {
@@ -18,6 +17,4 @@ public class MotionState extends btMotionState implements Disposable {
     public void setWorldTransform(Matrix4 worldTransform) {
         transform.set(worldTransform);
     }
-
-    public void dispose() {}
 }

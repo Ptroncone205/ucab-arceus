@@ -8,7 +8,12 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 
+import net.mgsx.gltf.loaders.glb.GLBAssetLoader;
+import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
+
 public class AssetUtils {
+
     public static void setTrueTypeFontLoaders(AssetManager manager) {
         FileHandleResolver resolver = new InternalFileHandleResolver();
         manager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
@@ -20,5 +25,10 @@ public class AssetUtils {
         params.fontFileName = fontFileName;
         params.fontParameters.size = fontSize;
         manager.load(assetKey, BitmapFont.class, params);
+    }
+
+    public static void loadGLTF(AssetManager manager, String path){
+        manager.setLoader(SceneAsset.class, ".gltf", new GLTFAssetLoader(new InternalFileHandleResolver()));
+        manager.load(path, SceneAsset.class);
     }
 }

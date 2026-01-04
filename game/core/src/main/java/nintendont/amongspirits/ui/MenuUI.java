@@ -2,59 +2,100 @@ package nintendont.amongspirits.ui;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 import nintendont.amongspirits.Const;
+import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.data.savedata.SaveEventListener;
 
-public class PauseMenu extends Table {
+/**
+ * literalmente una copia de gui manager + pausemenu
+ */
+public class MenuUI implements Disposable {
 
     private SaveEventListener saveListener;
 
+    private Main game;
+    public Stage stage;
     private Skin skin;
     private ArrayList<TextButton> buttons = new ArrayList<>();
     private int selected = 0;
-    private Button selButton;
+    private TextButton selButton;
 
-    public PauseMenu(Skin skin) {
-        super(skin);
-        this.skin = skin;
+    public MenuUI(Main game) {
+        this.game = game;
+        this.stage = new Stage(new ScreenViewport(), Const.get().getSpriteBatch());
+        createSkin();
 
-        this.setFillParent(true);
-        
-        this.setBackground(skin.newDrawable("white", 0,0,0, 0.85f));
-        
         create();
+    }
+
+    public void render(float delta){
+        stage.act(delta);
+        stage.draw();
     }
 
     private void create() {
         // Title
-        Label title = new Label("PAUSED", skin);
+        Table root = new Table();
+        root.setFillParent(true);
+        root.setBackground(skin.newDrawable("white", 0,0,0, 1f));
+        
+        Label title = new Label("JUEGUIto", skin);
         title.setFontScale(2f);
         
         // Buttons
-        TextButton btnResume = createButton("Resume", this::onResume);
-        TextButton btnSave = createButton("Save Game", this::onSave);
-        TextButton btnQuit = createButton("Quit to Title", this::onQuit);
+        TextButton btnResume = createButton("New Game", this::newGame);
+        TextButton btnSave = createButton("Load Game", this::loadGame);
+        TextButton btnQuit = createButton("Options", this::options);
 
         // Layout
-        this.center();
-        this.add(title).padBottom(50).row();
+        root.center();
+        root.add(title).padBottom(50).row();
         
-        this.add(btnResume).width(200).height(50).padBottom(15).row();
-        this.add(btnSave).width(200).height(50).padBottom(15).row();
-        this.add(btnQuit).width(200).height(50).padBottom(15).row();
+        root.add(btnResume).width(200).height(50).padBottom(15).row();
+        root.add(btnSave).width(200).height(50).padBottom(15).row();
+        root.add(btnQuit).width(200).height(50).padBottom(15).row();
 
+        stage.addActor(root);
+    }
+
+    private void createSkin() {
+        skin = new Skin();
+
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        skin.add("white", new Texture(pixmap));
+
+        skin.add("default", new BitmapFont());
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = skin.getFont("default");
+        skin.add("default", labelStyle);
+
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = skin.newDrawable("white", new Color(0.4f, 0.4f, 0.4f, 1));
+        textButtonStyle.down = skin.newDrawable("white", new Color(49f/255f, 142f/255f, 148f/255f, 1));
+        textButtonStyle.over = skin.newDrawable("white", new Color(0.2f, 0.8f, 0.9f, 1));
+        textButtonStyle.font = skin.getFont("default");
+        skin.add("default", textButtonStyle);
     }
 
     private TextButton createButton(String text, Runnable action) {
@@ -82,17 +123,16 @@ public class PauseMenu extends Table {
     }
 
 
-    public void onResume(){
+    public void newGame(){
         Const.currentState = GameState.INGAME;
-        this.setVisible(false);
-        Gdx.input.setCursorCatched(true);
+        game.newGame();
     }
 
-    public void onSave(){
+    public void loadGame(){
         if (saveListener != null) saveListener.onSaveRequest();
     }
 
-    public void onQuit(){
+    public void options(){
         if (saveListener != null) saveListener.onLoadRequest();
     }
 
@@ -123,5 +163,11 @@ public class PauseMenu extends Table {
 
     public void setSaveListener(SaveEventListener lsitener){
         this.saveListener = lsitener;
+    }
+
+    @Override
+    public void dispose(){
+        skin.dispose();
+        stage.dispose();
     }
 }

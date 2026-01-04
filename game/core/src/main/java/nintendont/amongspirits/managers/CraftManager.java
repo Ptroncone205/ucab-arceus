@@ -8,10 +8,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
 
 import nintendont.amongspirits.entities.items.Item;
-import nintendont.amongspirits.entities.items.Pokeball;
 
 public final class CraftManager {
-    private final HashMap<String, String> items = new HashMap<>();
     private final HashMap<String, Integer> recipes = new HashMap<>();
     public CraftManager(){
         ItemFactory.init();

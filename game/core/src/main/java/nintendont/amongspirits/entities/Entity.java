@@ -1,7 +1,6 @@
 package nintendont.amongspirits.entities;
 
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.particles.renderers.ModelInstanceRenderer;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Disposable;

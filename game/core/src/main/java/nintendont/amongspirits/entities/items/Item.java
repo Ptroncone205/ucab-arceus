@@ -1,8 +1,5 @@
 package nintendont.amongspirits.entities.items;
 
-import java.time.format.TextStyle;
-import java.util.LinkedList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -14,19 +11,12 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionAlgorithm;
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject.CollisionFlags;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.JsonValue;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.entities.Entity;
-import nintendont.amongspirits.physics.MotionState;
-
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 import net.mgsx.gltf.scene3d.scene.Scene;
 // TODO entity

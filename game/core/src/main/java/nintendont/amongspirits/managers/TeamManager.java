@@ -2,9 +2,7 @@ package nintendont.amongspirits.managers;
 
 import java.util.ArrayList;
 
-import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Pokemon;
-import nintendont.amongspirits.entities.items.Item;
 
 public class TeamManager {
     private ArrayList<Pokemon> team;

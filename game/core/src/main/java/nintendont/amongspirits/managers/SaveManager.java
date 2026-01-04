@@ -1,23 +1,16 @@
 package nintendont.amongspirits.managers;
 
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonWriter;
 
-import nintendont.amongspirits.data.savedata.ItemSerializer;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.data.savedata.StackSerializer;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
-import nintendont.amongspirits.entities.items.Consumable;
 import nintendont.amongspirits.entities.items.Item;
-import nintendont.amongspirits.entities.items.MaterialItem;
-import nintendont.amongspirits.entities.items.Pokeball;
 
 public class SaveManager {
     public static FileHandle file = Gdx.files.local("data/saves/save.json");

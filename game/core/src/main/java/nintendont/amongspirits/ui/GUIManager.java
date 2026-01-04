@@ -70,6 +70,8 @@ public class GUIManager implements Disposable{
             case SELECT_PKMN:
                 Const.currentState = GameState.INVENTORY;
                 break;
+            default:
+                return;
         }
         update();
     }
