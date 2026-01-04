@@ -8,15 +8,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
-import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
@@ -316,24 +309,6 @@ public class MainFalsoFake extends ApplicationAdapter
 	private float calculateCamHorDistance(float distanceFromPlayer) {
 		return (float) (distanceFromPlayer * Math.cos(Math.toRadians(camPitch)));
 	}
-
-	private void buildBoxes() {
-		ModelBuilder modelBuilder = new ModelBuilder();
-		modelBuilder.begin();
-
-		for (int x = 0; x < 100; x+= 10) {
-			for (int z = 0; z < 100; z+= 10) {
-				Material material = new Material();
-				material.set(PBRColorAttribute.createBaseColorFactor(Color.RED));
-				MeshPartBuilder builder = modelBuilder.part(x + ", " + z, GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal, material);
-				BoxShapeBuilder.build(builder, x, 0, z, 1f,1f,1f);
-			}
-		}
-
-		ModelInstance model = new ModelInstance(modelBuilder.end());
-		sceneManager.addScene(new Scene(model));
-	}
-
 
 	@Override
 	public void dispose() {
