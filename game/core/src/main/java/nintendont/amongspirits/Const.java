@@ -1,7 +1,10 @@
 package nintendont.amongspirits;
 
+import nintendont.amongspirits.physics.PhysicsWorld;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
@@ -18,6 +21,7 @@ public class Const implements Disposable {
     public static Const hola;
     // game states
     public static enum GameState{ 
+        MENU,
         INGAME,         // 0
         INVENTORY,      // 1
         PAUSE,          // 2
@@ -41,10 +45,10 @@ public class Const implements Disposable {
     public static short PF_GROUND = 1 << 2;
 
     // stuff
-    private PhysicsWorld physicsWorld;
-    private AssetManager assetManager;
-    private SpriteBatch spriteBatch;
-    private SceneManager sceneManager;
+    public PhysicsWorld physicsWorld;
+    public AssetManager assetManager;
+    public SpriteBatch spriteBatch;
+    public SceneManager sceneManager;
 
     private Const(){}
 
@@ -56,8 +60,6 @@ public class Const implements Disposable {
     }
 
     public void init(){
-        physicsWorld = new PhysicsWorld();
-        physicsWorld.create();
 
         assetManager = new AssetManager();
         spriteBatch = new SpriteBatch();
@@ -84,17 +86,15 @@ public class Const implements Disposable {
         return physicsWorld.getDynamicsWorld();
     }
 
-    public PhysicsWorld getPhysicsWorld(){
-        return this.physicsWorld;
+    public PhysicsWorld createPhysicsWorld(){
+        physicsWorld = new PhysicsWorld();
+        physicsWorld.create();
+        return physicsWorld;
     }
-    public SceneManager getSceneManager(){
-        return this.sceneManager;
-    }
-    public AssetManager getAssetManager(){
-        return this.assetManager;
-    }
-    public SpriteBatch getSpriteBatch(){
-        return this.spriteBatch;
+
+    public SpriteBatch createSpriteBatch(){
+        spriteBatch = new SpriteBatch();
+        return spriteBatch;
     }
     
     @Override

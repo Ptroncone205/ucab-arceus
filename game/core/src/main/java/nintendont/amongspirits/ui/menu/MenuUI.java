@@ -22,14 +22,14 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
-import nintendont.amongspirits.data.savedata.SaveEventListener;
+import nintendont.amongspirits.data.savedata.BtnEventListener;
 
 /**
  * literalmente una copia de gui manager + pausemenu
  */
 public class MenuUI implements Disposable {
 
-    private SaveEventListener saveListener;
+    private BtnEventListener saveListener;
 
     private Main game;
     public Stage stage;
@@ -43,7 +43,7 @@ public class MenuUI implements Disposable {
 
     public MenuUI(Main game) {
         this.game = game;
-        this.stage = new Stage(new ScreenViewport(), Const.get().getSpriteBatch());
+        this.stage = new Stage(new ScreenViewport(), Const.get().spriteBatch);
         createSkin();
 
         create();
@@ -165,8 +165,8 @@ public class MenuUI implements Disposable {
         }
     }
 
-    public void setSaveListener(SaveEventListener lsitener){
-        this.saveListener = lsitener;
+    public void setBtnListener(BtnEventListener listener){
+        this.saveListener = listener;
     }
 
     @Override

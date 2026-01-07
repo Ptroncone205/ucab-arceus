@@ -15,11 +15,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
-import nintendont.amongspirits.data.savedata.SaveEventListener;
+import nintendont.amongspirits.data.savedata.BtnEventListener;
 
 public class PauseMenu extends Table {
 
-    private SaveEventListener saveListener;
+    private BtnEventListener saveListener;
 
     private Skin skin;
     private ArrayList<TextButton> buttons = new ArrayList<>();
@@ -93,7 +93,7 @@ public class PauseMenu extends Table {
     }
 
     public void onQuit(){
-        if (saveListener != null) saveListener.onLoadRequest();
+        if (saveListener != null) saveListener.onQuitRequest();
     }
 
     public void onClick(){
@@ -121,7 +121,7 @@ public class PauseMenu extends Table {
         }
     }
 
-    public void setSaveListener(SaveEventListener lsitener){
+    public void setSaveListener(BtnEventListener lsitener){
         this.saveListener = lsitener;
     }
 }

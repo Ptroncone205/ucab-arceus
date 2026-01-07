@@ -21,7 +21,6 @@ public class Main extends Game {
     public void create() {
         context.init();
 
-
         this.setScreen(new MainMenu(this));
     }
 
@@ -40,6 +39,13 @@ public class Main extends Game {
         gameScreen = new GameScreen(this, load);
         this.setScreen(gameScreen);
     }
+
+    public void quitGame(){
+        Const.currentState = GameState.MENU;
+        gameScreen.dispose();
+        gameScreen = null;
+        this.setScreen(new MainMenu(this));
+    }
     
     @Override
     public void resize(int width, int height) {
@@ -49,8 +55,8 @@ public class Main extends Game {
     
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
         super.dispose();
+        context.dispose();
     }
 
 }

@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.JsonValue;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.entities.Entity;
+import nintendont.amongspirits.screens.GameScreen;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
 import net.mgsx.gltf.scene3d.scene.Scene;
 // TODO entity
@@ -45,7 +46,7 @@ public class Item extends Entity{
         this.name = data.getString("name");
         this.desc = data.getString("desc");
         this.isMaterial = data.getBoolean("isMaterial");
-        this.icon = Const.get().getAssetManager().get(data.getString("icon"),Texture.class);
+        this.icon = GameScreen.assets.get(data.getString("icon"),Texture.class);
         iconPath = data.getString("icon");
         System.out.println(this.name + " created: " + Gdx.files.internal(data.getString("icon")));
     }

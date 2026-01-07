@@ -23,7 +23,7 @@ import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.GUIController;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.savedata.SaveData;
-import nintendont.amongspirits.data.savedata.SaveEventListener;
+import nintendont.amongspirits.data.savedata.BtnEventListener;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.managers.CraftManager;
@@ -91,10 +91,10 @@ public class MainFalsoFake extends ApplicationAdapter
 
 		context.init();
 
-		AssetUtils.loadGLTF(context.getAssetManager(), "models/mc/lukitm501.gltf");
-		context.getAssetManager().finishLoading();
+		AssetUtils.loadGLTF(context.assetManager, "models/mc/lukitm501.gltf");
+		context.assetManager.finishLoading();
 		// create player scene
-		sceneAsset = context.getAssetManager().get("models/mc/lukitm501.gltf", SceneAsset.class);
+		sceneAsset = context.assetManager.get("models/mc/lukitm501.gltf", SceneAsset.class);
 		playerScene = new Scene(sceneAsset.scene);
 		float scale_factor = 0.2f;
 		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
@@ -121,7 +121,7 @@ public class MainFalsoFake extends ApplicationAdapter
 		inventory = new Satchel();
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
-		guiManager.getPauseMenu().setSaveListener(new SaveEventListener() {
+		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
 				SaveManager.saveGame(player, items);

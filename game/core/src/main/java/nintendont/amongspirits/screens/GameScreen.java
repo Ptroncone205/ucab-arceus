@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
@@ -31,7 +32,7 @@ import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.GUIController;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.savedata.SaveData;
-import nintendont.amongspirits.data.savedata.SaveEventListener;
+import nintendont.amongspirits.data.savedata.BtnEventListener;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.managers.CraftManager;
@@ -51,6 +52,7 @@ public class GameScreen implements Screen{
     private final Const context = Const.get();
 	private SceneManager sceneManager;
 	private SceneAsset sceneAsset;
+	public static AssetManager assets;
 	private Scene playerScene;
 
 	private Cubemap diffuseCubemap;
@@ -100,21 +102,21 @@ public class GameScreen implements Screen{
         Bullet.init();
         context.init();
 		ItemFactory.init();
-
+		assets = new AssetManager();
 		System.out.println("init just called");
 
 		// cargar todos los assets usados por el juego incluyendo texturas y modelos
-        AssetUtils.loadGLTF(context.getAssetManager(), "models/mc/lukitm501.gltf");
-		context.loadAsset("textures/oranberry.png", Texture.class);
-		context.loadAsset("textures/pokeball.png", Texture.class);
-		context.loadAsset("textures/tumblestone.png", Texture.class);
+        AssetUtils.loadGLTF(assets, "models/mc/lukitm501.gltf");
+		assets.load("textures/oranberry.png", Texture.class);
+		assets.load("textures/pokeball.png", Texture.class);
+		assets.load("textures/tumblestone.png", Texture.class);
 		
-		context.getAssetManager().finishLoading();
+		assets.finishLoading();
 
 		sceneManager = new SceneManager(new CustomShaderProvider(), PBRShaderProvider.createDefaultDepth(24));
 
 		// create player scene
-		sceneAsset = context.getAssetManager().get("models/mc/lukitm501.gltf", SceneAsset.class);
+		sceneAsset = assets.get("models/mc/lukitm501.gltf", SceneAsset.class);
 		playerScene = new Scene(sceneAsset.scene);
 		float scale_factor = 0.2f;
 		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
@@ -128,23 +130,26 @@ public class GameScreen implements Screen{
 		Gdx.input.setCursorCatched(true);
 		camera.position.set(0,0f, 4f);
 
-		physicsWorld = new PhysicsWorld();
-		physicsWorld.create();
+		physicsWorld = context.createPhysicsWorld();
 
 		multiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(multiplexer);
 
 		// text
-		batch = new SpriteBatch();
+		batch = context.spriteBatch;
 		font = new BitmapFont();
 		inventory = new Satchel();
 		
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
-		guiManager.getPauseMenu().setSaveListener(new SaveEventListener() {
+		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
 				SaveManager.saveGame(player, items);
+			}
+			@Override
+			public void onQuitRequest(){
+				game.quitGame();
 			}
 		});
 
@@ -240,7 +245,6 @@ public class GameScreen implements Screen{
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
-		System.out.println("assets laodesd"+ context.getAssetManager().getLoadedAssets());
         
     }
     
@@ -368,16 +372,14 @@ public class GameScreen implements Screen{
     public void dispose() {
         terrain.dispose();
 		sceneManager.dispose();
-		sceneAsset.dispose();
+		assets.dispose();
 		environmentCubemap.dispose();
 		diffuseCubemap.dispose();
 		specularCubemap.dispose();
 		brdfLUT.dispose();
 		skybox.dispose();
-		batch.dispose();
 		font.dispose();
-		physicsWorld.getDynamicsWorld().dispose();
-		context.dispose();
+		physicsWorld.dispose();
         
     }
     

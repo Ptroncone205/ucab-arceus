@@ -5,7 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.data.savedata.SaveData;
-import nintendont.amongspirits.data.savedata.SaveEventListener;
+import nintendont.amongspirits.data.savedata.BtnEventListener;
 import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.ui.menu.MenuUI;
 
@@ -18,7 +18,7 @@ public class MainMenu implements Screen{
     public MainMenu(Main game){
         this.game = game;
         menuUI = new MenuUI(game);
-        menuUI.setSaveListener(new SaveEventListener(){
+        menuUI.setBtnListener(new BtnEventListener(){
             @Override
             public void onLoadRequest(){
                 loadGame();
