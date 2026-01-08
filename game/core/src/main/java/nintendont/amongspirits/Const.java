@@ -33,7 +33,7 @@ public class Const implements Disposable {
     //todo
     public static float CAMERA_DEFAULT_PITCH = 0f;
     public static float CAMERA_MIN_PITCH = 1f;
-    public static float CAMERA_MAX_PITCH = 80f;
+    public static float CAMERA_MAX_PITCH = 89f;
     public static float CAMERA_ZOOM_LEVEL_FACTOR = 0.5f;
     public static float CAMERA_ANGLE_AROUND_PLAYER_FACTOR = 0.2f;
     public static float CAMERA_MIN_DISTANCE_FROM_PLAYER = 4;
@@ -99,9 +99,9 @@ public class Const implements Disposable {
     
     @Override
     public void dispose() {
-        sceneManager.dispose();
-        assetManager.dispose();
-        spriteBatch.dispose();
-        physicsWorld.dispose();
+        if (sceneManager != null) sceneManager.dispose();
+        if (assetManager != null) assetManager.dispose();
+        if (spriteBatch != null) spriteBatch.dispose();
+        if (physicsWorld != null) physicsWorld.dispose();
     }
 }

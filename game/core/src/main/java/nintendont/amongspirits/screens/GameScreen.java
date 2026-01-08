@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -29,7 +30,6 @@ import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
-import nintendont.amongspirits.controllers.GUIController;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.data.savedata.BtnEventListener;
@@ -40,6 +40,7 @@ import nintendont.amongspirits.managers.InteractionScanner;
 import nintendont.amongspirits.managers.ItemFactory;
 import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.managers.SaveManager;
+import nintendont.amongspirits.managers.TextInput;
 import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
@@ -65,7 +66,6 @@ public class GameScreen implements Screen{
 	// input
 	private InputMultiplexer multiplexer;
 	private PlayerController playerController;
-	private GUIController guiController;
 	// movement
 	private Player player;
 
@@ -91,6 +91,7 @@ public class GameScreen implements Screen{
 	private CraftManager crafting;
 
 	MyContactListener cl;
+	TextInput textlistener;
 	private InteractionScanner iScan;
 	private Item focusedItem;
 	private ArrayList<Item> items = new ArrayList<>();
@@ -122,6 +123,7 @@ public class GameScreen implements Screen{
 		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
 		sceneManager.addScene(playerScene);
 
+		textlistener = new TextInput();
 
 		camera = new PerspectiveCamera(67f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.near = 0.1f;
@@ -158,10 +160,16 @@ public class GameScreen implements Screen{
 		} else {
 			createData();
 		}
+
+		InputAdapter adapter = new InputAdapter(){
+			@Override
+			public boolean keyDown(int key){
+				if (Const.currentState == GameState.INGAME) return false;
+				return guiManager.handleInput(key);
+			}
+		};
 		
-		
-		guiController = new GUIController(guiManager);
-		multiplexer.addProcessor(guiController);
+		multiplexer.addProcessor(adapter);
 		multiplexer.addProcessor(guiManager.stage);
 		
 		playerController = new PlayerController(player, camera);

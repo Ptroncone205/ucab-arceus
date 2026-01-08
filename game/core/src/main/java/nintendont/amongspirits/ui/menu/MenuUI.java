@@ -37,11 +37,14 @@ public class MenuUI implements Disposable {
     private Table options;
     private Table account;
     private Skin skin;
+    private ArrayList<Table> tables = new ArrayList<>();
     private ArrayList<TextButton> buttons = new ArrayList<>();
     private int selected = 0;
     private TextButton selButton;
+    private String text;
 
     public MenuUI(Main game) {
+        this.text = "";
         this.game = game;
         this.stage = new Stage(new ScreenViewport(), Const.get().spriteBatch);
         createSkin();
@@ -55,20 +58,17 @@ public class MenuUI implements Disposable {
     }
 
     private void create() {
-        // Title
         root = new Table();
         root.setFillParent(true);
         root.setBackground(skin.newDrawable("white", 0,0,0, 1f));
         
-        Label title = new Label("JUEGUIto", skin);
+        Label title = new Label(text, skin);
         title.setFontScale(2f);
         
-        // Buttons
         TextButton btnResume = createButton("New Game", this::newGame);
         TextButton btnSave = createButton("Load Game", this::loadGame);
         TextButton btnQuit = createButton("Options", this::options);
 
-        // Layout
         root.center();
         root.add(title).padBottom(50).row();
         

@@ -1,6 +1,7 @@
 package nintendont.amongspirits.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import nintendont.amongspirits.Main;
@@ -25,8 +26,16 @@ public class MainMenu implements Screen{
             }
         });
 
+        InputAdapter adapter = new InputAdapter(){
+            @Override
+            public boolean keyDown(int key){
+                return menuUI.handleInput(key);
+            }
+        };
+
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
+        multiplexer.addProcessor(adapter);
         multiplexer.addProcessor(menuUI.stage);
 
     }
