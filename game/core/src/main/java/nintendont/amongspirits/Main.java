@@ -30,13 +30,10 @@ public class Main extends Game {
         screen.render(deltaTime);
     }
 
-    public void newGame(){
-        newGame(false);
-    }
-
-    public void newGame(boolean load){
+    public void newGame(String playerName, boolean load){
+        if (playerName.isBlank()) return;
         Const.currentState = GameState.INGAME;
-        gameScreen = new GameScreen(this, load);
+        gameScreen = new GameScreen(this, playerName, load);
         this.setScreen(gameScreen);
     }
 

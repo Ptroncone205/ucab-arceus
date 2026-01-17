@@ -1,5 +1,7 @@
 package nintendont.amongspirits.ui.menu;
 
-public class Account {
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+
+public class Account extends Table{
     
 }

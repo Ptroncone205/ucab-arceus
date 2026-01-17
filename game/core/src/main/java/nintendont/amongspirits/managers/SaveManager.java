@@ -18,6 +18,8 @@ public class SaveManager {
     public static void saveGame(Player player, ArrayList<Item> items){
         SaveData data = new SaveData(player, items);
 
+        file = Gdx.files.local(String.format("data/saves/save_%s.json", player.getName()));
+
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
         json.setUsePrototypes(false);
@@ -29,22 +31,23 @@ public class SaveManager {
         
         try{
             file.writeString(jsonString, false);
-            System.out.println("saved succesfully to: " + file.file().getAbsolutePath());
+            System.out.println("saved to: " + file.file().getAbsolutePath());
         }
         catch(Exception e){
             e.printStackTrace();
         }
     }
 
-    public static SaveData loadGame(){
+    public static SaveData loadGame(String playerName){
         Json json = new Json();
         json.setUsePrototypes(false);
 
         json.setSerializer(ItemStack.class, new StackSerializer());
         
         try{
+            file = Gdx.files.local(String.format("data/saves/save_%s.json", playerName));
             SaveData data = json.fromJson(SaveData.class, file);
-            System.out.println("loaded succesfully");
+            System.out.println("loaded from: " + file.file().getAbsolutePath());
             return data;
         } catch (Exception e){
             e.printStackTrace();

@@ -5,9 +5,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import nintendont.amongspirits.Main;
-import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.data.savedata.BtnEventListener;
-import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.ui.menu.MenuUI;
 
 public class MainMenu implements Screen{
@@ -22,7 +20,7 @@ public class MainMenu implements Screen{
         menuUI.setBtnListener(new BtnEventListener(){
             @Override
             public void onLoadRequest(){
-                loadGame();
+                loadGame(menuUI.getPlayerName(), true);
             }
         });
 
@@ -35,8 +33,8 @@ public class MainMenu implements Screen{
 
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
-        multiplexer.addProcessor(adapter);
         multiplexer.addProcessor(menuUI.stage);
+        multiplexer.addProcessor(adapter);
 
     }
         @Override
@@ -51,8 +49,9 @@ public class MainMenu implements Screen{
         
     }
 
-    public void loadGame(){
-        game.newGame(true);
+    public void loadGame(String playerName, boolean load){
+        game.newGame(playerName, load);
+        // TODO debe enviar el archivo especifico o en su defecto el nombre del jugador
     }
 
     @Override

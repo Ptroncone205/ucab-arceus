@@ -96,7 +96,7 @@ public class GameScreen implements Screen{
 	private Item focusedItem;
 	private ArrayList<Item> items = new ArrayList<>();
 
-    public GameScreen(Main game, boolean load){
+    public GameScreen(Main game, String playerName,boolean load){
 
         this.game = game;
 
@@ -156,9 +156,9 @@ public class GameScreen implements Screen{
 		});
 
 		if (load){
-			loadData();
+			loadData(playerName);
 		} else {
-			createData();
+			createData(playerName);
 		}
 
 		InputAdapter adapter = new InputAdapter(){
@@ -212,22 +212,26 @@ public class GameScreen implements Screen{
 
     }
 
-    private void loadData() {
+    private void loadData(String playerName) {
 		// load assets
-        SaveData data = SaveManager.loadGame();
-		inventory.setItems(data.inventory);
-		items = data.items;
-		for (Item item : items){
-			item.create(item.pos, 2f, 2f, 2f);
-			sceneManager.addScene(item.getScene());
+		try{
+			SaveData data = SaveManager.loadGame(playerName);
+			inventory.setItems(data.inventory);
+			items = data.items;
+			for (Item item : items){
+				item.create(item.pos, 2f, 2f, 2f);
+				sceneManager.addScene(item.getScene());
+			}
+			player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory);
+		} catch(Exception e){
+			System.err.println("Error cargando datos: " + e.getLocalizedMessage());
+			createData(playerName);
 		}
-		player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory);
-		
 	}
 
-	private void createData() {
+	private void createData(String playerName) {
 		// load assets
-		player = new Player("player", playerScene, new Vector3(0,15,0), inventory);
+		player = new Player(playerName, playerScene, new Vector3(0,15,0), inventory);
 		for (int i = 0; i<30; i++){
 			Item testItem;
 			if (i > 10){
