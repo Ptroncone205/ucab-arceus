@@ -25,7 +25,7 @@ public class SpiritMain extends ApplicationAdapter {
     private Camera camera;
     private Vector3 playerPos = new Vector3(0,5, 20);
     private AnimationController animationController;
-    private Spirit alfonso;
+    private Spirit3D alfonso;
     private PhysicsWorld physicsWorld;
 
     @Override
@@ -44,7 +44,7 @@ public class SpiritMain extends ApplicationAdapter {
         physicsWorld = new PhysicsWorld();
         physicsWorld.create();
         physicsWorld.createGround();
-        alfonso = new Spirit(scene, new Vector3[]{
+        alfonso = new Spirit3D(scene, new Vector3[]{
             new Vector3(0,3,0),
             new Vector3(10,3,10),
             new Vector3(0,3,10),

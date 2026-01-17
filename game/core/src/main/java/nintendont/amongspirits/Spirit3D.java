@@ -1,15 +1,13 @@
 package nintendont.amongspirits;
 
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.sun.org.apache.bcel.internal.generic.PUSH;
 import net.mgsx.gltf.scene3d.scene.Scene;
 
-public class Spirit {
+public class Spirit3D {
     private Scene scene;
     private AnimationController animationController;
     private Vector3 [] position;
@@ -23,7 +21,7 @@ public class Spirit {
     private btCapsuleShape capsuleShape;
     private Vector3 inertia;
 
-    public Spirit(Scene scene,Vector3 [] position ){
+    public Spirit3D(Scene scene, Vector3 [] position ){
         animationController = new AnimationController(scene.modelInstance);
         this.scene = scene;
         this.position = position;
