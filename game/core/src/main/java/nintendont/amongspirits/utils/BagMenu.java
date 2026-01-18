@@ -1,95 +1,121 @@
 package nintendont.amongspirits.utils;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import nintendont.amongspirits.BattleMain;
+import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.items.Consumable;
-import nintendont.amongspirits.entities.items.Item;
-import nintendont.amongspirits.managers.Satchel;
-
 import java.util.ArrayList;
 
-public class BagMenu extends Table{
-    private TextButton itemTable; // tienes q crearlo
+public class BagMenu extends Table {
+
     public BagMenu(TextButton.TextButtonStyle style, final BattleMain game, ArrayList<ItemStack> items){
-        if (!items.isEmpty()) {
-            for (int i = 0; i < items.size(); i++) {
-                Item item = items.get(i).getItem();
-                if (item instanceof Consumable) {
-                    itemTable = new TextButton(item.getName() + items.get(i).getCount(), style);
-                    this.add(itemTable).expand().fill().pad(2).row();
+
+        this.center();
+
+        Table scrollTable = new Table();
+        if (items != null && !items.isEmpty()){
+            for (final ItemStack stack : items){
+                if (stack.getItem() instanceof Consumable){
+                    TextButton btn = new TextButton(stack.getItem().getName() + " x" + stack.getCount(), style);
+                    btn.addListener(new ClickListener(){
+                        @Override
+                        public void clicked(InputEvent e, float x, float y){
+
+                            game.getStage().addActor(new HealMenu(style, game, stack));
+                        }
+                    });
+                    scrollTable.add(btn).size(220, 45).pad(2);
                 }
             }
-            itemTable.addListener(new ClickListener(){
-                @Override public void clicked(InputEvent e, float x, float y){
-                    if(game.getPotions() > 0) {
-                        game.setPotions(game.getPotions() - 1);
-                        game.getStage().addActor(new HealMenu(style, game, 40));
-                        game.onBackSelected();
-                    }
-                }});
+        }else{
+            scrollTable.add(new Label("VACÍO", new Label.LabelStyle(style.font, Color.GRAY)));
         }
 
-        TextButton back = new TextButton("VOLVER", style);
-        this.add(back).expand().fill().pad(2);
+        ScrollPane scroll = new ScrollPane(scrollTable);
+        this.add(scroll).height(130).row();
 
-        back.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
+        TextButton back = new TextButton("VOLVER", style);
+        back.addListener(new ClickListener() {
+
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
                 game.onBackSelected();
-            }});
+            }
+        });
+        this.add(back).size(220, 40).padBottom(50);
     }
 
-    private class HealMenu extends SpiritsMenu{
-        public HealMenu(TextButton.TextButtonStyle style, final BattleMain game, final int amount){
-            super(style, game, false);
-            this.clearChildren();
+    private class HealMenu extends Table {
+        public HealMenu(TextButton.TextButtonStyle style, final BattleMain game, final ItemStack stack) {
+            this.setFillParent(true);
 
-            this.add(new Label("¿A QUÉ ESPÍRITU DESEAS CURAR?", new Label.LabelStyle(style.font, com.badlogic.gdx.graphics.Color.YELLOW))).pad(20).row();
+            this.setBackground(game.getColoredDrawable(1, 1, new Color(0, 0, 0, 0.85f)));
+            this.center();
 
-            Table table = new Table();
+            this.add(new Label("USAR " + stack.getItem().getName().toUpperCase(),
+                new Label.LabelStyle(style.font, Color.YELLOW))).padBottom(20).row();
 
-            for(int i = 0; i < game.getTeam().length; i++){
-                final int idx = i;
-                final Spirit spirit = game.getTeam()[i];
+            Table grid = new Table();
+            for (final Invocation inv : game.getPlayerTeam().getMembers()) {
+                final Spirit spirit = inv.getSpirit();
 
-                Table card = new Table().pad(10);
-                card.setBackground(game.getColoredDrawable(1, 1, new com.badlogic.gdx.graphics.Color(0.1f, 0.1f, 0.1f, 0.8f)));
-                card.add(new Image(new com.badlogic.gdx.graphics.Texture(spirit.texturePath))).size(50).padRight(10);
+                Table card = new Table();
+                card.setBackground(game.getColoredDrawable(1, 1, new Color(1, 1, 1, 0.05f)));
+                card.pad(10);
 
-                Table info = new Table();
-                info.add(new Label(spirit.name, new Label.LabelStyle(style.font, com.badlogic.gdx.graphics.Color.WHITE))).left().row();
+                Label nameLabel = new Label(spirit.name, new Label.LabelStyle(style.font, Color.CYAN));
+                Label hpText = new Label((int)spirit.hp + "/" + (int)spirit.hpMax, new Label.LabelStyle(style.font, Color.WHITE));
 
-                Stack hpBg = new Stack();
-                hpBg.add(new Image(game.getColoredDrawable(120, 10, com.badlogic.gdx.graphics.Color.BLACK)));
-                float actualHp = spirit.hp / spirit.hpMax;
-                com.badlogic.gdx.graphics.Color barCol = actualHp < 0.2f ? com.badlogic.gdx.graphics.Color.RED : (actualHp < 0.5f ? com.badlogic.gdx.graphics.Color.YELLOW : com.badlogic.gdx.graphics.Color.GREEN);
-                hpBg.add(new Container<>(new Image(game.getColoredDrawable(1, 1, spirit.hp <= 0 ? com.badlogic.gdx.graphics.Color.GRAY : barCol))).width(120 * actualHp).height(10).align(com.badlogic.gdx.utils.Align.left));
-                info.add(hpBg).size(120, 10);
-                card.add(info).pad(10);
+                card.add(nameLabel).width(120).left();
 
-                TextButton button = new TextButton("CURAR", style);
+                float percent = spirit.hp / spirit.hpMax;
+                Stack hpStack = new Stack();
+                hpStack.add(new Image(game.getColoredDrawable(1, 1, Color.BLACK)));
+                Image bar = new Image(game.getColoredDrawable(1, 1,
+                    percent < 0.2f ? Color.RED : (percent < 0.5f ? Color.YELLOW : Color.GREEN)));
+                hpStack.add(new Container<>(bar).width(120 * percent).height(10).align(Align.left));
 
-                button.addListener(new ClickListener(){
-                    @Override public void clicked(InputEvent e, float x, float y){
-                    game.applyPotion(idx, amount);
-                    HealMenu.this.remove();
-                }});
-                card.add(button).size(100, 40);
-                table.add(card).pad(5);
-                if((i + 1) % 2 == 0) table.row();
+                card.add(hpStack).size(120, 10).padLeft(10).padRight(10);
+                card.add(hpText).width(80).right();
+
+                TextButton bCurar = new TextButton("CURAR", style);
+                if (spirit.hp >= spirit.hpMax) bCurar.setColor(Color.DARK_GRAY);
+
+                bCurar.addListener(new ClickListener(){
+                    @Override
+                    public void clicked(InputEvent e, float x, float y){
+                        if (spirit.hp < spirit.hpMax){
+
+                            float healPower = stack.getItem().getName().contains("Super") ? 50 : 20;
+                            spirit.heal(healPower);
+                            stack.setCount(stack.getCount() - 1);
+
+                            game.updateHealth();
+                            HealMenu.this.remove();
+                            game.startEnemyTurn();
+                        }
+                    }
+                });
+                card.add(bCurar).size(90, 40).padLeft(15);
+
+                grid.add(card).fillX().pad(4).row();
             }
-            this.add(table).row();
+            this.add(grid).row();
 
-            TextButton buttonCancel = new TextButton("CANCELAR", style);
-
-            buttonCancel.addListener(new ClickListener(){
-                @Override public void clicked(InputEvent e, float x, float y){
+            TextButton btnCancel = new TextButton("CANCELAR", style);
+            btnCancel.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent e, float x, float y) {
                     HealMenu.this.remove();
-                }});
-            this.add(buttonCancel).size(200, 50).pad(20);
+                }
+            });
+            this.add(btnCancel).size(200, 45).padTop(20);
         }
     }
 }

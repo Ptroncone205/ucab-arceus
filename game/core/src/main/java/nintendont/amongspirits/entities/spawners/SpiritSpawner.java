@@ -29,31 +29,31 @@ public class SpiritSpawner {
 
     public Entity spawnLion(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/lion/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Leon", "FIRE", 120f, new String[]{"Llamarada", "Colmillo Igneo", "Intimidar", "Derribar"}, "gokuprueba2.png");
+        Spirit spirit = new Spirit("Leon", "FIRE", 120f, "gokuprueba2.png");
         return spawnSpirit(spirit, modelAsset, null, 2f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnDeer(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/deer/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Ciervo", "THUNDER", 100f, new String[]{"Impactrueno", "Ataque Rapido", "Electro Bola", "Rugido"}, "gokuprueba.png");
+        Spirit spirit = new Spirit("Ciervo", "THUNDER", 100f, "gokuprueba.png");
         return spawnSpirit(spirit, modelAsset, "Armature|walk", 2.5f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnWolf(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/wolf/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Lobo", "ICE", 100f, new String[]{"Colmillo Hielo", "Mordisco", "Garra Hielo", "Aullido"}, "gokuprueba2.png");
+        Spirit spirit = new Spirit("Lobo", "ICE", 100f, "gokuprueba2.png");
         return spawnSpirit(spirit, modelAsset, "Take 001", 2.5f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnBunny(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/bunny/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Conejo", "ICE", 80f, new String[]{"Doble Patada", "Refuerzo", "Rayo Hielo", "Agilidad"}, "gokuprueba.png");
+        Spirit spirit = new Spirit("Conejo", "ICE", 80f, "gokuprueba.png");
         return spawnSpirit(spirit, modelAsset, "Take 001", 0.05f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnFox(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/fox/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Zorro", "FIRE", 120f, new String[]{"Llamarada", "Colmillo Igneo", "Intimidar", "Derribar"}, "gokuprueba2.png");
+        Spirit spirit = new Spirit("Zorro", "FIRE", 120f, "gokuprueba2.png");
         return spawnSpirit(spirit, modelAsset, "redfox|red_fox_walk_fwd_01", .75f, spawnPoint, patrolPoints);
     }
 

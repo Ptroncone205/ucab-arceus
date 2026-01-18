@@ -2,31 +2,19 @@ package nintendont.amongspirits;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Align;
-import net.mgsx.gltf.loaders.gltf.GLTFLoader;
-import net.mgsx.gltf.scene3d.scene.Scene;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
-import net.mgsx.gltf.scene3d.scene.SceneModel;
-import nintendont.amongspirits.data.spirits.Spirit;
-import nintendont.amongspirits.entities.ItemStack;
-import nintendont.amongspirits.managers.Satchel;
+import com.badlogic.gdx.utils.Timer;
+import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.utils.*;
-import nintendont.amongspirits.entities.Player;
+import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.entities.items.Consumable;
 
 import java.util.ArrayList;
 
@@ -37,267 +25,291 @@ public class BattleMain extends ApplicationAdapter implements MenuListener{
     private Sprite bgSprite;
     private Label messageLabel;
 
-    private Player player;
-    private Spirit[] team;
+    private Team playerTeam;
     private int activeIndex = 0;
-    private float hpEnemy = 100f, hpMaxEnemy = 100f;
     private String enemyName = "Tolon";
+    private float hpEnemy = 150f, hpMaxEnemy = 150f;
 
     private Image healthBarPlayer, healthBarEnemy;
-    private AttackMenu attackMenu;
-    private int potions = 3, superPotions = 3;
-
-    public TextButton.TextButtonStyle styleRed, styleBlue, styleGreen, styleYellow;
     private BitmapFont font;
+    private TextButton.TextButtonStyle styleRed, styleBlue, styleGreen, styleYellow;
+
+    private ArrayList<ItemStack> inventory;
 
     @Override
-    public void create(){
-        Bullet.init();
-        SceneAsset sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/lion/scene.gltf"));
-        player = new Player("alfonso", new Scene(sceneAsset.scene),new Vector3(),new Satchel());
+    public void create() {
         batch = new SpriteBatch();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-        Satchel satchel = player.getSatchel();
-
         font = new BitmapFont();
 
-        team = new Spirit[]{
-            new Spirit("Ciervo", "THUNDER", 100f, new String[]{"Impactrueno", "Ataque Rapido", "Electro Bola", "Rugido"}, "gokuprueba.png"),
-            new Spirit("Lobo", "ICE", 100f, new String[]{"Colmillo Hielo", "Mordisco", "Garra Hielo", "Aullido"}, "gokuprueba2.png"),
-            new Spirit("Conejo", "ICE", 80f, new String[]{"Doble Patada", "Refuerzo", "Rayo Hielo", "Agilidad"}, "gokuprueba.png"),
-            new Spirit("Leon", "FIRE", 120f, new String[]{"Llamarada", "Colmillo Igneo", "Intimidar", "Derribar"}, "gokuprueba2.png"),
-            new Spirit("Ciervo 2", "THUNDER", 100f, new String[]{"Impactrueno", "Ataque Rapido", "Electro Bola", "Rugido"}, "gokuprueba.png"),
-            new Spirit("Leon 2", "FIRE", 120f, new String[]{"Llamarada", "Colmillo Igneo", "Intimidar", "Derribar"}, "gokuprueba2.png")
-        };
+        // Styles
+        styleRed = createButtonStyle(Color.RED);
+        styleBlue = createButtonStyle(Color.BLUE);
+        styleGreen = createButtonStyle(Color.GREEN);
+        styleYellow = createButtonStyle(Color.YELLOW);
+
+        // Sprites
+        bgSprite = new Sprite(new Texture(Gdx.files.internal("fightbg.png")));
+        bgSprite.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Movimientos
+        SpiritMove placaje = new SpiritMove("mv01", "Placaje", "Golpe físico", SpiritMoveCategory.PHYSICAL, 40, 100, 35, 0);
+        SpiritMove llamarada = new SpiritMove("mv02", "Llamarada", "Fuego intenso", SpiritMoveCategory.ESPECIAL, 90, 85, 10, 10);
+        SpiritMove ventisca = new SpiritMove("mv03", "Ventisca", "Tormenta de hielo", SpiritMoveCategory.ESPECIAL, 110, 70, 5, 10);
+        SpiritMove chispa = new SpiritMove("mv04", "Chispa", "Descarga eléctrica", SpiritMoveCategory.ESPECIAL, 65, 100, 20, 30);
+
+        // Equipo
+        playerTeam = new Team();
+        playerTeam.getMembers().add(crearInvocacion("Ciervo 1", "THUNDER", 100, "gokuprueba.png", chispa, placaje,llamarada,ventisca));
+        playerTeam.getMembers().add(crearInvocacion("Ciervo 2", "THUNDER", 100, "gokuprueba.png", chispa, placaje,llamarada,ventisca));
+        playerTeam.getMembers().add(crearInvocacion("Lobo", "ICE", 120, "gokuprueba.png", chispa, placaje,llamarada,ventisca));
+        playerTeam.getMembers().add(crearInvocacion("Conejo", "ICE", 80, "gokuprueba2.png", chispa, placaje,llamarada,ventisca));
+        playerTeam.getMembers().add(crearInvocacion("Fénix", "FIRE", 90, "gokuprueba2.png", chispa, placaje,llamarada,ventisca));
+        playerTeam.getMembers().add(crearInvocacion("León", "FIRE", 130, "gokuprueba2.png", chispa, placaje,llamarada,ventisca));
+
+        // Inventario
+        inventory = new ArrayList<>();
+
+        Consumable pocion = new Consumable(1, "Pocion", "Restaura 20 HP", false);
+        inventory.add(new ItemStack(pocion, 1));
+        Consumable superPocion = new Consumable(2, "Super Pocion", "Restaura 50 HP", false);
+        inventory.add(new ItemStack(superPocion, 2));
 
         setupBattleUI();
+    }
+
+    private Invocation crearInvocacion(String nombre, String tipo, int hp, String tex, SpiritMove m1, SpiritMove m2, SpiritMove m3, SpiritMove m4){
+        Spirit s = new Spirit(nombre, tipo, hp, tex);
+        Invocation inv = new Invocation(s, 10);
+        inv.getMoves().add(m1);
+        inv.getMoves().add(m2);
+        inv.getMoves().add(m3);
+        inv.getMoves().add(m4);
+        return inv;
     }
 
     public void setupBattleUI(){
         stage.clear();
-        Table tableRoot = new Table();
-        tableRoot.setFillParent(true);
-        stage.addActor(tableRoot);
+        Table root = new Table();
+        root.setFillParent(true);
+        stage.addActor(root);
 
-        bgSprite = new Sprite(new Texture(Gdx.files.internal("fightbg.png")));
-        bgSprite.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        Spirit currentSpirit = playerTeam.getMembers().get(activeIndex).getSpirit();
 
-        styleRed = createButtonStyle(Color.RED);
-        styleBlue = createButtonStyle(new Color(0, 0, 0.5f, 1));
-        styleGreen = createButtonStyle(Color.GREEN);
-        styleYellow = createButtonStyle(new Color(0.6f, 0.6f, 0, 1));
-
-        healthBarPlayer = new Image();
+        // UI ENEMIGO
         healthBarEnemy = new Image();
+        Table enemyGroup = new Table();
+        enemyGroup.add(new Image(new Texture(Gdx.files.internal("gokuprueba2.png")))).size(180).row();
+        Table enemyInfo = new Table();
+        enemyInfo.add(healthBarEnemy).size(200, 20).row();
+        enemyInfo.add(new Label(enemyName, new Label.LabelStyle(font, Color.RED)));
+        enemyGroup.add(enemyInfo).left().padTop(10);
+        root.add(enemyGroup).expand().top().right().padTop(60).padRight(180).row();
 
-        // Enemigo
-        Table enemyArea = new Table();
-        enemyArea.add(new Image(new Texture("gokuprueba2.png"))).size(150).row();
+        // UI JUGADOR
+        healthBarPlayer = new Image();
+        Table playerGroup = new Table();
+        playerGroup.add(new Image(new Texture(Gdx.files.internal(currentSpirit.texturePath)))).size(180).row();
+        playerGroup.add(healthBarPlayer).size(200, 20).padTop(5).row();
+        playerGroup.add(new Label(currentSpirit.name, new Label.LabelStyle(font, Color.CYAN)));
+        root.add(playerGroup).expand().bottom().left().pad(40).row();
 
-        Table enemyStats = new Table();
-        enemyStats.add(new Label(enemyName, new Label.LabelStyle(font, Color.BLACK))).left().row();
-        Stack enemyStack = new Stack();
-        enemyStack.add(new Image(getColoredDrawable(200, 15, Color.BLACK)));
-        enemyStack.add(new Container<>(healthBarEnemy).align(Align.left));
-        enemyStats.add(enemyStack).size(200, 15).left();
+        float panelHeight = 190;
+        Table bottomPanel = new Table();
+        bottomPanel.setBackground(getColoredDrawable(1, 1, new Color(0, 0, 0, 0.85f)));
 
-        enemyArea.add(enemyStats).left().padTop(5);
-        tableRoot.add(enemyArea).expand().top().right().pad(40).row();
-
-        // Jugador
-        Table playerArea = new Table();
-        playerArea.add(new Image(new Texture(team[activeIndex].texturePath))).size(150);
-
-        Table pStats = new Table();
-        pStats.add(new Label(team[activeIndex].name, new Label.LabelStyle(font, Color.BLACK))).left().row();
-        Stack playerStack = new Stack();
-        playerStack.add(new Image(getColoredDrawable(200, 15, Color.BLACK)));
-        playerStack.add(new Container<>(healthBarPlayer).align(Align.left));
-        pStats.add(playerStack).size(200, 15);
-
-        playerArea.add(pStats).padLeft(20);
-        tableRoot.add(playerArea).expand().bottom().left().pad(40).row();
-
-        // Texto
-        Table bottom = new Table();
-        tableB = new Table();
-        messageLabel = new Label("¿Qué debería hacer " + team[activeIndex].name + "?", new Label.LabelStyle(font, Color.WHITE));
+        messageLabel = new Label("¿Qué hará " + currentSpirit.name + "?", new Label.LabelStyle(font, Color.WHITE));
         messageLabel.setWrap(true);
         messageLabel.setAlignment(Align.center);
+        bottomPanel.add(messageLabel).width(Gdx.graphics.getWidth() * 0.5f).height(panelHeight).pad(20);
 
-        Table msgTable = new Table();
-        msgTable.setBackground(getColoredDrawable(1,1, new Color(0.1f,0.1f,0.1f,0.8f)));
-        msgTable.add(messageLabel).expand().fill().pad(10);
+        tableB = new Table();
+        setupMainButtons(panelHeight);
+        bottomPanel.add(tableB).width(Gdx.graphics.getWidth() * 0.5f).height(panelHeight);
 
-        setupMainButtons();
-        bottom.add(msgTable).expand().fill().uniformX();
-        bottom.add(tableB).expand().fill().uniformX();
-        tableRoot.add(bottom).fillX().height(150).bottom();
-
+        root.add(bottomPanel).fillX().height(panelHeight);
         updateHealth();
     }
 
-    private void setupMainButtons(){
+    public void setupMainButtons(float panelH){
         tableB.clearChildren();
-        Table table = new Table();
-        TextButton buttonFight = new TextButton("FIGHT", styleRed);
-        TextButton buttonSpirits = new TextButton("SPIRITS", styleBlue);
-        TextButton buttonBag = new TextButton("BAG", styleGreen);
-        TextButton buttonRun = new TextButton("RUN", styleYellow);
 
-        buttonFight.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent e, float x, float y){
+        float btnW = (Gdx.graphics.getWidth() * 0.5f) / 2.1f;
+        float btnH = panelH / 2.2f;
+
+        TextButton btnFight = new TextButton("LUCHAR", styleRed);
+        TextButton btnBag = new TextButton("BOLSA", styleBlue);
+        TextButton btnTeam = new TextButton("EQUIPO", styleGreen);
+        TextButton btnRun = new TextButton("HUIR", styleYellow);
+
+        btnFight.addListener(new ClickListener(){
+            @Override public void clicked(InputEvent e, float x, float y){
                 onFightSelected();
             }});
 
-        buttonSpirits.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent e, float x, float y){
-            stage.addActor(new SpiritsMenu(styleBlue, BattleMain.this, false));
+        btnBag.addListener(new ClickListener(){
+            @Override public void clicked(InputEvent e, float x, float y){
+            tableB.clearChildren();
+            tableB.add(new BagMenu(styleBlue, BattleMain.this, inventory)).fill();
         }});
 
-        buttonBag.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent e, float x, float y){
-            tableB.clearChildren(); tableB.add(new BagMenu(styleGreen, BattleMain.this, player.getSatchel().getItems())).expand().fill();
+        btnTeam.addListener(new ClickListener(){
+            @Override public void clicked(InputEvent e, float x, float y){
+            stage.addActor(new SpiritsMenu(styleGreen, BattleMain.this, false));
         }});
 
-        buttonRun.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent e, float x, float y){ Gdx.app.exit();
-        }});
+        btnRun.addListener(new ClickListener(){
+            @Override public void clicked(InputEvent e, float x, float y){
+                Gdx.app.exit();
+            }});
 
-        table.add(buttonFight).expand().fill().uniformX().pad(2);
-        table.add(buttonSpirits).expand().fill().uniformX().pad(2).row();
-        table.add(buttonBag).expand().fill().uniformX().pad(2);
-        table.add(buttonRun).expand().fill().uniformX().pad(2);
-        tableB.add(table).expand().fill();
-        updateAttackMenu();
+        // Anadir botones principales
+        tableB.add(btnFight).size(btnW, btnH).pad(2);
+        tableB.add(btnBag).size(btnW, btnH).pad(2).row();
+        tableB.add(btnTeam).size(btnW, btnH).pad(2);
+        tableB.add(btnRun).size(btnW, btnH).pad(2);
+    }
+
+    @Override
+    public void onAttackSelected(String attackName){
+        Invocation currentInv = playerTeam.getMembers().get(activeIndex);
+        SpiritMove moveUsed = null;
+
+        for(SpiritMove m : currentInv.getMoves()){
+            if(m.getName().equals(attackName)){
+                moveUsed = m; break;
+            }
+        }
+
+        if (moveUsed != null){
+            hpEnemy -= (moveUsed.getBasePower() / 2f);
+            messageLabel.setText("¡" + currentInv.getSpirit().name + " usó " + attackName + "!");
+        }
+
+        updateHealth();
+        startEnemyTurn();
+    }
+
+    public void startEnemyTurn(){
+        tableB.clearChildren();
+        Timer.schedule(new Timer.Task(){
+            @Override public void run(){
+                if (hpEnemy <= 0){
+                    messageLabel.setText("¡El enemigo ha sido derrotado!");
+                }else{
+                    messageLabel.setText("¡El enemigo contraataca!");
+                    playerTeam.getMembers().get(activeIndex).getSpirit().hp -= 15;
+                    updateHealth();
+                    Timer.schedule(new Timer.Task(){
+                        @Override
+                        public void run(){
+                            if (playerTeam.getMembers().get(activeIndex).getSpirit().isFainted()){
+                                playerTeam.getMembers().get(activeIndex).getSpirit().hp = 0f;
+                                stage.addActor(new SpiritsMenu(styleGreen, BattleMain.this, true));
+                            }else{
+                                messageLabel.setText("¿Qué hará " + playerTeam.getMembers().get(activeIndex).getSpirit().name + "?");
+                                setupMainButtons(190);
+                            }
+                        }
+                    }, 1.5f);
+                }
+            }
+        }, 1.5f);
     }
 
     public void updateHealth(){
-        float hpAlly = team[activeIndex].hp / team[activeIndex].hpMax;
-        float hpEnemy = this.hpEnemy / hpMaxEnemy;
-
-        Color colorAlly = hpAlly < 0.2f ? Color.RED : (hpAlly < 0.5f ? Color.YELLOW : Color.GREEN);
-        Color colorEnemy = hpEnemy < 0.2f ? Color.RED : (hpEnemy < 0.5f ? Color.YELLOW : Color.GREEN);
-
-        healthBarPlayer.setDrawable(getColoredDrawable((int)(200 * hpAlly), 15, colorAlly));
-        healthBarEnemy.setDrawable(getColoredDrawable((int)(200 * hpEnemy), 15, colorEnemy));
+        Spirit s = playerTeam.getMembers().get(activeIndex).getSpirit();
+        healthBarPlayer.setDrawable(createBarDrawable(s.hp / s.hpMax));
+        healthBarEnemy.setDrawable(createBarDrawable(hpEnemy / hpMaxEnemy));
     }
 
-    public void dealDamage(boolean toEnemy, float amount){
-        if (toEnemy){
-            hpEnemy = Math.max(0, hpEnemy - amount);
-            updateHealth();
-        }else{
-            team[activeIndex].hp = Math.max(0, team[activeIndex].hp - amount);
-            updateHealth();
-
-            if (team[activeIndex].hp <= 0){
-                messageLabel.setText("¡" + team[activeIndex].name + " ha sido debilitado!");
-                stage.addActor(new SpiritsMenu(styleBlue, this, true));
-            }
-        }
+    private TextureRegionDrawable createBarDrawable(float percent){
+        int w = 200, h = 20;
+        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        p.setColor(Color.BLACK);
+        p.fill();
+        Color colorVida = percent < 0.2f ? Color.RED : (percent < 0.5f ? Color.YELLOW : Color.GREEN);
+        p.setColor(colorVida);
+        p.fillRectangle(0, 0, (int)(w * Math.max(0, percent)), h);
+        TextureRegionDrawable d = new TextureRegionDrawable(new TextureRegion(new Texture(p)));
+        p.dispose();
+        return d;
     }
 
-    public void switchSpirit(int index){
-        activeIndex = index;
-        messageLabel.setText("¡Adelante " + team[activeIndex].name + "!");
-        setupBattleUI();
-        enemyTurnTimer();
-    }
-
-    public void applyPotion(int index, int amount){
-        team[index].heal(amount);
-        messageLabel.setText(team[index].name + " recuperó salud.");
-        updateHealth();
-        enemyTurnTimer();
-    }
-
-    private void enemyTurnTimer(){
-        com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task(){
-            @Override
-            public void run() {
-                if(hpEnemy > 0 && team[activeIndex].hp > 0) {
-                    messageLabel.setText("¡" + enemyName + " lanza un ataque!");
-                    dealDamage(false, 15);
-                }
-            }
-        }, 1.2f);
-    }
-
-
-    public void updateAttackMenu(){
-        attackMenu = new AttackMenu(styleRed, this, team[activeIndex].moves[0], team[activeIndex].moves[1], team[activeIndex].moves[2], team[activeIndex].moves[3]);
-    }
-
-    public TextureRegionDrawable getColoredDrawable(int w, int h, Color c){
-        Pixmap p = new Pixmap(Math.max(1, w), h, Pixmap.Format.RGBA8888);
+    public TextureRegionDrawable getColoredDrawable(int w, int h, Color c) {
+        Pixmap p = new Pixmap(w > 0 ? w : 1, h, Pixmap.Format.RGBA8888);
         p.setColor(c); p.fill();
         TextureRegionDrawable d = new TextureRegionDrawable(new TextureRegion(new Texture(p)));
         p.dispose();
         return d;
     }
 
-    private TextButton.TextButtonStyle createButtonStyle(Color color){
-        TextButton.TextButtonStyle text = new TextButton.TextButtonStyle();
-        text.up = getColoredDrawable(1, 1, color);
-        text.font = font;
-        return text;
+    private TextButton.TextButtonStyle createButtonStyle(Color c) {
+        TextButton.TextButtonStyle s = new TextButton.TextButtonStyle();
+        s.up = getColoredDrawable(1, 1, c);
+        s.font = font;
+        return s;
     }
 
-    public Spirit[] getTeam(){
-        return team;
-    }
-
-    public int getActiveIndex(){
-        return activeIndex;
-    }
-
-    public int getPotions(){
-        return potions;
-    }
-
-    public void setPotions(int p){
-        potions = p;
-    }
-
-    public int getSuperPotions(){
-        return superPotions;
-    }
-
-    public void setSuperPotions(int p){
-        superPotions = p;
+    public Table getTableB(){
+        return tableB;
     }
 
     public Stage getStage(){
         return stage;
     }
 
+    public Team getPlayerTeam(){
+        return playerTeam;
+    }
 
-    @Override
-    public void onAttackSelected(String n){
-        messageLabel.setText(team[activeIndex].name + " usó " + n + "!");
-        dealDamage(true, 25);
-        onBackSelected();
-        if(hpEnemy > 0) enemyTurnTimer();
+    public int getActiveIndex(){
+        return activeIndex;
+    }
+
+    public ArrayList<ItemStack> getInventory(){
+        return inventory;
+    }
+
+    public void switchSpirit(int idx){
+        activeIndex = idx; setupBattleUI(); startEnemyTurn();
+    }
+
+    public void lose(){
+        if (dead(playerTeam.getMembers())){
+
+        }
+    }
+
+    public boolean dead(ArrayList<Invocation> members){
+        int dead = 0;
+        int i;
+        for(i = 0; i <= members.size(); i++){
+            if (members.get(i).getSpirit().isFainted()){
+                dead++;
+            }
+        }
+        if (dead < i){
+            return false;
+        }else{
+            return true;
+        }
     }
 
     @Override
-    public void onFightSelected() {
-        tableB.clearChildren(); tableB.add(attackMenu).expand().fill();
+    public void onBackSelected(){
+        setupMainButtons(190);
     }
 
     @Override
-    public void onBackSelected() {
-        setupMainButtons();
+    public void onFightSelected(){
+        tableB.clearChildren();
+        tableB.add(new AttackMenu(styleRed, this, playerTeam.getMembers().get(activeIndex).getMoves())).fill();
     }
 
     @Override
-    public void render() {
+    public void render(){
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin(); bgSprite.draw(batch); batch.end();
         stage.act(); stage.draw();

@@ -28,4 +28,12 @@ public class ItemStack {
         //item.useItem();
         count--;
     }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
 }

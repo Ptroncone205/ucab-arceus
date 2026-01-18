@@ -11,9 +11,9 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import net.mgsx.gltf.loaders.gltf.GLTFAssetLoader;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
-public class AssetUtils {
+public class AssetUtils{
 
-    public static void setTrueTypeFontLoaders(AssetManager manager) {
+    public static void setTrueTypeFontLoaders(AssetManager manager){
         FileHandleResolver resolver = new InternalFileHandleResolver();
         manager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(resolver));
         manager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(resolver));

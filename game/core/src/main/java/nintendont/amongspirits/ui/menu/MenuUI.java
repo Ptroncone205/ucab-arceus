@@ -133,6 +133,7 @@ public class MenuUI extends InputAdapter implements Disposable {
         currentMenu.setVisible(true);
         System.out.println("changed to " + name);
     }
+
     public void onClick(){
         selButton = (TextButton)buttons.get(selected);
         Runnable action = (Runnable)selButton.getUserObject();

@@ -3,7 +3,10 @@ package nintendont.amongspirits.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.github.czyzby.websocket.CommonWebSockets;
+import nintendont.amongspirits.BattleMain;
+import nintendont.amongspirits.CodexMain;
 import nintendont.amongspirits.Main;
+import nintendont.amongspirits.ui.menu.Help;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
