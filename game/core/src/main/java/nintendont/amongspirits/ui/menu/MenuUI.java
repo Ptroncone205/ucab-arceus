@@ -38,6 +38,8 @@ public class MenuUI extends InputAdapter implements Disposable {
     private Main game;
     public Stage stage;
     private Table root;
+    private Table options;
+    private Table account;
     private Skin skin;
     private HashMap<String, Table> tables = new HashMap<>();
     private Table currentMenu;
@@ -95,7 +97,7 @@ public class MenuUI extends InputAdapter implements Disposable {
         TextButton btnResume = createButton("New Game", this::newGame);
         TextButton btnSave = createButton("Load Game", this::loadGame);
         TextButton btnQuit = createButton("Options", this::options);
-        
+
         TextField username = new TextField(null, skin){
             @Override
             protected void updateDisplayText() {
@@ -114,7 +116,6 @@ public class MenuUI extends InputAdapter implements Disposable {
         });
         username.setSize(200, 40);
         buttons.add(username);
-
 
         root.center();
         root.add(title).padBottom(50).row();
@@ -166,7 +167,7 @@ public class MenuUI extends InputAdapter implements Disposable {
             @Override
             public boolean isOver(){
                 return buttons.indexOf(this) == selected;
-            } 
+            }
         };
         btn.setUserObject(action);
         btn.addListener(new ChangeListener() {
@@ -208,7 +209,7 @@ public class MenuUI extends InputAdapter implements Disposable {
         Runnable action = (Runnable)selButton.getUserObject();
         action.run();
     }
-    
+
     public boolean handleInput (int key){
         switch (key){
             case Keys.W:

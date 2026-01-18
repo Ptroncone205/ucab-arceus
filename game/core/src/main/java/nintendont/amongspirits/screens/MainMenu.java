@@ -40,13 +40,13 @@ public class MainMenu implements Screen{
         @Override
     public void show() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void render(float delta) {
         menuUI.render(delta);
-        
+
     }
 
     public void loadGame(String playerName, boolean load){
@@ -57,28 +57,28 @@ public class MainMenu implements Screen{
     @Override
     public void resize(int width, int height) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void pause() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void resume() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void hide() {
     }
-    
+
     @Override
     public void dispose() {
         menuUI.dispose();
-        
+
     }
 }
