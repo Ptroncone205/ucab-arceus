@@ -485,7 +485,8 @@ public class GameScreen implements Screen{
         }
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
-			System.out.println(player.getTeam());
+			player.getTeam().forEach(spirit -> System.out.printf(spirit.name + ", "));
+            System.out.println();
 		}
 
         if (socket.isOpen()) {
