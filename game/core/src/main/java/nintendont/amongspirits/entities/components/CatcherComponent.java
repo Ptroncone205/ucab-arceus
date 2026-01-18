@@ -2,5 +2,5 @@ package nintendont.amongspirits.entities.components;
 
 import com.badlogic.ashley.core.Component;
 
-public class CatchableComponent implements Component {
+public class CatcherComponent implements Component {
 }

@@ -1,16 +1,17 @@
 package nintendont.amongspirits.data.spirits;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Texture;
+import nintendont.amongspirits.data.codex.SpiritMove;
 
 import java.util.ArrayList;
 
 public class Invocation {
     private Spirit spirit;
     private Stats stats;
-    private ArrayList<SpiritMove> moves = new ArrayList<>();
 
     public Invocation(Spirit spirit) {
         this.spirit = spirit;
+        this.stats = new Stats();
     }
 
     public Stats getStats() {
@@ -30,7 +31,7 @@ public class Invocation {
     }
 
     public ArrayList<SpiritMove> getMoves(){
-        return moves;
+        return spirit.getForm().getMoves();
     }
 
     public boolean isFainted() {

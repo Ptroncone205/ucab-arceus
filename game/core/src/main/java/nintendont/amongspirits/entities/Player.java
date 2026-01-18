@@ -14,6 +14,7 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.data.spirits.Pasture;
 import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.data.spirits.Team;
+import nintendont.amongspirits.entities.systems.YumenjiangSystem;
 import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
@@ -27,6 +28,10 @@ public class Player implements Disposable{
     private Satchel satchel;
     private Team team = new Team();
     private Pasture pasture = new Pasture();
+
+
+    private ThrowingMode mode = ThrowingMode.TO_CATCH;
+    private int selectedTeamMemberIndex = 0;
 
     private Scene scene;
     private MotionState motionState;
@@ -134,10 +139,31 @@ public class Player implements Disposable{
         return pasture;
     }
 
+    public ThrowingMode getMode() {
+        return mode;
+    }
+
+    public void setMode(ThrowingMode mode) {
+        this.mode = mode;
+    }
+
+    public int getSelectedTeamMemberIndex() {
+        return selectedTeamMemberIndex;
+    }
+
+    public void setSelectedTeamMemberIndex(int selectedTeamMemberIndex) {
+        this.selectedTeamMemberIndex = selectedTeamMemberIndex;
+    }
+
     @Override
     public void dispose() {
         rigidBody.dispose();
         shape.dispose();
         scene.modelInstance.model.dispose();
+    }
+
+    public enum ThrowingMode {
+        TO_CATCH,
+        TO_ENCOUNTER,
     }
 }

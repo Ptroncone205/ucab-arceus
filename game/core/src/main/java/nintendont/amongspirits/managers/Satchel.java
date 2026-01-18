@@ -17,7 +17,7 @@ public class Satchel {
         if (items.size() >= SLOTS){
             return false;
         }
-        
+
         for (int i = 0; i < items.size(); i++){
             if ((items.get(i).item).name.equals(item.name)){
                 items.get(i).count++;
@@ -45,5 +45,9 @@ public class Satchel {
 
     public void setItems(ArrayList<ItemStack> items){
         this.items = items;
+    }
+
+    public boolean hasYumenjiang() {
+        return items.stream().anyMatch(i -> i.count == 1);
     }
 }

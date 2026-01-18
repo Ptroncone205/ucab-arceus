@@ -14,6 +14,7 @@ import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.CatchableComponent;
+import nintendont.amongspirits.entities.components.CatcherComponent;
 import nintendont.amongspirits.entities.components.SpiritTagComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
 import nintendont.amongspirits.physics.PhysicsWorld;
@@ -22,7 +23,7 @@ public class CatchableSystem extends IteratingSystem {
     private Engine engine;
     private Player player;
     private final PhysicsWorld world;
-    private final ComponentMapper<CatchableComponent> catchableMapper = ComponentMapper.getFor(CatchableComponent.class);
+    private final ComponentMapper<CatcherComponent> catcherMapper = ComponentMapper.getFor(CatcherComponent.class);
     private final ComponentMapper<TriggerComponent> triggerMapper = ComponentMapper.getFor(TriggerComponent.class);
 
     public CatchableSystem(Player player, PhysicsWorld world) {
@@ -64,6 +65,11 @@ public class CatchableSystem extends IteratingSystem {
     }
 
     public void handleTrigger(Entity entity, Entity otherEntity) {
+        CatcherComponent catcher = catcherMapper.get(otherEntity);
+        if (catcher == null) {
+            return;
+        }
+
         SpiritTagComponent spiritType = entity.getComponent(SpiritTagComponent.class);
         if (spiritType != null) {
             Invocation invocation = new Invocation(spiritType.spirit);

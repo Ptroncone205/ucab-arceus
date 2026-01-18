@@ -89,6 +89,10 @@ public class SpiritForm {
         this.researchLevel = researchLevel;
     }
 
+    public ArrayList<SpiritMove> getMoves() {
+        return moves;
+    }
+
     public List<ResearchTaskSet> getTasks() {
         return tasks;
     }

@@ -83,8 +83,8 @@ public class EncounterSystem extends IteratingSystem {
 
         Team enemyTeam = new Team();
         enemyTeam.getMembers().add(new Invocation(spiritTag.spirit));
-        Enemy enemy = new Enemy("Wild Spirit", new Team());
+        Enemy enemy = new Enemy("Wild Spirit", enemyTeam);
 
-        game.setScreen(new BattleScreen(player, enemy, challenger.teamMemberId));
+        game.setScreen(new BattleScreen(game, player, enemy, challenger.teamMemberId));
     }
 }

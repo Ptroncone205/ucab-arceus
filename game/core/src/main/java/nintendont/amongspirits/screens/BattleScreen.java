@@ -12,7 +12,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
+import nintendont.amongspirits.Main;
 import nintendont.amongspirits.data.codex.BattleSpiritAssets;
+import nintendont.amongspirits.data.codex.SpiritMove;
 import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.entities.Enemy;
 import nintendont.amongspirits.entities.Player;
@@ -26,6 +28,7 @@ public class BattleScreen implements Screen, MenuListener {
     private Sprite bgSprite;
     private Label messageLabel;
 
+    private Main game;
     private Player player;
     private Enemy enemy;
     private int playerActiveIndex = 0;
@@ -35,10 +38,13 @@ public class BattleScreen implements Screen, MenuListener {
     private BitmapFont font;
     private TextButton.TextButtonStyle styleRed, styleBlue, styleGreen, styleYellow;
 
-    public BattleScreen(Player player, Enemy enemy, int initialPlayerActiveIndex) {
+    public BattleScreen(Main game, Player player, Enemy enemy, int initialPlayerActiveIndex) {
+        this.game = game;
         this.player = player;
         this.enemy = enemy;
         this.playerActiveIndex = initialPlayerActiveIndex;
+
+        Gdx.input.setCursorCatched(false);
 
         assets = new AssetManager();
         assets.load(BattleSpiritAssets.MALE_DEER);
@@ -51,6 +57,8 @@ public class BattleScreen implements Screen, MenuListener {
         assets.load(BattleSpiritAssets.FEMALE_FOX);
         assets.load(BattleSpiritAssets.MALE_LION);
         assets.load(BattleSpiritAssets.FEMALE_LION);
+
+        assets.finishLoading();
 
         batch = new SpriteBatch();
         stage = new Stage();
@@ -128,25 +136,26 @@ public class BattleScreen implements Screen, MenuListener {
         TextButton btnRun = new TextButton("HUIR", styleYellow);
 
         btnFight.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
+            @Override public void clicked(InputEvent e, float x, float y) {
                 onFightSelected();
             }});
 
         btnBag.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
+            @Override public void clicked(InputEvent e, float x, float y) {
             tableB.clearChildren();
             tableB.add(new BagMenu(styleBlue, BattleScreen.this, player.getSatchel().getItems())).fill();
         }});
 
         btnTeam.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
+            @Override public void clicked(InputEvent e, float x, float y) {
             stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, false, assets));
         }});
 
         btnRun.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
-                Gdx.app.exit();
-            }});
+            @Override public void clicked(InputEvent e, float x, float y) {
+                game.setScreen(new GameScreen(game, player.getName(), true));
+            }
+        });
 
         // Anadir botones principales
         tableB.add(btnFight).size(btnW, btnH).pad(2);
@@ -308,6 +317,6 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void dispose() {
-
+        assets.dispose();
     }
 }

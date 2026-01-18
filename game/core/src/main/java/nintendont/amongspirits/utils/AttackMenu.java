@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import nintendont.amongspirits.data.spirits.SpiritMove;
+import nintendont.amongspirits.data.codex.SpiritMove;
 import java.util.ArrayList;
 
 public class AttackMenu extends Table{

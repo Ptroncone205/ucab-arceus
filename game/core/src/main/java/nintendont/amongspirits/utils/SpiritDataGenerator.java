@@ -2,6 +2,7 @@ package nintendont.amongspirits.utils;
 import java.util.Random;
 
 public class SpiritDataGenerator {
+    private static int nextId;
     private static final Random rand = new Random();
     private static final String[] names = {
         "Tian-Lang", "Yue-Tu", "Bai-Hu", "Ling-Lu", "Jiu-Wei",
@@ -43,6 +44,12 @@ public class SpiritDataGenerator {
         "A quiet observer of the tides who lived by the sea for many decades. One morning, they walked into the surf and became as fluid as the waves themselves. They now wander the coastlines, a shimmering presence in the spray, guiding the currents and watching the ships pass by.",
         "Known for an incredible sense of direction, they were never lost, no matter how far they traveled. When their journey reached its natural end, they became a guiding light for others. They roam the world's most confusing paths, helping the uncertain find their way home without ever speaking a word.",
     };
+    public int getNextId() {
+        return nextId++;
+    }
+    public boolean getGender() {
+        return rand.nextBoolean();
+    }
     public String getName(){
         return names[rand.nextInt(names.length)];
     }

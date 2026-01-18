@@ -17,6 +17,10 @@ public class Codex {
         return forms;
     }
 
+    public SpiritForm getFormById(int id) {
+        return forms.stream().filter(f -> f.getId() == id).findFirst().orElse(null);
+    }
+
     public void addForm(SpiritForm spiritForm) {
         // TODO actualizar la entrada si ya existe :v
         forms.add(spiritForm);

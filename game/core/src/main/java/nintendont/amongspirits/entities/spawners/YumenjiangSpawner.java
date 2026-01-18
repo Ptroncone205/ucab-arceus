@@ -11,7 +11,6 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
-import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
@@ -61,7 +60,7 @@ public class YumenjiangSpawner {
         return entity;
     }
 
-    public Entity spawnThrowableYumenjiang(Vector3 spawnPoint, Vector3 direction, float forceMagnitude) {
+    public Entity spawnThrowableYumenjiangToCatch(Vector3 spawnPoint, Vector3 direction, float forceMagnitude) {
         Entity entity = spawnYumenjiang(spawnPoint);
 
         ThrowableComponent throwable = engine.createComponent(ThrowableComponent.class);
@@ -80,10 +79,13 @@ public class YumenjiangSpawner {
         trigger.bulletObject.userData = entity;
         entity.add(trigger);
 
+        CatcherComponent catcher = engine.createComponent(CatcherComponent.class);
+        entity.add(catcher);
+
         return entity;
     }
 
-    public Entity spawnThrowableYumenjiangWithSpirit(Vector3 spawnPoint, Vector3 direction, float forceMagnitude, int teamMemberId) {
+    public Entity spawnThrowableYumenjiangToChallenge(Vector3 spawnPoint, Vector3 direction, float forceMagnitude, int teamMemberId) {
         Entity entity = spawnYumenjiang(spawnPoint);
 
         ThrowableComponent throwable = engine.createComponent(ThrowableComponent.class);

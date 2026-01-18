@@ -88,7 +88,6 @@ public class GameScreen implements Screen{
 
     private Engine ecsEngine;
     private PlayerSpawner playerSpawner;
-    private YumenjiangSpawner yumenjiangFactory;
 
 	private Cubemap diffuseCubemap;
 	private Cubemap environmentCubemap;
@@ -139,6 +138,9 @@ public class GameScreen implements Screen{
 		assets = new AssetManager();
 		System.out.println("init just called");
 
+        // Loading data
+        Codex codex = new FakeCodexLoader().load();
+
 		// cargar todos los assets usados por el juego incluyendo texturas y modelos
         AssetUtils.loadGLTF(assets, "models/mc/lukitm501.gltf");
 		assets.load("textures/oranberry.png", Texture.class);
@@ -184,7 +186,7 @@ public class GameScreen implements Screen{
 		inventory = new Satchel();
 
 		crafting = new CraftManager();
-		guiManager = new GUIManager(batch, inventory, crafting);
+		guiManager = new GUIManager(batch, inventory, crafting, codex);
 		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
@@ -251,15 +253,19 @@ public class GameScreen implements Screen{
 		iScan = new InteractionScanner();
 		focusedItem = null;
 
-        // Loading data
-        Codex codex = new FakeCodexLoader().load();
-
         // Setup ECS engine
         ecsEngine = new Engine();
 
         ecsEngine.addEntityListener(Family.all(ModelComponent.class).get(), new SceneModelListener(sceneManager));
         ecsEngine.addEntityListener(Family.all(RigidbodyComponent.class).get(), new BulletRigidbodyListener(physicsWorld.getDynamicsWorld()));
         ecsEngine.addEntityListener(Family.all(TriggerComponent.class).get(), new BulletTriggerListener(physicsWorld.getDynamicsWorld()));
+
+        // Setup yumenjiang factory
+        SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
+        YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
+
+        // Setup player factory
+        playerSpawner = new PlayerSpawner(ecsEngine, assets);
 
         ecsEngine.addSystem(new BulletPhysicsSystem(physicsWorld));
         ecsEngine.addSystem(new PlayerSystem(player, playerController));
@@ -269,14 +275,8 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
         ecsEngine.addSystem(new CatchableSystem(player, physicsWorld));
         ecsEngine.addSystem(new EncounterSystem(game, player, physicsWorld));
+        ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
-
-        // Setup player factory
-        playerSpawner = new PlayerSpawner(ecsEngine, assets);
-
-        // Setup yumenjiang factory
-        SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
-        yumenjiangFactory = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
 
         SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, codex);
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
@@ -393,9 +393,6 @@ public class GameScreen implements Screen{
                 Gdx.app.error("WS", "Error!", error);
                 return FULLY_HANDLED;
             }
-
-            // Note: You may also need to override onMessage(WebSocket, byte[])
-            // if sending binary data.
         });
 
         socket.connect();
@@ -469,24 +466,6 @@ public class GameScreen implements Screen{
 				sceneManager.removeScene(focusedItem.getScene());
 				focusedItem = null;
 			}
-        }
-
-
-        if (Const.currentState == GameState.INGAME && Gdx.input.justTouched()) {
-			boolean flag = false;
-			for (ItemStack iS : player.getSatchel().getItems()){
-				if (iS.getItem() instanceof Pokeball){
-					iS.count--;
-					flag = true;
-					break;
-				}
-			}
-			if (!flag) return;
-
-            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
-            Vector3 throwDirection = camera.direction.cpy();
-            throwDirection.add(new Vector3(0, 0.5f, 0));
-            yumenjiangFactory.spawnThrowableYumenjiang(spawnPoint, throwDirection, 50);
         }
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
