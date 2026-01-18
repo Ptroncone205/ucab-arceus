@@ -147,9 +147,9 @@ public class GUIManager implements Disposable{
             case SELECT_ITEM:
             case SELECT_PKMN:
                 return inventoryMenu.handleInput(keycode);
-            default: return false;
             case PAUSE:
                 return pauseMenu.handleInput(keycode);
+            default: return false;
         }
     }
 

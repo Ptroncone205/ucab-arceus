@@ -20,8 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import nintendont.amongspirits.data.savedata.BtnEventListener;
 
-public class Options extends Table {
-    private Table root;
+public class Options extends MenuOverlay {
     private Skin skin;
 
     private ArrayList<Actor> actors = new ArrayList<>();
@@ -29,10 +28,9 @@ public class Options extends Table {
     private int selected;
     private TextButton selButton;
 
-    public Options (Skin skin){
-        // root = new Table();
-        // this.add(root);
-        this.skin = skin;
+    public Options (Skin skin, MenuUI menu){
+        super(skin, menu);
+        
         this.setFillParent(true);
         this.setBackground(skin.newDrawable("white",new Color(Color.BLACK)));
         Label title = new Label("JUEGOTE", skin);
@@ -59,8 +57,6 @@ public class Options extends Table {
             }
         });
         username.setSize(200, 40);
-        actors.add(username);
-
 
         this.center();
         this.add(title).padBottom(50).row();
@@ -69,31 +65,17 @@ public class Options extends Table {
         this.add(btnResume).width(200).height(50).padBottom(15).row();
         this.add(btnSave).width(200).height(50).padBottom(15).row();
         this.add(btnQuit).width(200).height(50).padBottom(15).row();
-    }
 
+        TextButton btnBack = createButton("Back", this::back);
+        this.add(btnBack).width(200).height(50).padBottom(15).row();
 
-    private TextButton createButton(String text, Runnable action) {
-        TextButton btn = new TextButton(text, skin){
-            @Override
-            public boolean isOver(){
-                return actors.indexOf(this) == selected;
-            } 
-        };
-        btn.setUserObject(action);
-        actors.add(btn);
-        btn.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                action.run();
-            }
-        });
-        btn.addListener(new ClickListener(){
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                selected = actors.indexOf(btn);
-            }
-        });
-        return btn;
+        actors.add(username);
+        actors.add(btnResume);
+        actors.add(btnSave);
+        actors.add(btnQuit);
+        actors.add(btnBack);
+
+        this.setDebug(true);
     }
 
     public void onClick(){
@@ -102,23 +84,16 @@ public class Options extends Table {
         action.run();
     }
 
+    @Override
     public boolean handleInput (int key){
         switch (key){
-            case Keys.W:
-                selected -= 1;
-                if (selected < 0) selected = actors.size() - 1;
-                return true;
-            case Keys.S:
-                selected += 1;
-                if (selected >= actors.size()) selected = 0;
-                return true;
             case Keys.ENTER:
             case Keys.SPACE:
                 Actor a = actors.get(selected);
                 if (a instanceof TextButton) onClick();
                 return true;
             default:
-                return false;
+                return super.handleInput(key);
         }
     }
 }

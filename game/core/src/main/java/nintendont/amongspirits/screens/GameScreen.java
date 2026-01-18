@@ -364,7 +364,7 @@ public class GameScreen implements Screen{
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
-//        physicsWorld.renderDebug(camera);
+        // physicsWorld.renderDebug(camera);
 
 		// HUD
 		batch.begin();
