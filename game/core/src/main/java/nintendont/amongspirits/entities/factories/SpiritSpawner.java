@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
@@ -53,6 +54,9 @@ public class SpiritSpawner {
 
     public Entity spawnSpirit(SceneAsset modelAsset, String animationName, float modelScale, Vector3 spawnPoint, Vector3[] patrolPoints) {
         Entity entity = engine.createEntity();
+
+        SpiritTypeComponent spiritType = engine.createComponent(SpiritTypeComponent.class);
+        spiritType.spirit = new Spirit("juan", "FUEGO", 100f, null, animationName);
 
         ModelComponent model = engine.createComponent(ModelComponent.class);
         model.gltfScene = new Scene(modelAsset.scene);
@@ -101,6 +105,7 @@ public class SpiritSpawner {
 
         CatchableComponent catchable = engine.createComponent(CatchableComponent.class);
 
+        entity.add(spiritType);
         entity.add(transform);
         entity.add(model);
         entity.add(animation);

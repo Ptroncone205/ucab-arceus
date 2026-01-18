@@ -35,6 +35,7 @@ import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
@@ -42,6 +43,7 @@ import nintendont.amongspirits.entities.components.TriggerComponent;
 import nintendont.amongspirits.entities.factories.SpiritSpawner;
 import nintendont.amongspirits.entities.factories.YumenjiangSpawner;
 import nintendont.amongspirits.entities.items.Item;
+import nintendont.amongspirits.entities.items.Pokeball;
 import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InteractionScanner;
@@ -243,7 +245,7 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new AnimationSystem());
         ecsEngine.addSystem(new SpiritSystem());
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
-        ecsEngine.addSystem(new CatchableSystem(physicsWorld));
+        ecsEngine.addSystem(new CatchableSystem(physicsWorld, player.getTeam()));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
         // Setup yumenjiang factory
@@ -353,12 +355,26 @@ public class GameScreen implements Screen{
         }
 
 
-        if (Gdx.input.justTouched()) {
+        if (Const.currentState == GameState.INGAME && Gdx.input.justTouched()) {
+			boolean flag = false;
+			for (ItemStack iS : player.getSatchel().getItems()){
+				if (iS.getItem() instanceof Pokeball){
+					iS.count--;
+					flag = true;
+					break;
+				}
+			}
+			if (!flag) return;
+
             Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
             Vector3 throwDirection = camera.direction.cpy();
             throwDirection.add(new Vector3(0, 0.5f, 0));
             yumenjiangFactory.spawnThrowableYumenjiang(spawnPoint, throwDirection, 50);
         }
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
+			System.out.println(player.getTeam());
+		}
 
 
 		// render

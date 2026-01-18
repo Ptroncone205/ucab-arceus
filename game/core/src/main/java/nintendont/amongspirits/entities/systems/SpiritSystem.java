@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import nintendont.amongspirits.entities.components.AnimationComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
 import nintendont.amongspirits.entities.components.SpiritComponent;
+import nintendont.amongspirits.entities.components.SpiritTypeComponent;
 import nintendont.amongspirits.entities.components.TransformComponent;
 
 import java.awt.geom.NoninvertibleTransformException;
@@ -24,7 +25,7 @@ public class SpiritSystem extends IteratingSystem {
     private final ComponentMapper<SpiritComponent> spiritMapper = ComponentMapper.getFor(SpiritComponent.class);
     private final ComponentMapper<RigidbodyComponent> rigidbodyMapper = ComponentMapper.getFor(RigidbodyComponent.class);
     private final ComponentMapper<AnimationComponent> animationMapper = ComponentMapper.getFor(AnimationComponent.class);
-
+    private final ComponentMapper<SpiritTypeComponent> spiritTypeMapper = ComponentMapper.getFor(SpiritTypeComponent.class);
     public SpiritSystem() {
         super(Family.all(SpiritComponent.class, RigidbodyComponent.class, AnimationComponent.class).get());
     }
@@ -35,6 +36,7 @@ public class SpiritSystem extends IteratingSystem {
         SpiritComponent spirit = spiritMapper.get(entity);
         RigidbodyComponent rigidbody = rigidbodyMapper.get(entity);
         AnimationComponent animation = animationMapper.get(entity);
+        SpiritTypeComponent spiritType = spiritTypeMapper.get(entity);
 
         if(spirit.status == STATUS_MOVING) {
             rigidbody.bulletBody.activate(true);

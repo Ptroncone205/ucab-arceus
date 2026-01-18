@@ -8,8 +8,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestNotMeRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import nintendont.amongspirits.Const;
+import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
@@ -21,6 +23,7 @@ public class Player implements Disposable{
     private final Vector3 tmpPosition = new Vector3();
 
     private Satchel satchel;
+    private Array<Spirit> team = new Array<>(6);
 
     private Scene scene;
     private MotionState motionState;
@@ -118,6 +121,10 @@ public class Player implements Disposable{
 
     public Satchel getSatchel(){
         return satchel;
+    }
+
+    public Array<Spirit> getTeam(){
+        return team;
     }
 
     @Override
