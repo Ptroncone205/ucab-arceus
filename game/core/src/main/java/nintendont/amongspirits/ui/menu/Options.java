@@ -2,23 +2,15 @@ package nintendont.amongspirits.ui.menu;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-
-import nintendont.amongspirits.data.savedata.BtnEventListener;
 
 public class Options extends MenuOverlay {
     private Skin skin;
@@ -30,16 +22,16 @@ public class Options extends MenuOverlay {
 
     public Options (Skin skin, MenuUI menu){
         super(skin, menu);
-        
+
         this.setFillParent(true);
         this.setBackground(skin.newDrawable("white",new Color(Color.BLACK)));
         Label title = new Label("JUEGOTE", skin);
         title.setFontScale(2f);
-        
+
         TextButton btnResume = createButton("New Game", () -> System.out.println("new game"));
         TextButton btnSave = createButton("Load Game", () -> System.out.println("laod game"));
         TextButton btnQuit = createButton("Options", () -> System.out.println("options"));
-        
+
         TextField username = new TextField(null, skin){
             @Override
             protected void updateDisplayText() {

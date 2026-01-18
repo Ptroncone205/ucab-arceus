@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-public class Help extends MenuOverlay{
+public class Help extends MenuOverlay {
 
     public Help (Skin skin, MenuUI menu){
         super(skin, menu);
@@ -18,7 +18,7 @@ public class Help extends MenuOverlay{
         this.setBackground(skin.newDrawable(new TextureRegionDrawable(new Texture(new Pixmap(Gdx.files.internal("textures/menu/arceus.png"))))));
         Label title = new Label("AYUDA", skin);
         title.setFontScale(2f);
-        
+
         TextButton btnBack = createButton("Back", this::back);
         TextArea h1 = new TextArea("Usa WASD para moverte", skin);
         h1.setSize(200, 200);

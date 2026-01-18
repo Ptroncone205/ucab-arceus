@@ -1,36 +1,69 @@
 package nintendont.amongspirits.ui.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.CodexPreviewAssets;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.Satchel;
+import nintendont.amongspirits.ui.codex.CodexMainUI;
+import nintendont.amongspirits.ui.menu.MenuOverlay;
+import nintendont.amongspirits.utils.AssetUtils;
+
+import java.util.HashMap;
 
 public class GUIManager implements Disposable{
+    private AssetManager assetManager = Const.get().assetManager;
     public Stage stage;
+    private CodexMainUI codexUI;
+    private Codex codex;
     private InventoryMenu inventoryMenu;
     private Skin skin;
     private PauseMenu pauseMenu;
 
-    public GUIManager (SpriteBatch batch, Satchel satchel, CraftManager craftManager){
+
+    public GUIManager (SpriteBatch batch, Satchel satchel, CraftManager craftManager, Codex codex){
         stage =new Stage(new ScreenViewport(), batch);
+        this.codex = codex;
+        assetManager.load("sfx/ui/open_page_foley.ogg", Sound.class);
+        assetManager.load("sprites/icons/lion.png", Texture.class);
+        assetManager.load("sprites/backgrounds/codex-scroll.png", Texture.class);
+        assetManager.load(CodexPreviewAssets.DEER);
+        assetManager.load(CodexPreviewAssets.WOLF);
+        assetManager.load(CodexPreviewAssets.BUNNY);
+        assetManager.load(CodexPreviewAssets.FOX);
+        assetManager.load(CodexPreviewAssets.LION);
+
+        AssetUtils.setTrueTypeFontLoaders(assetManager);
+        AssetUtils.loadFont(assetManager, "roboto_xs.ttf", "fonts/roboto.ttf", 12);
+        AssetUtils.loadFont(assetManager, "roboto_sm.ttf", "fonts/roboto.ttf", 14);
+        AssetUtils.loadFont(assetManager, "roboto_base.ttf", "fonts/roboto.ttf", 16);
+        AssetUtils.loadFont(assetManager, "roboto_lg.ttf", "fonts/roboto.ttf", 18);
+        AssetUtils.loadFont(assetManager, "roboto_xl.ttf", "fonts/roboto.ttf", 20);
+        AssetUtils.loadFont(assetManager, "roboto_2xl.ttf", "fonts/roboto.ttf", 24);
+        AssetUtils.loadFont(assetManager, "chinese_8xl.ttf", "fonts/chinese_takeaway.ttf", 96);
+        AssetUtils.loadFont(assetManager, "chinese_9xl.ttf", "fonts/chinese_takeaway.ttf", 128);
+
+        assetManager.finishLoading();
+        codexUI = new CodexMainUI(assetManager, codex);
 
         createSkin();
         inventoryMenu = new InventoryMenu(satchel, craftManager, skin);
         pauseMenu = new PauseMenu(skin);
 
+        stage.addActor(codexUI);
         stage.addActor(pauseMenu);
         stage.addActor(inventoryMenu);
 
@@ -58,7 +91,7 @@ public class GUIManager implements Disposable{
             case PAUSE:
                 Const.currentState = GameState.INGAME;
                 pauseMenu.setVisible(false);
-                
+
                 Gdx.input.setCursorCatched(true);
                 break;
             case INVENTORY:
@@ -83,7 +116,7 @@ public class GUIManager implements Disposable{
                 inventoryMenu.setVisible(true);
                 Gdx.input.setCursorCatched(false);
                 break;
-        
+
             case INVENTORY:
                 Const.currentState = GameState.INGAME;
                 inventoryMenu.setVisible(false);
@@ -101,9 +134,24 @@ public class GUIManager implements Disposable{
         update();
     }
 
+    public void toggleCodex(){
+        if (Const.currentState != GameState.INGAME && Const.currentState != GameState.CODEX) return;
+        if (codexUI.isVisible()){
+            codexUI.setVisible(false);
+        } else{
+            codexUI = new CodexMainUI(assetManager, codex);
+            stage.addActor(codexUI);
+            codexUI.validate();
+            codexUI.setVisible(true);
+        }
+        Gdx.input.setCursorCatched(!Gdx.input.isCursorCatched());
+        Const.currentState = Const.currentState == GameState.INGAME ? GameState.CODEX : GameState.INGAME;
+    }
+
     public void hideAll(){
         inventoryMenu.setVisible(false);
         pauseMenu.setVisible(false);
+        codexUI.setVisible(false);
         Const.currentState = GameState.INGAME;
     }
 
@@ -149,6 +197,8 @@ public class GUIManager implements Disposable{
                 return inventoryMenu.handleInput(keycode);
             case PAUSE:
                 return pauseMenu.handleInput(keycode);
+            case CODEX:
+//                return codexUI.handleInput(keycode);
             default: return false;
         }
     }

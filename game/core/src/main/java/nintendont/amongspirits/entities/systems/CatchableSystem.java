@@ -13,6 +13,8 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btManifoldPoint;
 import com.badlogic.gdx.utils.Array;
 
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.entities.components.CatchableComponent;
 import nintendont.amongspirits.entities.components.SpiritTypeComponent;
@@ -25,11 +27,12 @@ public class CatchableSystem extends IteratingSystem {
     private final PhysicsWorld world;
     private final ComponentMapper<CatchableComponent> catchableMapper = ComponentMapper.getFor(CatchableComponent.class);
     private final ComponentMapper<TriggerComponent> triggerMapper = ComponentMapper.getFor(TriggerComponent.class);
-
-    public CatchableSystem(PhysicsWorld world, Array<Spirit> team) {
+    private final FakeCodexLoader codex;
+    public CatchableSystem(PhysicsWorld world, Array<Spirit> team, FakeCodexLoader codex) {
         super(Family.all(CatchableComponent.class, TriggerComponent.class).get());
         this.world = world;
         this.team = team;
+        this.codex = codex;
     }
 
     @Override
@@ -65,14 +68,16 @@ public class CatchableSystem extends IteratingSystem {
     }
 
     public void handleTrigger(Entity entity, Entity otherEntity) {
-        
+        if (team.size == 6) return;
+
         SpiritTypeComponent s1 = entity.getComponent(SpiritTypeComponent.class);
         if (s1 == null) s1 = entity.getComponent(SpiritTypeComponent.class);
-        
+
         team.add(s1.spirit);
-        
+        codex.addForm(s1.spirit.name);
+
         engine.removeEntity(entity);
         engine.removeEntity(otherEntity);
-        
+
     }
 }

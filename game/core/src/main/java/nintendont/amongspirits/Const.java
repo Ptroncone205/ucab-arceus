@@ -20,14 +20,15 @@ public class Const implements Disposable {
     //singleton jeje
     public static Const hola;
     // game states
-    public static enum GameState{ 
+    public static enum GameState{
         MENU,
         INGAME,         // 0
         INVENTORY,      // 1
         PAUSE,          // 2
         SELECT_ITEM,    // 3
         SELECT_PKMN,    // 4
-        BATTLE          // 5
+        BATTLE,         // 5
+        CODEX
     }
     public static GameState currentState = GameState.INGAME;
     //todo
@@ -73,7 +74,7 @@ public class Const implements Disposable {
     public void addRigidBody(btRigidBody body){
         physicsWorld.getDynamicsWorld().addRigidBody(body);
     }
-    
+
     public void addScene(Scene scene){
         sceneManager.addScene(scene);
     }
@@ -81,7 +82,7 @@ public class Const implements Disposable {
     public <T> void loadAsset(String path, Class<T> type){
         assetManager.load(path, type);
     }
-    
+
     public btDiscreteDynamicsWorld getDynamicsWorld(){
         return physicsWorld.getDynamicsWorld();
     }
@@ -96,7 +97,7 @@ public class Const implements Disposable {
         spriteBatch = new SpriteBatch();
         return spriteBatch;
     }
-    
+
     @Override
     public void dispose() {
         if (sceneManager != null) sceneManager.dispose();

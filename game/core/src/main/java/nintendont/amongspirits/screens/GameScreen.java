@@ -44,6 +44,8 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.online.packets.PlayerCoordinates;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.entities.ItemStack;
@@ -183,7 +185,10 @@ public class GameScreen implements Screen{
 		inventory = new Satchel();
 
 		crafting = new CraftManager();
-		guiManager = new GUIManager(batch, inventory, crafting);
+        FakeCodexLoader codexLoader = new FakeCodexLoader();
+        Codex codex = codexLoader.load();
+
+		guiManager = new GUIManager(batch, inventory, crafting, codex);
 		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
@@ -263,7 +268,7 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new AnimationSystem());
         ecsEngine.addSystem(new SpiritSystem());
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
-        ecsEngine.addSystem(new CatchableSystem(physicsWorld, player.getTeam()));
+        ecsEngine.addSystem(new CatchableSystem(physicsWorld, player.getTeam(), codexLoader));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
         // Setup player factory
@@ -472,6 +477,7 @@ public class GameScreen implements Screen{
 			for (ItemStack iS : player.getSatchel().getItems()){
 				if (iS.getItem() instanceof Pokeball){
 					iS.count--;
+                    guiManager.update();
 					flag = true;
 					break;
 				}
@@ -522,6 +528,9 @@ public class GameScreen implements Screen{
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             guiManager.toggleInventory();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+            guiManager.toggleCodex();
         }
 
         // FOR DEBUGGING: Remember to delete

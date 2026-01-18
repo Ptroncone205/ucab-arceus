@@ -1,9 +1,14 @@
 package nintendont.amongspirits.data.codex;
 
+import java.util.HashMap;
+
 public class FakeCodexLoader extends CodexLoader {
+    private HashMap<String, SpiritForm> formsMap;
+    private Codex codex;
     @Override
     public Codex load() {
-        Codex codex = new Codex();
+        codex = new Codex();
+        this.formsMap = new HashMap<>();
 
         SpiritForm deer = new SpiritForm(
             1,
@@ -207,12 +212,21 @@ public class FakeCodexLoader extends CodexLoader {
             0
         ));
 
+        formsMap.put("Leon", lion);
+        formsMap.put("Zorro", fox);
+        formsMap.put("Conejo", bunny);
+        formsMap.put("Lobo", wolf);
+        formsMap.put("Ciervo", deer);
+
         codex.addForm(deer);
-        codex.addForm(wolf);
-        codex.addForm(bunny);
+//        codex.addForm(wolf);
+//        codex.addForm(bunny);
+
 //        codex.addForm(bear);
-        codex.addForm(fox);
-        codex.addForm(lion);
+
+//        codex.addForm(fox);
+//        codex.addForm(lion);
+
 //        codex.addForm(horse);
 //        codex.addForm(basilisk);
 //        codex.addForm(frog);
@@ -221,5 +235,9 @@ public class FakeCodexLoader extends CodexLoader {
 //        codex.addForm(armadillo);
 
         return codex;
+    }
+
+    public void addForm(String name){
+        codex.addForm( this.formsMap.get(name) );
     }
 }
