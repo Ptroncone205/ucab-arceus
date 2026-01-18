@@ -35,7 +35,7 @@ public class MenuUI extends InputAdapter implements Disposable {
 
     private Main game;
     public Stage stage;
-    
+
     private Skin skin;
     private HashMap<String, MenuOverlay> tables = new HashMap<>();
     private MenuOverlay currentMenu;
@@ -140,6 +140,7 @@ public class MenuUI extends InputAdapter implements Disposable {
         currentMenu.setVisible(true);
         System.out.println("changed to " + name);
     }
+
     public void onClick(){
         selButton = (TextButton)buttons.get(selected);
         Runnable action = (Runnable)selButton.getUserObject();

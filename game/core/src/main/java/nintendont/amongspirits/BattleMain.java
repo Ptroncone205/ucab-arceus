@@ -227,7 +227,8 @@ public class BattleMain extends ApplicationAdapter implements MenuListener{
     private TextureRegionDrawable createBarDrawable(float percent){
         int w = 200, h = 20;
         Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-        p.setColor(Color.BLACK); p.fill();
+        p.setColor(Color.BLACK);
+        p.fill();
         Color colorVida = percent < 0.2f ? Color.RED : (percent < 0.5f ? Color.YELLOW : Color.GREEN);
         p.setColor(colorVida);
         p.fillRectangle(0, 0, (int)(w * Math.max(0, percent)), h);

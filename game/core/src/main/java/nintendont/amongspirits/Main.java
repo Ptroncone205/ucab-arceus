@@ -43,13 +43,12 @@ public class Main extends Game {
         gameScreen = null;
         this.setScreen(new MainMenu(this));
     }
-    
+
     @Override
     public void resize(int width, int height) {
-        // TODO Auto-generated method stub
         super.resize(width, height);
     }
-    
+
     @Override
     public void dispose() {
         super.dispose();
