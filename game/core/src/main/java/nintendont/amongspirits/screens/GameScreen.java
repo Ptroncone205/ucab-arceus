@@ -1,8 +1,11 @@
 package nintendont.amongspirits.screens;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Optional;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -20,6 +23,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.github.czyzby.websocket.WebSocket;
+import com.github.czyzby.websocket.WebSocketListener;
+import com.github.czyzby.websocket.WebSockets;
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
@@ -34,14 +44,17 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
+import nintendont.amongspirits.data.online.packets.PlayerCoordinates;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
+import nintendont.amongspirits.entities.components.TransformComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
-import nintendont.amongspirits.entities.factories.SpiritSpawner;
-import nintendont.amongspirits.entities.factories.YumenjiangSpawner;
+import nintendont.amongspirits.entities.spawners.PlayerSpawner;
+import nintendont.amongspirits.entities.spawners.SpiritSpawner;
+import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.entities.items.Pokeball;
 import nintendont.amongspirits.entities.systems.*;
@@ -59,15 +72,20 @@ import nintendont.amongspirits.ui.game.BtnEventListener;
 import nintendont.amongspirits.ui.game.GUIManager;
 import nintendont.amongspirits.utils.AssetUtils;
 
+import static com.github.czyzby.websocket.WebSocketListener.FULLY_HANDLED;
+
 public class GameScreen implements Screen{
     private Main game;
+    private WebSocket socket;
     private final Const context = Const.get();
 	private SceneManager sceneManager;
 	private SceneAsset sceneAsset;
 	public static AssetManager assets;
 	private Scene playerScene;
+    private HashMap<Integer, Entity> onlinePlayers = new  HashMap<>();
 
     private Engine ecsEngine;
+    private PlayerSpawner playerSpawner;
     private YumenjiangSpawner yumenjiangFactory;
 
 	private Cubemap diffuseCubemap;
@@ -248,6 +266,9 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new CatchableSystem(physicsWorld, player.getTeam()));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
+        // Setup player factory
+        playerSpawner = new PlayerSpawner(ecsEngine, assets);
+
         // Setup yumenjiang factory
         SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
         yumenjiangFactory = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
@@ -282,6 +303,97 @@ public class GameScreen implements Screen{
             new Vector3(-13.61148f,-4.642546f,90.47211f),
             new Vector3(22.177233f,-7.333871f,62.20569f),
         });
+
+        String address = "localhost";
+        int port = 8080;
+
+        socket = WebSockets.newSocket(WebSockets.toWebSocketUrl(address, port));
+
+        socket.addListener(new WebSocketListener() {
+            @Override
+            public boolean onOpen(WebSocket webSocket) {
+                Gdx.app.log("WS", "Connected!");
+                Json json = new Json();
+                json.setOutputType(JsonWriter.OutputType.json);
+                PlayerCoordinates packet = new PlayerCoordinates();
+                packet.type = "player_signin";
+                packet.x = player.playerPos.x;
+                packet.y = player.playerPos.y;
+                packet.z = player.playerPos.z;
+                webSocket.send(json.toJson(packet));
+                return FULLY_HANDLED;
+            }
+
+            @Override
+            public boolean onMessage(WebSocket webSocket, String packet) {
+                Gdx.app.log("WS", "Received: " + packet);
+
+                Json json = new Json();
+                JsonValue root = new JsonReader().parse(packet);
+                String type = root.getString("type");
+                PlayerCoordinates coords;
+                switch (type) {
+                    case "player_signedin":
+                        int signedInID = root.getInt("id");
+                        Gdx.app.log("WS", "Player " + signedInID + " signed in!");
+                        break;
+                    case "all_players":
+                        for (JsonValue player : root.get("players")) {
+                            coords = json.readValue(PlayerCoordinates.class, player);
+                            Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
+                            onlinePlayers.put(coords.id, companion);
+                        }
+                        break;
+                    case "player_connected":
+                        coords = json.readValue(PlayerCoordinates.class, root.get("player"));
+                        Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
+                        onlinePlayers.put(coords.id, companion);
+                        break;
+                    case "player_moved":
+                        coords = json.readValue(PlayerCoordinates.class, root.get("player"));
+                        Entity target = onlinePlayers.get(coords.id);
+                        if (target != null) {
+                            TransformComponent transform = target.getComponent(TransformComponent.class);
+                            transform.matrix.setTranslation(coords.x, coords.y, coords.z);
+//                            transform.matrix.setFromEulerAnglesRad(coords.rotX, coords.rotY, coords.rotZ);
+                        }
+                        break;
+                    case "player_disconnected":
+                        int disconnectedID = root.getInt("id");
+                        Entity removed = onlinePlayers.remove(disconnectedID);
+                        if (removed != null) {
+                            Gdx.app.log("WS", "Player " + disconnectedID + " disconnected!");
+                        }
+                        break;
+                    default:
+                        Gdx.app.log("WS", "Unknown message type received: " + type);
+                }
+
+                return FULLY_HANDLED;
+            }
+
+            @Override
+            public boolean onMessage(WebSocket webSocket, byte[] bytes) {
+                return false;
+            }
+
+            @Override
+            public boolean onClose(WebSocket webSocket, int closeCode, String reason) {
+                Gdx.app.log("WS", "Closed: " + reason);
+                return FULLY_HANDLED;
+            }
+
+            @Override
+            public boolean onError(WebSocket webSocket, Throwable error) {
+                Gdx.app.error("WS", "Error!", error);
+                return FULLY_HANDLED;
+            }
+
+            // Note: You may also need to override onMessage(WebSocket, byte[])
+            // if sending binary data.
+        });
+
+        socket.connect();
     }
 
     private void loadData(String playerName) {
@@ -375,6 +487,17 @@ public class GameScreen implements Screen{
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
 			System.out.println(player.getTeam());
 		}
+
+        if (socket.isOpen()) {
+            Json json = new Json();
+            json.setOutputType(JsonWriter.OutputType.json);
+            PlayerCoordinates packet = new PlayerCoordinates();
+            packet.type = "player_update";
+            packet.x = player.playerPos.x;
+            packet.y = player.playerPos.y;
+            packet.z = player.playerPos.z;
+            socket.send(json.toJson(packet));
+        }
 
 
 		// render
@@ -486,6 +609,8 @@ public class GameScreen implements Screen{
 		skybox.dispose();
 		font.dispose();
 		physicsWorld.dispose();
+        if (socket.isOpen()) {
+            socket.close();
+        }
     }
-
 }

@@ -1,4 +1,4 @@
-package nintendont.amongspirits.entities.factories;
+package nintendont.amongspirits.entities.spawners;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
