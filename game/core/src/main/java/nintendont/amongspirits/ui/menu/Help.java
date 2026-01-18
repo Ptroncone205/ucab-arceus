@@ -24,20 +24,32 @@ public class Help extends MenuOverlay {
         Table titleTable = new Table();
 
         titleTable.setBackground(skin.newDrawable("white", Color.BLACK));
-        titleTable.add(title).pad(20, 50, 20, 50);
+        titleTable.add(title).pad(10, 50, 20, 50);
 
         // Sub Menus
         Introduccion intro = new Introduccion(skin,menu);
         menu.addMenu("Introduccion", intro);
 
         InventarioHelp inv = new InventarioHelp(skin, menu);
-        menu.addMenu("Inventario",inv);
+        menu.addMenu("Inventario", inv);
+
+        CodexHelp codex = new CodexHelp(skin, menu);
+        menu.addMenu("Codex", codex);
+
+        BattleHelp battle = new BattleHelp(skin, menu);
+        menu.addMenu("Battle", battle);
+
+        Extra extra = new Extra(skin, menu);
+        menu.addMenu("Extra", extra);
+
+
 
 
         TextButton btnIntro = createButton("Introduccion al Mundo", ()-> menu.setMenu("Introduccion"));
         TextButton btnInv = createButton("Inventario", () -> menu.setMenu("Inventario"));
-        TextButton btnBattle = createButton("Batalla", () -> System.out.println("Battle"));
-        TextButton btnCodex = createButton("Codex", () -> System.out.println("Codex"));
+        TextButton btnBattle = createButton("Batalla", () -> menu.setMenu("Battle"));
+        TextButton btnCodex = createButton("Codex", () -> menu.setMenu("Codex"));
+        TextButton btnExtra = createButton("Extra", () -> menu.setMenu("Extra"));
         TextButton btnBack = createButton("Volver", this::back);
 
         this.center();
@@ -47,6 +59,7 @@ public class Help extends MenuOverlay {
         this.add(btnInv).width(400).height(60).padBottom(10).row();
         this.add(btnBattle).width(400).height(60).padBottom(10).row();
         this.add(btnCodex).width(400).height(60).padBottom(10).row();
+        this.add(btnExtra).width(400).height(60).padBottom(10).row();
 
         this.add(btnBack).width(200).height(50).padTop(40).row();
     }
