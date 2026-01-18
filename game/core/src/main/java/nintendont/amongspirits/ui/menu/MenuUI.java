@@ -86,8 +86,11 @@ public class MenuUI extends InputAdapter implements Disposable {
         root.setBackground(skin.newDrawable(new TextureRegionDrawable(new Texture(new Pixmap(Gdx.files.internal("textures/menu/arceus.png"))))));
         Label title = new Label("JUEGUITO", skin);
         title.setFontScale(2f);
-        Options o =new Options(skin);
-        addMenu("options", o);
+
+        Options options =new Options(skin);
+        addMenu("options", options);
+        Account account = new Account(skin);
+        addMenu("account", account);
         
         TextButton btnResume = createButton("New Game", this::newGame);
         TextButton btnSave = createButton("Load Game", this::loadGame);
