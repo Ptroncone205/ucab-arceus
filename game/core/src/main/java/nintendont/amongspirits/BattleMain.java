@@ -53,7 +53,7 @@ public class BattleMain extends ApplicationAdapter implements MenuListener{
     @Override
     public void create(){
         Bullet.init();
-        SceneAsset sceneAsset = new GLTFLoader().load(Gdx.files.internal("lion/scene.gltf"));
+        SceneAsset sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/lion/scene.gltf"));
         player = new Player("alfonso", new Scene(sceneAsset.scene),new Vector3(),new Satchel());
         batch = new SpriteBatch();
         stage = new Stage();

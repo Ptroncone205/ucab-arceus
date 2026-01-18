@@ -88,8 +88,7 @@ public class PhysicsWorld implements Disposable {
         }
     }
 
-    public void update() {
-        final float delta = Gdx.graphics.getDeltaTime();
+    public void update(float delta) {
         dynamicsWorld.stepSimulation(delta,5,1f/60f);
     }
 

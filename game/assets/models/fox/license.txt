@@ -1,0 +1,11 @@
+Model Information:
+* title:	fox from COTW game
+* source:	https://sketchfab.com/3d-models/fox-from-cotw-game-8ee74ae404b5467e931e6f48d323762f
+* author:	Game-animal ripper (https://sketchfab.com/game-ripper)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "fox from COTW game" (https://sketchfab.com/3d-models/fox-from-cotw-game-8ee74ae404b5467e931e6f48d323762f) by Game-animal ripper (https://sketchfab.com/game-ripper) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

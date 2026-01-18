@@ -2,6 +2,8 @@ package nintendont.amongspirits.screens;
 
 import java.util.ArrayList;
 
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -25,6 +27,7 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
+import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderProvider;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 import nintendont.amongspirits.Const;
@@ -32,9 +35,14 @@ import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.savedata.SaveData;
-import nintendont.amongspirits.data.savedata.BtnEventListener;
 import nintendont.amongspirits.entities.Player;
+import nintendont.amongspirits.entities.components.ModelComponent;
+import nintendont.amongspirits.entities.components.RigidbodyComponent;
+import nintendont.amongspirits.entities.components.TriggerComponent;
+import nintendont.amongspirits.entities.factories.SpiritSpawner;
+import nintendont.amongspirits.entities.factories.YumenjiangSpawner;
 import nintendont.amongspirits.entities.items.Item;
+import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InteractionScanner;
 import nintendont.amongspirits.managers.ItemFactory;
@@ -45,6 +53,7 @@ import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
 import nintendont.amongspirits.terrains.HeightMapTerrain;
+import nintendont.amongspirits.ui.game.BtnEventListener;
 import nintendont.amongspirits.ui.game.GUIManager;
 import nintendont.amongspirits.utils.AssetUtils;
 
@@ -55,6 +64,9 @@ public class GameScreen implements Screen{
 	private SceneAsset sceneAsset;
 	public static AssetManager assets;
 	private Scene playerScene;
+
+    private Engine ecsEngine;
+    private YumenjiangSpawner yumenjiangFactory;
 
 	private Cubemap diffuseCubemap;
 	private Cubemap environmentCubemap;
@@ -96,7 +108,7 @@ public class GameScreen implements Screen{
 	private Item focusedItem;
 	private ArrayList<Item> items = new ArrayList<>();
 
-    public GameScreen(Main game, String playerName,boolean load){
+    public GameScreen(Main game, String playerName, boolean load){
 
         this.game = game;
 
@@ -111,15 +123,23 @@ public class GameScreen implements Screen{
 		assets.load("textures/oranberry.png", Texture.class);
 		assets.load("textures/pokeball.png", Texture.class);
 		assets.load("textures/tumblestone.png", Texture.class);
-		
+        assets.load("models/yumenjiang/scene.gltf", SceneAsset.class);
+        assets.load("models/lion/scene.gltf", SceneAsset.class);
+        assets.load("models/wolf/scene.gltf", SceneAsset.class);
+        assets.load("models/deer/scene.gltf", SceneAsset.class);
+        assets.load("models/bunny/scene.gltf", SceneAsset.class);
+        assets.load("models/fox/scene.gltf", SceneAsset.class);
+
 		assets.finishLoading();
 
-		sceneManager = new SceneManager(new CustomShaderProvider(), PBRShaderProvider.createDefaultDepth(24));
+        PBRShaderConfig config = PBRShaderProvider.createDefaultConfig();
+        config.numBones = 90;
+		sceneManager = new SceneManager(new CustomShaderProvider(config), PBRShaderProvider.createDefaultDepth(90));
 
 		// create player scene
 		sceneAsset = assets.get("models/mc/lukitm501.gltf", SceneAsset.class);
 		playerScene = new Scene(sceneAsset.scene);
-		float scale_factor = 0.2f;
+		float scale_factor = 10f;
 		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
 		sceneManager.addScene(playerScene);
 
@@ -141,7 +161,7 @@ public class GameScreen implements Screen{
 		batch = context.spriteBatch;
 		font = new BitmapFont();
 		inventory = new Satchel();
-		
+
 		crafting = new CraftManager();
 		guiManager = new GUIManager(batch, inventory, crafting);
 		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
@@ -168,10 +188,10 @@ public class GameScreen implements Screen{
 				return guiManager.handleInput(key);
 			}
 		};
-		
+
 		multiplexer.addProcessor(adapter);
 		multiplexer.addProcessor(guiManager.stage);
-		
+
 		playerController = new PlayerController(player, camera);
 		multiplexer.addProcessor(playerController);
 		physicsWorld.getDynamicsWorld().addRigidBody(player.getRigidBody(), Const.PF_PLAYER, Const.PF_GROUND | Const.PF_ITEM);
@@ -210,6 +230,56 @@ public class GameScreen implements Screen{
 		iScan = new InteractionScanner();
 		focusedItem = null;
 
+        // Setup ECS engine
+        ecsEngine = new Engine();
+
+        ecsEngine.addEntityListener(Family.all(ModelComponent.class).get(), new SceneModelListener(sceneManager));
+        ecsEngine.addEntityListener(Family.all(RigidbodyComponent.class).get(), new BulletRigidbodyListener(physicsWorld.getDynamicsWorld()));
+        ecsEngine.addEntityListener(Family.all(TriggerComponent.class).get(), new BulletTriggerListener(physicsWorld.getDynamicsWorld()));
+
+        ecsEngine.addSystem(new BulletPhysicsSystem(physicsWorld));
+        ecsEngine.addSystem(new PlayerSystem(player, playerController));
+        ecsEngine.addSystem(new TriggerTransformSystem());
+        ecsEngine.addSystem(new AnimationSystem());
+        ecsEngine.addSystem(new SpiritSystem());
+        ecsEngine.addSystem(new ThrowablePhysicsSystem());
+        ecsEngine.addSystem(new CatchableSystem(physicsWorld));
+        ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
+
+        // Setup yumenjiang factory
+        SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
+        yumenjiangFactory = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
+
+        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets);
+        spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
+            new Vector3(30.155998f,-5.723038f,17.230192f),
+            new Vector3(1.6152792f,-6.701237f,35.62867f),
+            new Vector3(-17.962223f,-7.386892f,12.141544f),
+        });
+        spiritSpawner.spawnDeer(new Vector3(-8.658541f,-7.1790175f,-83.79534f), new Vector3[] {
+            new Vector3(-8.658541f,-7.1790175f,-83.79534f),
+            new Vector3(-67.99276f,-3.6083195f,-91.609474f),
+            new Vector3(-124.330864f,-6.713242f,-110.35451f),
+            new Vector3(-125.90662f,-3.1293454f,-41.220222f),
+            new Vector3(-124.330864f,-6.713242f,-110.35451f),
+            new Vector3(-67.99276f,-3.6083195f,-91.609474f),
+        });
+        spiritSpawner.spawnWolf(new Vector3(-118.479904f,-13.676473f,16.55237f), new Vector3[] {
+            new Vector3(-118.479904f,-13.676473f,16.55237f),
+            new Vector3(-56.469837f,-10.573059f,26.624063f),
+            new Vector3(-103.06346f,-13.143304f,114.45455f),
+        });
+        spiritSpawner.spawnBunny(new Vector3(28.545568f,-11.491491f,-50.88826f), new Vector3[] {
+            new Vector3(28.545568f,-11.491491f,-50.88826f),
+            new Vector3(28.737074f,-11.382355f,-89.65038f),
+            new Vector3(79.27631f,-11.176129f,-73.44786f),
+        });
+        spiritSpawner.spawnFox(new Vector3(42.199657f,-6.9087963f,65.2783f), new Vector3[] {
+            new Vector3(42.199657f,-6.9087963f,65.2783f),
+            new Vector3(12.966826f,-9.829789f,101.345924f),
+            new Vector3(-13.61148f,-4.642546f,90.47211f),
+            new Vector3(22.177233f,-7.333871f,62.20569f),
+        });
     }
 
     private void loadData(String playerName) {
@@ -257,19 +327,15 @@ public class GameScreen implements Screen{
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
-        
+
     }
-    
+
     @Override
     public void render(float delta) {
         float deltaTime = Gdx.graphics.getDeltaTime();
-		// updates
-		physicsWorld.update();
-		playerController.update(deltaTime);
-		// handleInput(deltaTime);
-		// processInput(deltaTime);
-		player.update();
-		sceneManager.update(deltaTime);
+
+        ecsEngine.update(deltaTime);
+
 		if (Const.currentState == GameState.INGAME)
 			updateCamera();
 
@@ -287,10 +353,18 @@ public class GameScreen implements Screen{
         }
 
 
+        if (Gdx.input.justTouched()) {
+            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
+            Vector3 throwDirection = camera.direction.cpy();
+            throwDirection.add(new Vector3(0, 0.5f, 0));
+            yumenjiangFactory.spawnThrowableYumenjiang(spawnPoint, throwDirection, 50);
+        }
+
+
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
-		// physicsWorld.renderDebug(camera);
+//        physicsWorld.renderDebug(camera);
 
 		// HUD
 		batch.begin();
@@ -309,7 +383,11 @@ public class GameScreen implements Screen{
         if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
             guiManager.toggleInventory();
         }
-        
+
+        // FOR DEBUGGING: Remember to delete
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
+            System.out.println(player.playerPos);
+        }
     }
 
     private void updateCamera() {
@@ -359,27 +437,27 @@ public class GameScreen implements Screen{
     @Override
     public void resize(int width, int height) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void pause() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void resume() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void hide() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     @Override
     public void dispose() {
         terrain.dispose();
@@ -392,7 +470,6 @@ public class GameScreen implements Screen{
 		skybox.dispose();
 		font.dispose();
 		physicsWorld.dispose();
-        
     }
-    
+
 }

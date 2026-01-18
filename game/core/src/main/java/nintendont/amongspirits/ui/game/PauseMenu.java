@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
-import nintendont.amongspirits.data.savedata.BtnEventListener;
 
 public class PauseMenu extends Table {
 
@@ -31,9 +30,9 @@ public class PauseMenu extends Table {
         this.skin = skin;
 
         this.setFillParent(true);
-        
+
         this.setBackground(skin.newDrawable("white", 0,0,0, 0.85f));
-        
+
         create();
     }
 
@@ -41,7 +40,7 @@ public class PauseMenu extends Table {
         // Title
         Label title = new Label("PAUSED", skin);
         title.setFontScale(2f);
-        
+
         // Buttons
         TextButton btnResume = createButton("Resume", this::onResume);
         TextButton btnSave = createButton("Save Game", this::onSave);
@@ -50,7 +49,7 @@ public class PauseMenu extends Table {
         // Layout
         this.center();
         this.add(title).padBottom(50).row();
-        
+
         this.add(btnResume).width(200).height(50).padBottom(15).row();
         this.add(btnSave).width(200).height(50).padBottom(15).row();
         this.add(btnQuit).width(200).height(50).padBottom(15).row();
@@ -62,7 +61,7 @@ public class PauseMenu extends Table {
             @Override
             public boolean isOver(){
                 return buttons.indexOf(this) == selected;
-            } 
+            }
         };
         btn.setUserObject(action);
         btn.addListener(new ChangeListener() {

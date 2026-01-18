@@ -35,15 +35,15 @@ public class PlayerController extends InputAdapter{
         if (up == true){
             moveDir.add(camForward);
         }
-        
+
         if (down == true){
             moveDir.sub(camForward);
         }
-        
+
         if (left == true){
             moveDir.sub(camRight);
         }
-        
+
         if (right == true){
             moveDir.add(camRight);
         }
@@ -55,6 +55,10 @@ public class PlayerController extends InputAdapter{
         }
 
         moveDir.set(0,0,0);
+    }
+
+    public Vector3 getMoveDir() {
+        return moveDir;
     }
 
     @Override
