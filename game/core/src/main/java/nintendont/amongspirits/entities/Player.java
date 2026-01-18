@@ -11,8 +11,9 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import nintendont.amongspirits.Const;
-import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.spirits.Pasture;
 import nintendont.amongspirits.data.spirits.Spirit;
+import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
@@ -24,8 +25,8 @@ public class Player implements Disposable{
     private final Vector3 tmpPosition = new Vector3();
 
     private Satchel satchel;
-    private final Array<Spirit> team = new Array<>(6);
-    private final Codex codex = new Codex();
+    private Team team = new Team();
+    private Pasture pasture = new Pasture();
 
     private Scene scene;
     private MotionState motionState;
@@ -125,11 +126,13 @@ public class Player implements Disposable{
         return satchel;
     }
 
-    public Array<Spirit> getTeam(){
+    public Team getTeam(){
         return team;
     }
 
-    public Codex getCodex(){ return codex; }
+    public Pasture getPasture(){
+        return pasture;
+    }
 
     @Override
     public void dispose() {

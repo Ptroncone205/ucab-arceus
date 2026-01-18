@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import nintendont.amongspirits.BattleMain;
+import nintendont.amongspirits.screens.BattleScreen;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.entities.ItemStack;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class BagMenu extends Table {
 
-    public BagMenu(TextButton.TextButtonStyle style, final BattleMain game, ArrayList<ItemStack> items){
+    public BagMenu(TextButton.TextButtonStyle style, final BattleScreen game, ArrayList<ItemStack> items){
 
         this.center();
 
@@ -52,7 +52,7 @@ public class BagMenu extends Table {
     }
 
     private class HealMenu extends Table {
-        public HealMenu(TextButton.TextButtonStyle style, final BattleMain game, final ItemStack stack) {
+        public HealMenu(TextButton.TextButtonStyle style, final BattleScreen game, final ItemStack stack) {
             this.setFillParent(true);
 
             this.setBackground(game.getColoredDrawable(1, 1, new Color(0, 0, 0, 0.85f)));
@@ -62,19 +62,17 @@ public class BagMenu extends Table {
                 new Label.LabelStyle(style.font, Color.YELLOW))).padBottom(20).row();
 
             Table grid = new Table();
-            for (final Invocation inv : game.getPlayerTeam().getMembers()) {
-                final Spirit spirit = inv.getSpirit();
-
+            for (final Invocation inv : game.getPlayer().getTeam().getMembers()) {
                 Table card = new Table();
                 card.setBackground(game.getColoredDrawable(1, 1, new Color(1, 1, 1, 0.05f)));
                 card.pad(10);
 
-                Label nameLabel = new Label(spirit.name, new Label.LabelStyle(style.font, Color.CYAN));
-                Label hpText = new Label((int)spirit.hp + "/" + (int)spirit.hpMax, new Label.LabelStyle(style.font, Color.WHITE));
+                Label nameLabel = new Label(inv.getFullName(), new Label.LabelStyle(style.font, Color.CYAN));
+                Label hpText = new Label(inv.getHP() + "/" + inv.getMaxHP(), new Label.LabelStyle(style.font, Color.WHITE));
 
                 card.add(nameLabel).width(120).left();
 
-                float percent = spirit.hp / spirit.hpMax;
+                float percent = inv.getHealthRatio();
                 Stack hpStack = new Stack();
                 hpStack.add(new Image(game.getColoredDrawable(1, 1, Color.BLACK)));
                 Image bar = new Image(game.getColoredDrawable(1, 1,
@@ -85,15 +83,15 @@ public class BagMenu extends Table {
                 card.add(hpText).width(80).right();
 
                 TextButton bCurar = new TextButton("CURAR", style);
-                if (spirit.hp >= spirit.hpMax) bCurar.setColor(Color.DARK_GRAY);
+                if (inv.isFullyHealthy()) bCurar.setColor(Color.DARK_GRAY);
 
                 bCurar.addListener(new ClickListener(){
                     @Override
                     public void clicked(InputEvent e, float x, float y){
-                        if (spirit.hp < spirit.hpMax){
+                        if (!inv.isFullyHealthy()){
 
-                            float healPower = stack.getItem().getName().contains("Super") ? 50 : 20;
-                            spirit.heal(healPower);
+                            int healPower = stack.getItem().getName().contains("Super") ? 50 : 20;
+                            inv.heal(healPower);
                             stack.setCount(stack.getCount() - 1);
 
                             game.updateHealth();

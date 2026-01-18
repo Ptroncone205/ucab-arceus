@@ -13,7 +13,10 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.SpiritForm;
 import nintendont.amongspirits.data.spirits.Spirit;
+import nintendont.amongspirits.data.spirits.SpiritGenders;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
@@ -21,46 +24,59 @@ import nintendont.amongspirits.physics.PhysicsLayers;
 public class SpiritSpawner {
     private final Engine engine;
     private final AssetManager assetManager;
+    private final Codex codex;
 
-    public SpiritSpawner(Engine engine, AssetManager assetManager) {
+    public SpiritSpawner(Engine engine, AssetManager assetManager, Codex codex) {
         this.engine = engine;
         this.assetManager = assetManager;
+        this.codex = codex;
+    }
+
+    public Spirit generateSpirit(SpiritForm form) {
+        Spirit spirit = new Spirit(
+            1,
+            "Tilin",
+            "Tulun",
+            "Some secret",
+            SpiritGenders.FEMALE,
+            form);
+        return spirit;
     }
 
     public Entity spawnLion(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/lion/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Leon", "FIRE", 120f, "gokuprueba2.png");
+        Spirit spirit = generateSpirit(codex.getForms().get(0));
         return spawnSpirit(spirit, modelAsset, null, 2f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnDeer(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/deer/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Ciervo", "THUNDER", 100f, "gokuprueba.png");
+        Spirit spirit = generateSpirit(codex.getForms().get(0));
         return spawnSpirit(spirit, modelAsset, "Armature|walk", 2.5f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnWolf(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/wolf/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Lobo", "ICE", 100f, "gokuprueba2.png");
+        Spirit spirit = generateSpirit(codex.getForms().get(0));
         return spawnSpirit(spirit, modelAsset, "Take 001", 2.5f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnBunny(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/bunny/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Conejo", "ICE", 80f, "gokuprueba.png");
+        Spirit spirit = generateSpirit(codex.getForms().get(0));
         return spawnSpirit(spirit, modelAsset, "Take 001", 0.05f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnFox(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/fox/scene.gltf", SceneAsset.class);
-        Spirit spirit = new Spirit("Zorro", "FIRE", 120f, "gokuprueba2.png");
+        Spirit spirit = generateSpirit(codex.getForms().get(0));
         return spawnSpirit(spirit, modelAsset, "redfox|red_fox_walk_fwd_01", .75f, spawnPoint, patrolPoints);
     }
 
     public Entity spawnSpirit(Spirit spiritData, SceneAsset modelAsset, String animationName, float modelScale, Vector3 spawnPoint, Vector3[] patrolPoints) {
         Entity entity = engine.createEntity();
 
-        SpiritTypeComponent spiritType = engine.createComponent(SpiritTypeComponent.class);
+        SpiritTagComponent spiritType = engine.createComponent(SpiritTagComponent.class);
         spiritType.spirit = spiritData;
 
         ModelComponent model = engine.createComponent(ModelComponent.class);
@@ -110,7 +126,6 @@ public class SpiritSpawner {
 
         CatchableComponent catchable = engine.createComponent(CatchableComponent.class);
 
-        entity.add(spiritType);
         entity.add(transform);
         entity.add(model);
         entity.add(animation);
@@ -118,6 +133,7 @@ public class SpiritSpawner {
         entity.add(trigger);
         entity.add(spirit);
         entity.add(catchable);
+        entity.add(spiritType);
 
         engine.addEntity(entity);
         return entity;

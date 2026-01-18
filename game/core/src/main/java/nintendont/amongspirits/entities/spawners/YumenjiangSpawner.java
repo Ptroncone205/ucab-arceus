@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
@@ -52,19 +53,9 @@ public class YumenjiangSpawner {
         rigidbody.bulletBody.setAngularFactor(0.1f);
         rigidbody.motionState = motionState;
 
-        TriggerComponent trigger = engine.createComponent(TriggerComponent.class);
-        btCollisionShape triggerShape = new btSphereShape(3f);
-        trigger.group = PhysicsLayers.HITBOX;
-        trigger.mask = PhysicsLayers.HITBOX;
-        trigger.bulletObject = new btCollisionObject();
-        trigger.bulletObject.setCollisionFlags(trigger.bulletObject.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
-        trigger.bulletObject.setCollisionShape(triggerShape);
-        trigger.bulletObject.userData = entity;
-
         entity.add(transform);
         entity.add(model);
         entity.add(rigidbody);
-        entity.add(trigger);
 
         engine.addEntity(entity);
         return entity;
@@ -78,6 +69,42 @@ public class YumenjiangSpawner {
         throwable.forceMagnitude = forceMagnitude;
         throwable.triggered = false;
         entity.add(throwable);
+
+        TriggerComponent trigger = engine.createComponent(TriggerComponent.class);
+        btCollisionShape triggerShape = new btSphereShape(3f);
+        trigger.group = PhysicsLayers.HITBOX;
+        trigger.mask = PhysicsLayers.HITBOX;
+        trigger.bulletObject = new btCollisionObject();
+        trigger.bulletObject.setCollisionFlags(trigger.bulletObject.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+        trigger.bulletObject.setCollisionShape(triggerShape);
+        trigger.bulletObject.userData = entity;
+        entity.add(trigger);
+
+        return entity;
+    }
+
+    public Entity spawnThrowableYumenjiangWithSpirit(Vector3 spawnPoint, Vector3 direction, float forceMagnitude, int teamMemberId) {
+        Entity entity = spawnYumenjiang(spawnPoint);
+
+        ThrowableComponent throwable = engine.createComponent(ThrowableComponent.class);
+        throwable.direction = direction.cpy();
+        throwable.forceMagnitude = forceMagnitude;
+        throwable.triggered = false;
+        entity.add(throwable);
+
+        TriggerComponent trigger = engine.createComponent(TriggerComponent.class);
+        btCollisionShape triggerShape = new btSphereShape(5f);
+        trigger.group = PhysicsLayers.HITBOX;
+        trigger.mask = PhysicsLayers.HITBOX;
+        trigger.bulletObject = new btCollisionObject();
+        trigger.bulletObject.setCollisionFlags(trigger.bulletObject.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+        trigger.bulletObject.setCollisionShape(triggerShape);
+        trigger.bulletObject.userData = entity;
+        entity.add(trigger);
+
+        ChallengerComponent challenger = engine.createComponent(ChallengerComponent.class);
+        challenger.teamMemberId = teamMemberId;
+        entity.add(challenger);
 
         return entity;
     }
