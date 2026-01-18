@@ -5,39 +5,41 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import nintendont.amongspirits.BattleMain;
 import nintendont.amongspirits.data.spirits.Spirit;
+import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.entities.items.Consumable;
+import nintendont.amongspirits.entities.items.Item;
+import nintendont.amongspirits.managers.Satchel;
+
+import java.util.ArrayList;
 
 public class BagMenu extends Table{
-    public BagMenu(TextButton.TextButtonStyle style, final BattleMain game){
-        TextButton potion = new TextButton("POCIÓN (" + game.getPotions() + ")", style);
-        TextButton superPotion = new TextButton("SUPER POCIÓN (" + game.getSuperPotions() + ")", style);
+    private TextButton itemTable; // tienes q crearlo
+    public BagMenu(TextButton.TextButtonStyle style, final BattleMain game, ArrayList<ItemStack> items){
+        if (!items.isEmpty()) {
+            for (int i = 0; i < items.size(); i++) {
+                Item item = items.get(i).getItem();
+                if (item instanceof Consumable) {
+                    itemTable = new TextButton(item.getName() + items.get(i).getCount(), style);
+                    this.add(itemTable).expand().fill().pad(2).row();
+                }
+            }
+            itemTable.addListener(new ClickListener(){
+                @Override public void clicked(InputEvent e, float x, float y){
+                    if(game.getPotions() > 0) {
+                        game.setPotions(game.getPotions() - 1);
+                        game.getStage().addActor(new HealMenu(style, game, 40));
+                        game.onBackSelected();
+                    }
+                }});
+        }
+
         TextButton back = new TextButton("VOLVER", style);
-
-        potion.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
-            if(game.getPotions() > 0) {
-                game.setPotions(game.getPotions() - 1);
-                game.getStage().addActor(new HealMenu(style, game, 40));
-                game.onBackSelected();
-            }
-        }});
-
-        superPotion.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y){
-            if(game.getSuperPotions() > 0) {
-                game.setSuperPotions(game.getSuperPotions() - 1);
-                game.getStage().addActor(new HealMenu(style, game, 80));
-                game.onBackSelected();
-            }
-        }});
+        this.add(back).expand().fill().pad(2);
 
         back.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y){
                 game.onBackSelected();
             }});
-
-        this.add(potion).expand().fill().pad(2).row();
-        this.add(superPotion).expand().fill().pad(2).row();
-        this.add(back).expand().fill().pad(2);
     }
 
     private class HealMenu extends SpiritsMenu{

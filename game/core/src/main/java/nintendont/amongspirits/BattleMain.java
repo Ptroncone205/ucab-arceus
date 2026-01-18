@@ -10,14 +10,25 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import net.mgsx.gltf.loaders.gltf.GLTFLoader;
+import net.mgsx.gltf.scene3d.scene.Scene;
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import net.mgsx.gltf.scene3d.scene.SceneModel;
 import nintendont.amongspirits.data.spirits.Spirit;
+import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.utils.*;
+import nintendont.amongspirits.entities.Player;
+
+import java.util.ArrayList;
 
 public class BattleMain extends ApplicationAdapter implements MenuListener{
     private Stage stage;
@@ -26,6 +37,7 @@ public class BattleMain extends ApplicationAdapter implements MenuListener{
     private Sprite bgSprite;
     private Label messageLabel;
 
+    private Player player;
     private Spirit[] team;
     private int activeIndex = 0;
     private float hpEnemy = 100f, hpMaxEnemy = 100f;
@@ -40,9 +52,13 @@ public class BattleMain extends ApplicationAdapter implements MenuListener{
 
     @Override
     public void create(){
+        Bullet.init();
+        SceneAsset sceneAsset = new GLTFLoader().load(Gdx.files.internal("lion/scene.gltf"));
+        player = new Player("alfonso", new Scene(sceneAsset.scene),new Vector3(),new Satchel());
         batch = new SpriteBatch();
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+        Satchel satchel = player.getSatchel();
 
         font = new BitmapFont();
 
@@ -145,7 +161,7 @@ public class BattleMain extends ApplicationAdapter implements MenuListener{
         buttonBag.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent e, float x, float y){
-            tableB.clearChildren(); tableB.add(new BagMenu(styleGreen, BattleMain.this)).expand().fill();
+            tableB.clearChildren(); tableB.add(new BagMenu(styleGreen, BattleMain.this, player.getSatchel().getItems())).expand().fill();
         }});
 
         buttonRun.addListener(new ClickListener(){
