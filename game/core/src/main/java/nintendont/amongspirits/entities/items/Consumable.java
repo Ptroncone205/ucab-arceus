@@ -32,7 +32,4 @@ public class Consumable extends Item {
         effect.apply((Pokemon) target);
     }
 
-    // public String getValue(){
-    //     return
-    // }
 }
