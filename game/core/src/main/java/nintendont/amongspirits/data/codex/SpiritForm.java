@@ -17,6 +17,8 @@ public class SpiritForm {
     private int researchLevel;
     private final AssetDescriptor<Texture> iconAsset;
     private final AssetDescriptor<Texture> previewAsset;
+    private final AssetDescriptor<Texture> battleMaleAsset;
+    private final AssetDescriptor<Texture> battleFemaleAsset;
 
     public SpiritForm(
         int id,
@@ -25,7 +27,9 @@ public class SpiritForm {
         String longDescription,
         SpiritElement element,
         AssetDescriptor<Texture> iconAsset,
-        AssetDescriptor<Texture> previewAsset
+        AssetDescriptor<Texture> previewAsset,
+        AssetDescriptor<Texture> battleMaleAsset,
+        AssetDescriptor<Texture> battleFemaleAsset
     ) {
         this.id = id;
         this.animalName = animalName;
@@ -34,6 +38,8 @@ public class SpiritForm {
         this.element = element;
         this.iconAsset = iconAsset;
         this.previewAsset = previewAsset;
+        this.battleMaleAsset = battleMaleAsset;
+        this.battleFemaleAsset = battleFemaleAsset;
         this.moves = new ArrayList<>();
         this.tasks = new ArrayList<>();
         this.researchLevel = 0;
@@ -65,6 +71,14 @@ public class SpiritForm {
 
     public AssetDescriptor<Texture> getPreviewAsset() {
         return previewAsset;
+    }
+
+    public AssetDescriptor<Texture> getBattleMaleAsset() {
+        return battleMaleAsset;
+    }
+
+    public AssetDescriptor<Texture> getBattleFemaleAsset() {
+        return battleFemaleAsset;
     }
 
     public int getResearchLevel() {

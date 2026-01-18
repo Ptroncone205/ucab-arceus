@@ -2,7 +2,6 @@ package nintendont.amongspirits.screens;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -44,8 +43,11 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.online.packets.PlayerCoordinates;
 import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
@@ -129,7 +131,6 @@ public class GameScreen implements Screen{
 	private ArrayList<Item> items = new ArrayList<>();
 
     public GameScreen(Main game, String playerName, boolean load){
-
         this.game = game;
 
         Bullet.init();
@@ -250,6 +251,9 @@ public class GameScreen implements Screen{
 		iScan = new InteractionScanner();
 		focusedItem = null;
 
+        // Loading data
+        Codex codex = new FakeCodexLoader().load();
+
         // Setup ECS engine
         ecsEngine = new Engine();
 
@@ -263,7 +267,8 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new AnimationSystem());
         ecsEngine.addSystem(new SpiritSystem());
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
-        ecsEngine.addSystem(new CatchableSystem(physicsWorld, player.getTeam()));
+        ecsEngine.addSystem(new CatchableSystem(player, physicsWorld));
+        ecsEngine.addSystem(new EncounterSystem(game, player, physicsWorld));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
         // Setup player factory
@@ -273,7 +278,7 @@ public class GameScreen implements Screen{
         SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
         yumenjiangFactory = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
 
-        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets);
+        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, codex);
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
             new Vector3(30.155998f,-5.723038f,17.230192f),
             new Vector3(1.6152792f,-6.701237f,35.62867f),
@@ -485,7 +490,7 @@ public class GameScreen implements Screen{
         }
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
-			player.getTeam().forEach(spirit -> System.out.printf(spirit.name + ", "));
+			player.getTeam().getMembers().forEach(spirit -> System.out.printf(spirit.getSpirit().getName() + ", "));
             System.out.println();
 		}
 

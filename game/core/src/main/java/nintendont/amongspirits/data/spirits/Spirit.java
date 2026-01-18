@@ -2,31 +2,43 @@ package nintendont.amongspirits.data.spirits;
 
 import nintendont.amongspirits.data.codex.SpiritForm;
 
-public class Spirit{
-    public String name, lastName;
-    public String biography;
-    public int id;
-    public boolean gender;
-    public SpiritForm form;
-    public float hp;
-    public float hpMax;
-    public String type;
-    public String texturePath;
+public class Spirit {
+    private final int id;
+    private final String name, lastName;
+    private final String biography;
+    private final boolean gender;
+    private final SpiritForm form;
 
-    public Spirit(String name, String type, float hpMax, String texturePath){
+    public Spirit(int id, String name, String lastName, String biography, boolean gender, SpiritForm form) {
         this.name = name;
-        this.type = type;
-        this.hpMax = hpMax;
-        this.hp = hpMax;
-        this.texturePath = texturePath;
+        this.lastName = lastName;
+        this.biography = biography;
+        this.id = id;
+        this.gender = gender;
+        this.form = form;
     }
 
-    public boolean isFainted(){
-        return hp <= 0;
+    public int getId() {
+        return id;
     }
 
-    public void heal(float amount){
-        this.hp += amount;
-        if (this.hp > this.hpMax) this.hp = this.hpMax;
+    public String getName() {
+        return name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public boolean getGender() {
+        return gender;
+    }
+
+    public SpiritForm getForm() {
+        return form;
     }
 }

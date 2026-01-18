@@ -1,5 +1,17 @@
 package nintendont.amongspirits.data.spirits;
 
 public class StatValue{
-    protected int level, current;
+    protected int current;
+
+    public int getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(int current) {
+        if (current <= 0) {
+            current = 0;
+        } else {
+            this.current = current;
+        }
+    }
 }

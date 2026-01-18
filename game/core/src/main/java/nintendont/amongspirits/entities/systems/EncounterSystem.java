@@ -9,18 +9,34 @@ import com.badlogic.gdx.physics.bullet.collision.ContactResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btManifoldPoint;
-import nintendont.amongspirits.entities.components.CatchableComponent;
+import nintendont.amongspirits.data.spirits.Invocation;
+import nintendont.amongspirits.data.spirits.Spirit;
+import nintendont.amongspirits.data.spirits.SpiritGenders;
+import nintendont.amongspirits.data.spirits.Team;
+import nintendont.amongspirits.entities.Enemy;
+import nintendont.amongspirits.entities.Player;
+import nintendont.amongspirits.entities.components.SpiritTagComponent;
+import nintendont.amongspirits.screens.BattleScreen;
+import nintendont.amongspirits.Main;
+import nintendont.amongspirits.entities.components.ChallengerComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
 import nintendont.amongspirits.physics.PhysicsWorld;
 
 public class EncounterSystem extends IteratingSystem {
     private Engine engine;
+
+    private final Main game;
+    private final Player player;
     private final PhysicsWorld world;
-    private final ComponentMapper<CatchableComponent> catchableMapper = ComponentMapper.getFor(CatchableComponent.class);
+
+    private final ComponentMapper<ChallengerComponent> challengerMapper = ComponentMapper.getFor(ChallengerComponent.class);
+    private final ComponentMapper<SpiritTagComponent> spiritTagMapper = ComponentMapper.getFor(SpiritTagComponent.class);
     private final ComponentMapper<TriggerComponent> triggerMapper = ComponentMapper.getFor(TriggerComponent.class);
 
-    public EncounterSystem(PhysicsWorld world) {
-        super(Family.all(CatchableComponent.class, TriggerComponent.class).get());
+    public EncounterSystem(Main game, Player player, PhysicsWorld world) {
+        super(Family.all(ChallengerComponent.class, TriggerComponent.class).get());
+        this.game = game;
+        this.player = player;
         this.world = world;
     }
 
@@ -57,7 +73,18 @@ public class EncounterSystem extends IteratingSystem {
     }
 
     public void handleTrigger(Entity entity, Entity otherEntity) {
-        engine.removeEntity(entity);
-        engine.removeEntity(otherEntity);
+        ChallengerComponent challenger = challengerMapper.get(entity);
+
+        SpiritTagComponent spiritTag = spiritTagMapper.get(otherEntity);
+
+        if (spiritTag == null) {
+            return;
+        }
+
+        Team enemyTeam = new Team();
+        enemyTeam.getMembers().add(new Invocation(spiritTag.spirit));
+        Enemy enemy = new Enemy("Wild Spirit", new Team());
+
+        game.setScreen(new BattleScreen(player, enemy, challenger.teamMemberId));
     }
 }
