@@ -163,4 +163,8 @@ public class MenuUI extends InputAdapter implements Disposable {
         skin.dispose();
         stage.dispose();
     }
+
+    public Main getGame() {
+        return game;
+    }
 }

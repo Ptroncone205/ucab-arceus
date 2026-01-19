@@ -193,10 +193,12 @@ public class GameScreen implements Screen{
 
 		guiManager = new GUIManager(batch, crafting, player, codex);
 		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
+
 			@Override
 			public void onSaveRequest(){
 				SaveManager.saveGame(player, items);
 			}
+
 			@Override
 			public void onQuitRequest(){
 				game.quitGame();
@@ -447,7 +449,7 @@ public class GameScreen implements Screen{
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
-
+        game.playMusic("", true);
     }
 
     @Override
@@ -471,7 +473,6 @@ public class GameScreen implements Screen{
 				focusedItem = null;
 			}
         }
-
 
         if (Const.currentState == GameState.INGAME && Gdx.input.justTouched()) {
 			boolean flag = false;
@@ -593,13 +594,14 @@ public class GameScreen implements Screen{
     @Override
     public void pause() {
         // TODO Auto-generated method stub
+        game.stopMusic();
 
     }
 
     @Override
     public void resume() {
         // TODO Auto-generated method stub
-
+        game.playMusic("", true);
     }
 
     @Override

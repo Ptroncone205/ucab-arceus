@@ -58,6 +58,7 @@ public class SpiritsMenu extends Table {
                 @Override
                 public void clicked(InputEvent e, float x, float y) {
                     if (!button.isDisabled()) {
+                        game.getGame().playSound("");
                         game.switchSpirit(idx);
                         SpiritsMenu.this.remove();
                     }
@@ -74,7 +75,10 @@ public class SpiritsMenu extends Table {
         if (!flag) {
             TextButton back = new TextButton("CERRAR", style);
             back.addListener(new ClickListener() {
-                @Override public void clicked(InputEvent e, float x, float y) { SpiritsMenu.this.remove(); }
+                @Override
+                public void clicked(InputEvent e, float x, float y) {
+                    game.getGame().playSound("");
+                    SpiritsMenu.this.remove(); }
             });
             this.add(back).size(200, 50).pad(20);
         }

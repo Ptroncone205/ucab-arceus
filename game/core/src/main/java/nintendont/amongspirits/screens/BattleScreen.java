@@ -43,6 +43,7 @@ public class BattleScreen implements Screen, MenuListener {
         this.player = player;
         this.enemy = enemy;
         this.playerActiveIndex = initialPlayerActiveIndex;
+        game.playMusic("", true);
 
         Gdx.input.setCursorCatched(false);
 
@@ -142,17 +143,20 @@ public class BattleScreen implements Screen, MenuListener {
 
         btnBag.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
+                game.playSound("");
             tableB.clearChildren();
             tableB.add(new BagMenu(styleBlue, BattleScreen.this, player.getSatchel().getItems())).fill();
         }});
 
         btnTeam.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
+                game.playSound("");
             stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, false, assets));
         }});
 
         btnRun.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
+                game.playSound("");
                 game.setScreen(new GameScreen(game, player.getName(), true));
             }
         });
@@ -166,6 +170,7 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void onAttackSelected(String attackName) {
+        game.playSound("");
         Invocation playerInvocation = getPlayerActiveInvocation();
         SpiritMove moveUsed = null;
 
@@ -178,6 +183,7 @@ public class BattleScreen implements Screen, MenuListener {
         if (moveUsed != null) {
             Invocation enemyInvocation = getEnemyActiveInvocation();
             enemyInvocation.takeDamage(moveUsed.getBasePower() / 2);
+            game.playSound("");
             messageLabel.setText("¡" + enemyInvocation.getFullName() + " usó " + attackName + "!");
         }
 
@@ -190,6 +196,7 @@ public class BattleScreen implements Screen, MenuListener {
         Timer.schedule(new Timer.Task(){
             @Override public void run(){
                 if (getEnemyActiveInvocation().isFainted()){
+                    game.playSound("");
                     messageLabel.setText("¡El enemigo ha sido derrotado!");
                 }else{
                     messageLabel.setText("¡El enemigo contraataca!");
@@ -223,6 +230,10 @@ public class BattleScreen implements Screen, MenuListener {
 
     private Invocation getEnemyActiveInvocation() {
         return enemy.getTeam().getMembers().get(enemyActiveIndex);
+    }
+
+    public Main getGame() {
+        return game;
     }
 
     private TextureRegionDrawable createBarDrawable(float percent){
@@ -274,11 +285,13 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void onBackSelected(){
+        game.playSound("");
         setupMainButtons(190);
     }
 
     @Override
     public void onFightSelected(){
+        game.playSound("");
         tableB.clearChildren();
         tableB.add(new AttackMenu(styleRed, this, getPlayerActiveInvocation().getMoves())).fill();
     }

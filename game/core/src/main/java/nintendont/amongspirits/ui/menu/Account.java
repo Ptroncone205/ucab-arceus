@@ -2,6 +2,7 @@ package nintendont.amongspirits.ui.menu;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -17,14 +18,20 @@ public class Account extends MenuOverlay {
         super(skin, menu);
 
         this.setFillParent(true);
+
+
         this.setBackground(skin.newDrawable(new TextureRegionDrawable(new Texture(new Pixmap(Gdx.files.internal("textures/menu/arceus.png"))))));
-        Label title = new Label("Usuairo", skin);
+        Label title = new Label("Usuario", skin);
         title.setFontScale(2f);
 
         TextField username = creaTextField(skin);
         username.setSize(200, 40);
 
-        TextButton btnResume = createButton("New Game", menu::newGame);
+        TextButton btnResume = createButton("New Game", () ->{menu.getGame().playMusic("", true);
+
+            menu.newGame();
+        });
+
         TextButton btnSave = createButton("Load Game", menu::loadGame);
         TextButton btnQuit = createButton("Options", ()->menu.setMenu("options"));
         TextButton btnHelp = createButton("Help", ()->menu.setMenu("help"));

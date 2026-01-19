@@ -2,6 +2,7 @@ package nintendont.amongspirits.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,11 +18,17 @@ public class IntroScreen implements Screen {
     private Main game;
     private Stage stage;
     private BitmapFont font;
+    private Music introMusic;
 
     public IntroScreen(Main game) {
         this.game = game;
         this.stage = new Stage();
         this.font = new BitmapFont();
+
+        introMusic = Gdx.audio.newMusic(Gdx.files.internal("music and sounds/music/intro_theme.mp3"));
+        introMusic.setLooping(true);
+        introMusic.setVolume(0.5f);
+        introMusic.play();
 
         setupIntroSequence();
     }
@@ -107,6 +114,7 @@ public class IntroScreen implements Screen {
                 Gdx.input.setInputProcessor(new com.badlogic.gdx.InputAdapter() {
                     @Override
                     public boolean keyDown(int keycode) {
+
                         goToMainMenu();
                         return true;
                     }
@@ -121,6 +129,8 @@ public class IntroScreen implements Screen {
     }
 
     private void goToMainMenu() {
+        game.playSound("music and sounds/sounds/button_pressed.mp3");
+        introMusic.stop();
         game.setScreen(new MainMenu(game));
     }
 
@@ -138,14 +148,19 @@ public class IntroScreen implements Screen {
 
     @Override public void show() {}
 
-    @Override public void pause() {}
+    @Override public void pause() {
+        introMusic.pause();
+    }
 
-    @Override public void resume() {}
+    @Override public void resume() {
+        introMusic.play();
+    }
 
     @Override public void hide() {}
 
     @Override public void dispose() {
         stage.dispose();
         font.dispose();
+        introMusic.dispose();
     }
 }
