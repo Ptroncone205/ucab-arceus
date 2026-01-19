@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import nintendont.amongspirits.data.codex.Codex;
 import nintendont.amongspirits.data.codex.CodexPreviewAssets;
 import nintendont.amongspirits.data.codex.FakeCodexLoader;
@@ -48,7 +49,7 @@ public class CodexMain extends ApplicationAdapter {
 
         Codex codex = new FakeCodexLoader().load();
 
-        CodexMainUI main = new CodexMainUI(assetManager, codex);
+        CodexMainUI main = new CodexMainUI(assetManager, codex, new Skin());
         stage.addActor(main);
 
         Actor menu = main.findActor("codex_menu");

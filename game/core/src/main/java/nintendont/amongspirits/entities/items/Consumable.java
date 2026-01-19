@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.JsonValue;
 import nintendont.amongspirits.entities.Entity;
-import nintendont.amongspirits.entities.Pokemon;
 import nintendont.amongspirits.entities.items.effects.HealEffect;
 import nintendont.amongspirits.entities.items.effects.ItemEffect;
 
@@ -27,9 +26,9 @@ public class Consumable extends Item {
         }
     }
 
-    @Override
-    public void useItem(Entity target){
-        effect.apply((Pokemon) target);
-    }
+//    @Override
+//    public void useItem(Entity target){
+//        effect.apply((com.badlogic.ashley.core.Entity) target);
+//    }
 
 }

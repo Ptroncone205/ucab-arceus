@@ -1,5 +1,6 @@
 package nintendont.amongspirits.ui.game;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
@@ -16,6 +17,8 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.data.codex.Codex;
 import nintendont.amongspirits.data.codex.CodexPreviewAssets;
+import nintendont.amongspirits.data.spirits.Pasture;
+import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.ui.codex.CodexMainUI;
@@ -32,9 +35,10 @@ public class GUIManager implements Disposable{
     private InventoryMenu inventoryMenu;
     private Skin skin;
     private PauseMenu pauseMenu;
+    private PastureUI pastureUI;
 
 
-    public GUIManager (SpriteBatch batch, Satchel satchel, CraftManager craftManager, Codex codex){
+    public GUIManager (SpriteBatch batch, CraftManager craftManager, Player player, Codex codex){
         stage =new Stage(new ScreenViewport(), batch);
         this.codex = codex;
         assetManager.load("sfx/ui/open_page_foley.ogg", Sound.class);
@@ -55,12 +59,14 @@ public class GUIManager implements Disposable{
         AssetUtils.loadFont(assetManager, "roboto_2xl.ttf", "fonts/roboto.ttf", 24);
         AssetUtils.loadFont(assetManager, "chinese_8xl.ttf", "fonts/chinese_takeaway.ttf", 96);
         AssetUtils.loadFont(assetManager, "chinese_9xl.ttf", "fonts/chinese_takeaway.ttf", 128);
-
         assetManager.finishLoading();
-        codexUI = new CodexMainUI(assetManager, codex);
 
         createSkin();
-        inventoryMenu = new InventoryMenu(satchel, craftManager, skin);
+
+        pastureUI = new PastureUI(skin, player.getPasture());
+        codexUI = new CodexMainUI(assetManager, codex, skin);
+
+        inventoryMenu = new InventoryMenu(player.getSatchel(), craftManager, skin);
         pauseMenu = new PauseMenu(skin);
 
         stage.addActor(codexUI);
@@ -80,6 +86,10 @@ public class GUIManager implements Disposable{
         inventoryMenu.refresh();
     }
 
+    public void togglePasture(){
+
+    }
+
     public void togglePause() {
 
         switch (Const.currentState){
@@ -95,14 +105,14 @@ public class GUIManager implements Disposable{
                 Gdx.input.setCursorCatched(true);
                 break;
             case INVENTORY:
-                Const.currentState = GameState.INGAME;
-                inventoryMenu.setVisible(false);
-                Gdx.input.setCursorCatched(true);
+                toggleInventory();
                 break;
             case SELECT_ITEM:
             case SELECT_PKMN:
                 Const.currentState = GameState.INVENTORY;
                 break;
+            case CODEX:
+                toggleCodex();
             default:
                 return;
         }
@@ -112,21 +122,16 @@ public class GUIManager implements Disposable{
     public void toggleInventory() {
         switch (Const.currentState) {
             case INGAME:
-                Const.currentState = GameState.INVENTORY;
-                inventoryMenu.setVisible(true);
-                Gdx.input.setCursorCatched(false);
-                break;
-
             case INVENTORY:
-                Const.currentState = GameState.INGAME;
-                inventoryMenu.setVisible(false);
-                Gdx.input.setCursorCatched(true);
+                Const.currentState = Const.currentState==GameState.INGAME? GameState.INVENTORY: GameState.INGAME;
+                inventoryMenu.setVisible(!inventoryMenu.isVisible());
+                Gdx.input.setCursorCatched(!Gdx.input.isCursorCatched());
                 break;
             case SELECT_ITEM:
             case SELECT_PKMN:
-                Const.currentState = GameState.INGAME;
+                Const.currentState = GameState.INVENTORY;
                 inventoryMenu.setVisible(false);
-                Gdx.input.setCursorCatched(true);
+                Gdx.input.setCursorCatched(false);
                 break;
             default:
                 return;
@@ -139,7 +144,7 @@ public class GUIManager implements Disposable{
         if (codexUI.isVisible()){
             codexUI.setVisible(false);
         } else{
-            codexUI = new CodexMainUI(assetManager, codex);
+            codexUI = new CodexMainUI(assetManager, codex, skin);
             stage.addActor(codexUI);
             codexUI.validate();
             codexUI.setVisible(true);

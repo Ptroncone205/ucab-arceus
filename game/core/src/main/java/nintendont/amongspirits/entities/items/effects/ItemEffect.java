@@ -1,7 +1,7 @@
 package nintendont.amongspirits.entities.items.effects;
 
-import nintendont.amongspirits.entities.Pokemon;
+import nintendont.amongspirits.data.spirits.Spirit;
 
 public interface ItemEffect {
-    void apply(Pokemon pokemon);
+    void apply(Spirit pokemon);
 }

@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.JsonValue;
 
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
-import nintendont.amongspirits.entities.Pokemon;
 import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.managers.ItemFactory;
 
@@ -30,7 +29,7 @@ public class SaveData implements Json.Serializable{
     public void write(Json json) {
         json.writeValue("name", name);
         json.writeValue("inventory", inventory);
-        
+
         json.writeArrayStart("items");
         for (Item item : items){
             json.writeObjectStart();
@@ -60,5 +59,5 @@ public class SaveData implements Json.Serializable{
             items.add(item);
         }
     }
-    
+
 }

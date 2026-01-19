@@ -138,9 +138,6 @@ public class GameScreen implements Screen{
 		assets = new AssetManager();
 		System.out.println("init just called");
 
-        // Loading data
-        Codex codex = new FakeCodexLoader().load();
-
 		// cargar todos los assets usados por el juego incluyendo texturas y modelos
         AssetUtils.loadGLTF(assets, "models/mc/lukitm501.gltf");
 		assets.load("textures/oranberry.png", Texture.class);
@@ -185,8 +182,16 @@ public class GameScreen implements Screen{
 		font = new BitmapFont();
 		inventory = new Satchel();
 
+
+        Codex codex = new FakeCodexLoader().load();
 		crafting = new CraftManager();
-		guiManager = new GUIManager(batch, inventory, crafting, codex);
+        if (load){
+            loadData(playerName);
+        } else {
+            createData(playerName);
+        }
+
+		guiManager = new GUIManager(batch, crafting, player, codex);
 		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
@@ -198,11 +203,7 @@ public class GameScreen implements Screen{
 			}
 		});
 
-		if (load){
-			loadData(playerName);
-		} else {
-			createData(playerName);
-		}
+
 
 		InputAdapter adapter = new InputAdapter(){
 			@Override
@@ -252,6 +253,9 @@ public class GameScreen implements Screen{
 		cl = new MyContactListener();
 		iScan = new InteractionScanner();
 		focusedItem = null;
+
+        // Loading data
+
 
         // Setup ECS engine
         ecsEngine = new Engine();
@@ -468,10 +472,32 @@ public class GameScreen implements Screen{
 			}
         }
 
+
+        if (Const.currentState == GameState.INGAME && Gdx.input.justTouched()) {
+			boolean flag = false;
+			for (ItemStack iS : player.getSatchel().getItems()){
+				if (iS.getItem() instanceof Pokeball){
+					iS.count--;
+                    guiManager.update();
+					flag = true;
+					break;
+				}
+			}
+			if (!flag) return;
+
+            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
+            Vector3 throwDirection = camera.direction.cpy();
+            throwDirection.add(new Vector3(0, 0.5f, 0));
+    //            yumenjiangFactory.spawnThrowableYumenjiang(spawnPoint, throwDirection, 50);
+            }
+
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
 			player.getTeam().getMembers().forEach(spirit -> System.out.printf(spirit.getSpirit().getName() + ", "));
             System.out.println();
 		}
+        if (Gdx.input.isKeyJustPressed(Input.Keys.C)){
+            guiManager.toggleCodex();
+        }
 
         if (socket.isOpen()) {
             Json json = new Json();
