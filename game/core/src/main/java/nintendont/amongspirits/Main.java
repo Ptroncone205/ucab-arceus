@@ -7,6 +7,7 @@ import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.managers.ItemFactory;
 import nintendont.amongspirits.screens.GameScreen;
+import nintendont.amongspirits.screens.IntroScreen;
 import nintendont.amongspirits.screens.MainMenu;
 
 public class Main extends Game {
@@ -21,7 +22,7 @@ public class Main extends Game {
     public void create() {
         context.init();
 
-        this.setScreen(new MainMenu(this));
+        setScreen(new IntroScreen(this));
     }
 
     @Override
