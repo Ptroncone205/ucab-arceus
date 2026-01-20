@@ -2,6 +2,7 @@ package nintendont.amongspirits;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import nintendont.amongspirits.Const.GameState;
@@ -11,13 +12,15 @@ import nintendont.amongspirits.screens.MainMenu;
 
 public class Main extends Game {
     private final Const context = Const.get();
-    private GameScreen gameScreen;
+    public AssetManager assets;
+    public GameScreen gameScreen;
     private Music currentMusic;
 
     @Override
     public void create() {
         context.init();
-        this.setScreen(new IntroScreen(this));
+        assets = context.assets;
+        this.setScreen(new IntroScreen(this, assets));
     }
 
     @Override
@@ -31,12 +34,11 @@ public class Main extends Game {
         playMusic("", true);
 
         Const.currentState = GameState.INGAME;
-        gameScreen = new GameScreen(this, playerName, load);
+        gameScreen = new GameScreen(this, assets, playerName, load);
         this.setScreen(gameScreen);
     }
 
     public void quitGame(){
-        Const.currentState = GameState.MENU;
         if(gameScreen != null) {
             gameScreen.dispose();
             gameScreen = null;

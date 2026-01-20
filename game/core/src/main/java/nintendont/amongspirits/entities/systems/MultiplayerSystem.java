@@ -114,7 +114,7 @@ public class MultiplayerSystem extends EntitySystem {
 
         if (challenger != null) {
             socket.close();
-            game.setScreen(new BattleScreen(game, player, challenger, player.getSelectedTeamMemberIndex()));
+            game.setScreen(new BattleScreen(game, player, challenger, player.getSelectedTeamMemberIndex(), game.assets));
             return;
         }
 

@@ -77,6 +77,8 @@ public class CatchableSystem extends IteratingSystem {
             Team team = player.getTeam();
             if (team.getMembers().size() < 6) {
                 team.getMembers().add(invocation);
+            } else {
+                //
             }
             player.getPasture().getInvocations().add(invocation);
         }

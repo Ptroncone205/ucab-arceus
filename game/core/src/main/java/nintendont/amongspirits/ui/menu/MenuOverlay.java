@@ -16,7 +16,7 @@ public class MenuOverlay extends Table{
     protected MenuUI menu;
     protected Skin skin;
 
-    protected ArrayList<Actor> actors = new ArrayList<>();
+    protected ArrayList<Actor> actores = new ArrayList<>();
     protected int selected;
 
     public MenuOverlay (Skin skin, MenuUI menu){
@@ -28,11 +28,11 @@ public class MenuOverlay extends Table{
         switch (key){
             case Keys.W:
                 selected -= 1;
-                if (selected < 0) selected = actors.size() - 1;
+                if (selected < 0) selected = actores.size() - 1;
                 return true;
             case Keys.S:
                 selected += 1;
-                if (selected >= actors.size()) selected = 0;
+                if (selected >= actores.size()) selected = 0;
                 return true;
             default:
                 return false;
@@ -43,7 +43,7 @@ public class MenuOverlay extends Table{
         TextButton btn = new TextButton(text, skin){
             @Override
             public boolean isOver(){
-                return actors.indexOf(this) == selected;
+                return actores.indexOf(this) == selected;
             }
         };
         btn.setUserObject(action);
@@ -56,10 +56,10 @@ public class MenuOverlay extends Table{
         btn.addListener(new ClickListener(){
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                selected = actors.indexOf(btn);
+                selected = actores.indexOf(btn);
             }
         });
-        actors.add(btn);
+        actores.add(btn);
         return btn;
     }
 
@@ -80,7 +80,7 @@ public class MenuOverlay extends Table{
         textField.addListener(new ClickListener(){
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                selected = actors.indexOf(textField);
+                selected = actores.indexOf(textField);
             }
         });
         return textField;

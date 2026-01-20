@@ -23,6 +23,11 @@ public class MainMenu implements Screen{
             public void onLoadRequest(){
                 loadGame(menuUI.getPlayerName(), true);
             }
+
+            @Override
+            public void onQuitRequest() {
+                super.onQuitRequest();
+            }
         });
 
         InputAdapter adapter = new InputAdapter(){

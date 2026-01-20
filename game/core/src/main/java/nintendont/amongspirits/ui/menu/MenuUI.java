@@ -10,11 +10,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -45,23 +47,32 @@ public class MenuUI extends InputAdapter implements Disposable {
                 switch (key) {
                     case Keys.ESCAPE:
                     case Keys.ENTER:
-                        Actor a = getKeyboardFocus();
-                        if (a instanceof TextField){
-                            playerName = ((TextField)a).getText();
-                            System.out.println(playerName);
-                            unfocusAll();
-                            return true;
-                        }
+                        setPlayerName();
+                        return false;
                     default:
                         return super.keyDown(key);
                 }
             }
         };
+        stage.addCaptureListener(new ClickListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                setPlayerName();
+                return true;
+            }
+        });
         createSkin();
 
         create();
     }
-
+    private void setPlayerName(){
+        Actor a = stage.getKeyboardFocus();
+        if (a instanceof TextField){
+            playerName = ((TextField)a).getText();
+            System.out.println(playerName);
+            stage.unfocusAll();
+        }
+    }
     public String getPlayerName(){
         return playerName;
     }

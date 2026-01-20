@@ -90,7 +90,7 @@ public class ChallengeSystem extends IteratingSystem {
             if (socket.isOpen()) {
                 socket.close();
             }
-            game.setScreen(new BattleScreen(game, player, enemy, challenger.teamMemberId));
+            game.setScreen(new BattleScreen(game, player, enemy, challenger.teamMemberId, game.assets));
             alreadyChallenging = true;
         } else if (playerTag != null) {
             if (socket.isClosed()) {

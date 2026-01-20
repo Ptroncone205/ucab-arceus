@@ -49,7 +49,7 @@ public class CodexMain extends ApplicationAdapter {
 
         Codex codex = new FakeCodexLoader().load();
 
-        CodexMainUI main = new CodexMainUI(assetManager, codex, new Skin());
+        CodexMainUI main = new CodexMainUI(assetManager, codex, new Skin(), null);
         stage.addActor(main);
 
         Actor menu = main.findActor("codex_menu");
@@ -77,6 +77,5 @@ public class CodexMain extends ApplicationAdapter {
     @Override
     public void dispose() {
         stage.dispose();
-        assetManager.dispose();
     }
 }

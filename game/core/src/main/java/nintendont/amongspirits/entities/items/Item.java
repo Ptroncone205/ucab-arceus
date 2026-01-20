@@ -1,6 +1,7 @@
 package nintendont.amongspirits.entities.items;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -23,6 +24,7 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 // TODO entity
 public class Item extends Entity{
     public static final float PICKUP_DIST = 3f;
+    private AssetManager assets;
     public String iconPath;
     public final int id;
     public final String name;
@@ -33,7 +35,8 @@ public class Item extends Entity{
     public Scene scene;
     public Vector3 pos;
 
-    public Item (int id, String name, String desc, boolean isMaterial){
+    public Item (int id, String name, String desc, boolean isMaterial, AssetManager assets){
+        this.assets = assets;
         this.icon = null;
         this.id = id;
         this.name = name;
@@ -41,12 +44,12 @@ public class Item extends Entity{
         this.isMaterial = isMaterial;
     }
 
-    public Item(JsonValue data){
+    public Item(JsonValue data, AssetManager assets){
         this.id = data.getInt("id");
         this.name = data.getString("name");
         this.desc = data.getString("desc");
         this.isMaterial = data.getBoolean("isMaterial");
-        this.icon = GameScreen.assets.get(data.getString("icon"),Texture.class);
+        this.icon = assets.get(data.getString("icon"),Texture.class);
         iconPath = data.getString("icon");
         System.out.println(this.name + " created: " + Gdx.files.internal(data.getString("icon")));
     }

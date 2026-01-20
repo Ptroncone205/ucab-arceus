@@ -1,4 +1,5 @@
 package nintendont.amongspirits.data.savedata;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -22,7 +23,7 @@ public class ItemSerializer implements Json.Serializer<Item>{
 
     @Override
     public Item read(Json json, JsonValue jsonData, Class type) {
-        
+
         Integer id = jsonData.getInt("id");
         float x = jsonData.getFloat("x");
         float y = jsonData.getFloat("y");
@@ -34,5 +35,5 @@ public class ItemSerializer implements Json.Serializer<Item>{
 
         return item;
     }
-    
+
 }

@@ -50,11 +50,11 @@ public class Account extends MenuOverlay {
         this.add(topT).row();
         this.add(botT).row();
 
-        actors.add(username);
-        actors.add(btnResume);
-        actors.add(btnSave);
-        actors.add(btnQuit);
-        actors.add(btnHelp);
+        actores.add(username);
+        actores.add(btnResume);
+        actores.add(btnSave);
+        actores.add(btnQuit);
+        actores.add(btnHelp);
 
         this.setDebug(true);
     }
@@ -69,7 +69,7 @@ public class Account extends MenuOverlay {
         switch (key){
             case Keys.ENTER:
             case Keys.SPACE:
-                Actor a = actors.get(selected);
+                Actor a = actores.get(selected);
                 if (a instanceof TextButton) onClick((TextButton)a);
                 return true;
             default:

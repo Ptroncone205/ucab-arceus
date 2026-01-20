@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
+import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
-import nintendont.amongspirits.data.codex.BattleSpiritAssets;
 import nintendont.amongspirits.data.codex.SpiritMove;
 import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.entities.Enemy;
@@ -40,7 +40,7 @@ public class BattleScreen implements Screen, MenuListener {
     private BitmapFont font;
     private TextButton.TextButtonStyle styleRed, styleBlue, styleGreen, styleYellow;
 
-    public BattleScreen(Main game, Player player, Enemy enemy, int initialPlayerActiveIndex) {
+    public BattleScreen(Main game, Player player, Enemy enemy, int initialPlayerActiveIndex, AssetManager assets) {
         this.game = game;
         this.player = player;
         this.enemy = enemy;
@@ -49,19 +49,17 @@ public class BattleScreen implements Screen, MenuListener {
 
         Gdx.input.setCursorCatched(false);
 
-        assets = new AssetManager();
-        assets.load(BattleSpiritAssets.MALE_DEER);
-        assets.load(BattleSpiritAssets.FEMALE_DEER);
-        assets.load(BattleSpiritAssets.MALE_WOLF);
-        assets.load(BattleSpiritAssets.FEMALE_WOLF);
-        assets.load(BattleSpiritAssets.MALE_BUNNY);
-        assets.load(BattleSpiritAssets.FEMALE_BUNNY);
-        assets.load(BattleSpiritAssets.MALE_FOX);
-        assets.load(BattleSpiritAssets.FEMALE_FOX);
-        assets.load(BattleSpiritAssets.MALE_LION);
-        assets.load(BattleSpiritAssets.FEMALE_LION);
-
-        assets.finishLoading();
+        this.assets = assets;
+//        assets.load(BattleSpiritAssets.MALE_DEER);
+//        assets.load(BattleSpiritAssets.FEMALE_DEER);
+//        assets.load(BattleSpiritAssets.MALE_WOLF);
+//        assets.load(BattleSpiritAssets.FEMALE_WOLF);
+//        assets.load(BattleSpiritAssets.MALE_BUNNY);
+//        assets.load(BattleSpiritAssets.FEMALE_BUNNY);
+//        assets.load(BattleSpiritAssets.MALE_FOX);
+//        assets.load(BattleSpiritAssets.FEMALE_FOX);
+//        assets.load(BattleSpiritAssets.MALE_LION);
+//        assets.load(BattleSpiritAssets.FEMALE_LION);
 
         batch = new SpriteBatch();
         stage = new Stage();
@@ -159,7 +157,7 @@ public class BattleScreen implements Screen, MenuListener {
         btnRun.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
                 game.playSound("");
-                goBackToGame();
+                game.setScreen(game.gameScreen);
             }
         });
 
@@ -340,7 +338,7 @@ public class BattleScreen implements Screen, MenuListener {
     }
 
     private void goBackToGame() {
-        game.setScreen(new GameScreen(game, player.getName(), true));
+        game.setScreen(new GameScreen(game, assets, player.getName(), true));
     }
 
     @Override
@@ -370,6 +368,5 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void dispose() {
-        assets.dispose();
     }
 }

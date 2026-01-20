@@ -16,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Const.GameState;
 
-public class PauseMenu extends Table {
+public class PauseMenu extends MenuTable {
 
     private BtnEventListener saveListener;
 
@@ -25,8 +25,8 @@ public class PauseMenu extends Table {
     private int selected = 0;
     private Button selButton;
 
-    public PauseMenu(Skin skin) {
-        super(skin);
+    public PauseMenu(Skin skin, GUIManager gui) {
+        super(gui);
         this.skin = skin;
 
         this.setFillParent(true);
@@ -82,9 +82,7 @@ public class PauseMenu extends Table {
 
 
     public void onResume(){
-        Const.currentState = GameState.INGAME;
-        this.setVisible(false);
-        Gdx.input.setCursorCatched(true);
+        gui.goBack();
     }
 
     public void onSave(){

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -17,14 +18,16 @@ import nintendont.amongspirits.entities.items.Pokeball;
  * es tecnicamente un factory :)
  */
 public class ItemFactory {
-    private static ArrayList<JsonValue> items = new ArrayList<>(); // lista de datos de todos los items
+    private static final ArrayList<JsonValue> items = new ArrayList<>(); // lista de datos de todos los items
     private static final HashMap<String, ItemCreator> registry = new HashMap<>(); // mapa de id -> tipo de item
+    private static AssetManager assets;
 
     interface ItemCreator {
-        Item create(JsonValue data);
+        Item create(JsonValue data, AssetManager assets);
     }
 
-    public static void init(){
+    public static void init(AssetManager assets){
+        ItemFactory.assets = assets;
         JsonReader json = new JsonReader();
         JsonValue data = json.parse(Gdx.files.internal("data/items.json"));
         for (JsonValue j : data){
@@ -39,6 +42,6 @@ public class ItemFactory {
     public static Item createItem(Integer id){
         JsonValue data = items.get(id);
         ItemCreator r = registry.get(data.getString("type"));
-        return r.create(data);
+        return r.create(data, assets);
     }
 }

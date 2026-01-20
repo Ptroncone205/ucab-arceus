@@ -25,18 +25,23 @@ import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.Satchel;
 
-public class InventoryMenu extends Table{
+public class InventoryMenu extends MenuTable{
     private Satchel invManager;
     private CraftManager craftManager;
-    public GameState currentState;
     private Table grid;
-    private Table team;
+    private MenuTable teamTable;
     private Label title;
     private Label desc;
     private Skin skin;
     private Image cursor;
     Vector2 cursorPos = new Vector2();
 
+    private enum InvState{
+        NONE,
+        SELECT_ITEM,
+        SELECT_PKMN
+    }
+    private InvState invState = InvState.NONE;
     private final int ROWS = 5;
     private final int COLS = 4;
 
@@ -47,7 +52,8 @@ public class InventoryMenu extends Table{
     private int selected = 0;
 
 
-    public InventoryMenu (Satchel invManager, CraftManager craftManager, Skin skin){
+    public InventoryMenu (Satchel invManager, CraftManager craftManager, Skin skin,TeamMenu teamTable, GUIManager gui){
+        super(gui);
         this.invManager = invManager;
         this.craftManager = craftManager;
         this.skin = skin;
@@ -61,7 +67,6 @@ public class InventoryMenu extends Table{
         this.addActor(cursor);
         cursor.toFront();
         cursor.setTouchable(Touchable.disabled);
-        updateCursor();
 
         // top bar
         Table header = new Table();
@@ -96,28 +101,29 @@ public class InventoryMenu extends Table{
 
 
         // contenedor de equipos (aqui salen los pokemon o lo q sea)
-        team = new Table();
-        team.top().padTop(20);
+        this.teamTable = teamTable;
+        Table team = new Table();
+        team.center().top().pad(20);
         team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.2f));
+        team.add(teamTable);
+//        team.setDebug(true);
 
         body.add(leftPanel).width(Value.percentWidth(0.55f, body)).expandY().fillY();
         body.add(team).width(Value.percentWidth(0.45f, body)).expandY().fillY();
 
         this.add(body).expand().fill();
-        refresh();
-
-        // this.addListener(new ClickListener());
-        // this.setDebug(true);
+        update();
+        updateCursor();
     }
     private ItemStack selItem;
     public void updateDesc(){
         // solo porque me molestabaa tener que actualioxar todo
         // actualizar descripcion
-        switch (Const.currentState) {
+        switch (invState) {
             case SELECT_ITEM:
                 desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDesc() + "\n selected");
                 break;
-        
+
             default:
                 if (invManager.getItems().isEmpty()){
                     desc.setText("No items :(");
@@ -136,7 +142,7 @@ public class InventoryMenu extends Table{
             cursor.setVisible(false);
             return;
         } else cursor.setVisible(true);
-        
+
         if (selected < invManager.getItems().size()){
             grid.getChildren().get(selected).localToActorCoordinates(cursor, cursorPos);
         } else {
@@ -145,7 +151,8 @@ public class InventoryMenu extends Table{
         cursor.setPosition(cursorPos.x,cursorPos.y);
         cursor.toFront();
     }
-    public void refresh(){ // construye el menu, se llama al agregar o eliminar un item
+    @Override
+    public void update(){ // construye el menu, se llama al agregar o eliminar un item
         grid.clear();
         int cols = 0;
         int sel = 0;
@@ -165,23 +172,24 @@ public class InventoryMenu extends Table{
             grid.add(slot).size(70).pad(15);
 
             cols++;
-            
+
             if ( cols > COLS){
                 grid.row();
                 cols = 0;
             }
             sel++;
         }
-        
+
         this.validate();
         updateDesc();
         updateCursor();
-    } 
+        teamTable.update();
+    }
 
     private Actor createSlot(Skin skin, ItemStack stack, int sel) {
         Stack slotStack = new Stack();
         Image bg;
-        
+
         bg = new Image(skin.newDrawable("white", Color.DARK_GRAY));
 
         bg.setTouchable(Touchable.disabled);
@@ -199,7 +207,7 @@ public class InventoryMenu extends Table{
         Table iconContainer = new Table();
         iconContainer.add(icon).size(50);
 
-        iconContainer.setTouchable(Touchable.disabled); 
+        iconContainer.setTouchable(Touchable.disabled);
         icon.setTouchable(Touchable.disabled);
 
         slotStack.add(iconContainer);
@@ -212,11 +220,12 @@ public class InventoryMenu extends Table{
         }
 
         int index = invManager.getItems().indexOf(stack);
-        
+
         slotStack.setTouchable(Touchable.enabled);
         slotStack.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                System.out.println("helpp");
                 onClick(stack);
             }
 
@@ -254,34 +263,35 @@ public class InventoryMenu extends Table{
 
     public void onClick(ItemStack stack){
         if (stack.getItem().isMaterial()){
-            if (Const.currentState == Const.GameState.INVENTORY){
+            if (invState == InvState.NONE){
                     itemA = stack;
-                    Const.currentState = Const.GameState.SELECT_ITEM;
+                    invState = InvState.SELECT_ITEM;
                     updateDesc();
-            } else if (Const.currentState == Const.GameState.SELECT_ITEM) {
+            } else if (invState == InvState.SELECT_ITEM) {
                 itemB = stack;
                 Item output = craftManager.craft(itemA.getItem(), itemB.getItem());
                 if (output != null){
                     invManager.addItem(output);
                     selected = selected <= 0 ? 0 : selected - 1;
                     itemA.count--; itemB.count--;
-                    refresh();
+                    update();
                 }
-                Const.currentState = Const.GameState.INVENTORY;
+                invState = InvState.NONE;
             }
-        } else 
+        } else
         if (stack.getItem() instanceof Consumable){
-            if (Const.currentState == Const.GameState.INVENTORY){
+            if (invState == InvState.NONE){
                 itemA = stack;
-                Const.currentState = Const.GameState.SELECT_PKMN;
-                refresh();
+                invState = InvState.SELECT_PKMN;
+                update();
             }
         }
     }
 
+    @Override
     public boolean handleInput (int key){
         int size = invManager.getItems().size();
-        if (size == 0 ) return false;
+//        if (size == 0 ) return false;
         switch (key) {
             case Keys.W:
                 if (selected - ROWS >= 0 ) selected -= ROWS;
@@ -299,6 +309,8 @@ public class InventoryMenu extends Table{
                 System.out.println("clicked");
                 onClick(invManager.getItems().get(selected));
                 break;
+            default:
+                return false;
         }
         updateDesc();
         updateCursor();
