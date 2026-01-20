@@ -20,7 +20,7 @@ public class Account extends  MenuOverlay{
         TextField username = creaTextField(skin);
         username.setSize(200, 40);
 
-        TextButton btnLogIn = createButton("Log In", ()->menu.setMenu("play"));
+        TextButton btnLogIn = createButton("Log In", ()->{if(!menu.getPlayerName().isBlank())menu.setMenu("play");});
 
         Table topT = new Table();
         topT.add(title).padBottom(50).padRight(20);

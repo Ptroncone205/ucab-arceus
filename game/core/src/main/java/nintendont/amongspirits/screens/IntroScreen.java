@@ -28,6 +28,7 @@ public class IntroScreen implements Screen {
     private BitmapFont font;
     private Music introMusic;
     private AssetManager assets;
+    private int hola;
 
     public IntroScreen(Main game, AssetManager assets) {
         this.game = game;
@@ -199,7 +200,7 @@ public class IntroScreen implements Screen {
     @Override
     public void render(float delta) {
         assets.update();
-        if (!assets.isFinished()) System.out.println("LOADING: " + assets.getLoadedAssets() * 100 / 34 + "%");
+        if (!assets.isFinished()) System.out.println("LOADING: " + assets.getLoadedAssets() * 100 / 55 + "%");
         if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT_BRACKET) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             goToMainMenu();
         }
