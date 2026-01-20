@@ -111,6 +111,7 @@ public class InventoryMenu extends MenuTable{
                     selectedIndex = index;
                     ((ConsumableItem)itemA.getItem()).getEffect().apply(getSelSpirit());
                     itemA.decrease();
+                    invState = InvState.NONE;
                     update();
                     return;
                 }
