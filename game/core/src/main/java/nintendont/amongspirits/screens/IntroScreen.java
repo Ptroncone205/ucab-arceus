@@ -42,6 +42,7 @@ public class IntroScreen implements Screen {
         assets.load(GameAssets.POKEBALL);
         assets.load(GameAssets.TUMBLESTONE);
         assets.load(GameAssets.YUMENJIANG_SCENE);
+        assets.load(GameAssets.PHOENIX_SCENE);
         assets.load(GameAssets.LION_SCENE);
         assets.load(GameAssets.WOLF_SCENE);
         assets.load(GameAssets.DEER_SCENE);

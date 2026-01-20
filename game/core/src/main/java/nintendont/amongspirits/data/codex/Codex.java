@@ -33,4 +33,8 @@ public class Codex {
     public boolean isComplete() {
         return complete;
     }
+
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
 }

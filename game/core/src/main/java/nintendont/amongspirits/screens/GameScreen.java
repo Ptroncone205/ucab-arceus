@@ -33,11 +33,10 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
+import nintendont.amongspirits.data.assets.GameAssets;
 import nintendont.amongspirits.data.config.MultiplayerConfig;
 import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
-import nintendont.amongspirits.data.satchel.ItemDB;
 import nintendont.amongspirits.data.spirits.Invocation;
-import nintendont.amongspirits.data.satchel.ItemDBLoader;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
@@ -49,7 +48,6 @@ import nintendont.amongspirits.entities.spawners.SpiritSpawner;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
 import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.managers.TextInput;
 import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
@@ -118,8 +116,8 @@ public class GameScreen implements Screen{
         context.init();
 
         PBRShaderConfig config = PBRShaderProvider.createDefaultConfig();
-        config.numBones = 90;
-		sceneManager = new SceneManager(new CustomShaderProvider(config), PBRShaderProvider.createDefaultDepth(90));
+        config.numBones = 156;
+		sceneManager = new SceneManager(new CustomShaderProvider(config), PBRShaderProvider.createDefaultDepth(156));
 
         game.playMusic("music and sounds/music/game.mp3", true);
 
@@ -163,10 +161,9 @@ public class GameScreen implements Screen{
 				game.quitGame();
 			}
 		});
-		
-		catchMode = new Texture("textures/pokeball.png");
-		noPkmn = new Texture("textures/pokeball2.png");
 
+        catchMode = assets.get(GameAssets.POKEBALL);
+        noPkmn = assets.get(GameAssets.NO_POKEBALL);
 
 		multiplexer.addProcessor(guiManager.stage);
 		multiplexer.addProcessor(new InputAdapter(){
@@ -241,6 +238,7 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new ItemSystem(player, camera, guiManager, multiplexer, socket));
         ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera, guiManager));
         ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner, itemSpawner));
+        ecsEngine.addSystem(new EndgameSystem(player, spiritSpawner, guiManager));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
@@ -319,12 +317,12 @@ public class GameScreen implements Screen{
 		}
 		if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER && player.getTeam().getMembers().isEmpty()){
 			batch.draw(noPkmn, 50, 50, 50,50);
-			
+
 		}else if (player.getMode() == Player.ThrowingMode.TO_CATCH){
 			batch.draw(catchMode, 50, 50, 50,50);
-			
+
 		}else if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER){
-			Invocation active = player.getTeam().getMembers().getFirst();
+			Invocation active = player.getTeam().getMembers().get(player.getSelectedTeamMemberIndex());
 			batch.draw(assets.get(active.getBattleAsset()), 50, 50, 50,50);
 		}
 		batch.end();
