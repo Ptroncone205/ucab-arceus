@@ -43,6 +43,7 @@ public class ItemSystem extends IteratingSystem {
         this.camera = camera;
         this.socket = socket;
         json.setOutputType(JsonWriter.OutputType.json);
+        json.setUsePrototypes(false);
         input.addProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {

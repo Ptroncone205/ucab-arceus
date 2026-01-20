@@ -84,7 +84,7 @@ wssWorld.on("connection", (ws) => {
       );
     } else if (packet.type == "item_collected") {
       const targetItemId = packet.itemId;
-      const targetSpawnIndex = items.spawnIndex;
+      const targetSpawnIndex = packet.spawnIndex;
       const targetItem = items.find((item) => item.id === targetItemId);
 
       if (!targetItem) {
@@ -133,15 +133,15 @@ wssWorld.on("connection", (ws) => {
         ws,
       );
 
-      timeout(() => {
-        targetItemId[0] = true;
+      setTimeout(() => {
+        targetSpawn[0] = true;
         broadcast(
           JSON.stringify({
             type: "item_respawned",
             itemId: targetItemId,
             spawnIndex: targetSpawnIndex,
           }),
-          ws,
+          null,
         );
       }, 60000);
     }

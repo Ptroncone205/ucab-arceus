@@ -36,6 +36,7 @@ public class MultiplayerSystem extends EntitySystem {
     private final ItemSpawner itemSpawner;
     private final HashMap<Integer, Entity> onlinePlayers = new HashMap<>();
     private final HashMap<Integer, OnlineItem> onlineItems = new HashMap<>();
+    private PlayerCoordinatesPacket lastPlayerPacket;
     private Enemy challenger = null;
 
     public MultiplayerSystem(
@@ -52,6 +53,7 @@ public class MultiplayerSystem extends EntitySystem {
         this.itemSpawner = itemSpawner;
 
         json.setOutputType(JsonWriter.OutputType.json);
+        json.setUsePrototypes(false);
 
         socket.addListener(new WebSocketListener() {
             @Override
@@ -89,8 +91,10 @@ public class MultiplayerSystem extends EntitySystem {
                         break;
                     case "item_collected_broadcast":
                         handleItemCollectedBroadcast(root);
+                        break;
                     case "item_respawned":
                         handleItemRespawned(root);
+                        break;
                     default:
                         Gdx.app.log("WS", "Unknown message type received: " + type);
                 }
@@ -130,7 +134,10 @@ public class MultiplayerSystem extends EntitySystem {
         }
 
         PlayerCoordinatesPacket packet = createPlayerPacketFrom("player_update");
-        socket.send(json.toJson(packet));
+        if (lastPlayerPacket == null || packet.x - lastPlayerPacket.x > 0.001 || packet.y - lastPlayerPacket.y > 0.001 || packet.z - lastPlayerPacket.z > 0.001) {
+            socket.send(json.toJson(packet));
+        }
+        lastPlayerPacket = packet;
     }
 
     private void handleWorldSetup(JsonValue root) {
@@ -154,7 +161,9 @@ public class MultiplayerSystem extends EntitySystem {
                 OnlineItemSpawn onlineItemSpawn = new OnlineItemSpawn();
                 onlineItemSpawn.available = spawn.getBoolean(0);
                 onlineItemSpawn.position = new Vector3(x, y, z);
-                onlineItemSpawn.entity = itemSpawner.spawnItemByIdForOnline(itemId, i, new Vector3(x, y, z));
+                if (onlineItemSpawn.available) {
+                    onlineItemSpawn.entity = itemSpawner.spawnItemByIdForOnline(itemId, i, new Vector3(x, y, z));
+                }
 
                 if (onlineItemSpawn.entity == null) {
                     Gdx.app.log("WS", "Unsupported item ID for spawning: " + itemId);
