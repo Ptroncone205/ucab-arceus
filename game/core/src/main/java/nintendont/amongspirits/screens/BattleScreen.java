@@ -70,32 +70,39 @@ public class BattleScreen implements Screen, MenuListener {
 
     public void setupBattleUI(){
         stage.clear();
-        Table root = new Table();
-        root.setFillParent(true);
-        stage.addActor(root);
 
-        // UI ENEMIGO
-        Invocation enemyInvocation = getEnemyActiveInvocation();
-        Texture enemyGraphic = assets.get(enemyInvocation.getBattleAsset());
-        healthBarEnemy = new Image();
-        Table enemyGroup = new Table();
-        enemyGroup.add(new Image(enemyGraphic)).size(180).row();
-        Table enemyInfo = new Table();
-        enemyInfo.add(healthBarEnemy).size(200, 20).row();
-        enemyInfo.add(new Label(enemyInvocation.getFullName(), new Label.LabelStyle(font, Color.RED)));
-        enemyGroup.add(enemyInfo).left().padTop(10);
-        root.add(enemyGroup).expand().top().right().padTop(60).padRight(180).row();
+        Stack mainStack = new Stack();
+        mainStack.setFillParent(true);
+        stage.addActor(mainStack);
 
-        // UI JUGADOR
+        Table gameLayer = new Table();
+
+        // JUGADOR
         Invocation playerInvocation = getPlayerActiveInvocation();
-        Texture playerGraphic = assets.get(playerInvocation.getBattleAsset());
-        healthBarPlayer = new Image();
         Table playerGroup = new Table();
-        playerGroup.add(new Image(playerGraphic)).size(180).row();
-        playerGroup.add(healthBarPlayer).size(200, 20).padTop(5).row();
-        playerGroup.add(new Label(playerInvocation.getFullName(), new Label.LabelStyle(font, Color.CYAN)));
-        root.add(playerGroup).expand().bottom().left().pad(40).row();
+        healthBarPlayer = new Image();
 
+        playerGroup.add(new Label(playerInvocation.getFullName(), new Label.LabelStyle(font, Color.CYAN))).row();
+        playerGroup.add(healthBarPlayer).size(220, 22).padTop(5).row();
+
+        playerGroup.add(new Image((Texture)assets.get(playerInvocation.getBattleAsset()))).size(350);
+
+        gameLayer.add(playerGroup).expand().bottom().left().padLeft(60);
+
+        // ENEMIGO
+        Invocation enemyInvocation = getEnemyActiveInvocation();
+        Table enemyGroup = new Table();
+        healthBarEnemy = new Image();
+
+        enemyGroup.add(new Label(enemyInvocation.getFullName(), new Label.LabelStyle(font, Color.RED))).row();
+        enemyGroup.add(healthBarEnemy).size(220, 22).padBottom(5).row();
+        enemyGroup.add(new Image((Texture)assets.get(enemyInvocation.getBattleAsset()))).size(350);
+
+        gameLayer.add(enemyGroup).expandX().right().padTop(300).padRight(60).row();
+
+        mainStack.add(gameLayer.padBottom(550));
+
+        Table uiLayer = new Table();
         float panelHeight = 190;
         Table bottomPanel = new Table();
         bottomPanel.setBackground(getColoredDrawable(1, 1, new Color(0, 0, 0, 0.85f)));
@@ -107,9 +114,11 @@ public class BattleScreen implements Screen, MenuListener {
 
         tableB = new Table();
         setupMainButtons(panelHeight);
-        bottomPanel.add(tableB).width(Gdx.graphics.getWidth() * 0.5f).height(panelHeight);
+        bottomPanel.add(tableB.padRight(10)).width(Gdx.graphics.getWidth() * 0.5f).height(panelHeight);
 
-        root.add(bottomPanel).fillX().height(panelHeight);
+        uiLayer.add(bottomPanel).expand().bottom().fillX();
+        mainStack.add(uiLayer);
+
         updateHealth();
     }
 
@@ -148,8 +157,6 @@ public class BattleScreen implements Screen, MenuListener {
                 game.setScreen(game.gameScreen);
             }
         });
-
-        // Anadir botones principales
         tableB.add(btnFight).size(btnW, btnH).pad(2);
         tableB.add(btnBag).size(btnW, btnH).pad(2).row();
         tableB.add(btnTeam).size(btnW, btnH).pad(2);
@@ -177,7 +184,6 @@ public class BattleScreen implements Screen, MenuListener {
                 }
             }
         }
-
         checkEndgame();
         updateHealth();
         startEnemyTurn();
