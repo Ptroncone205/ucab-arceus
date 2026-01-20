@@ -1,7 +1,5 @@
 package nintendont.amongspirits.screens;
 
-import java.util.ArrayList;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
@@ -35,30 +33,22 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
-import nintendont.amongspirits.data.assets.GameAssets;
-import nintendont.amongspirits.data.codex.BattleSpiritAssets;
-import nintendont.amongspirits.data.codex.Codex;
-import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.config.MultiplayerConfig;
 import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
-import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.satchel.ItemDB;
 import nintendont.amongspirits.data.spirits.Invocation;
-import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.data.satchel.ItemDBLoader;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
 import nintendont.amongspirits.entities.factories.MultiplayerWSFactory;
-import nintendont.amongspirits.entities.items.Pokeball;
+import nintendont.amongspirits.entities.spawners.ItemSpawner;
 import nintendont.amongspirits.entities.spawners.PlayerSpawner;
 import nintendont.amongspirits.entities.spawners.SpiritSpawner;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
-import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.InteractionScanner;
-import nintendont.amongspirits.managers.ItemFactory;
-import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.managers.TextInput;
 import nintendont.amongspirits.physics.MyContactListener;
@@ -68,14 +58,15 @@ import nintendont.amongspirits.terrains.HeightMapTerrain;
 import nintendont.amongspirits.ui.game.BtnEventListener;
 import nintendont.amongspirits.ui.game.GUIManager;
 import nintendont.amongspirits.ui.game.PauseMenu;
-import nintendont.amongspirits.utils.AssetUtils;
 
 public class GameScreen implements Screen{
-    private Main game;
+    private final Main game;
+	private final AssetManager assets;
+	private final Player player;
+
     private final Const context = Const.get();
 	private SceneManager sceneManager;
 	private SceneAsset sceneAsset;
-	public AssetManager assets;
 	private Scene playerScene;
 
     private Engine ecsEngine;
@@ -91,7 +82,6 @@ public class GameScreen implements Screen{
 	private InputMultiplexer multiplexer;
 	private PlayerController playerController;
 	// movement
-	private Player player;
 
 	//camera
 	private PerspectiveCamera camera;
@@ -111,8 +101,6 @@ public class GameScreen implements Screen{
 	private BitmapFont font;
 
 	private GUIManager guiManager;
-	private Satchel inventory;
-    private Codex codex;
 	private CraftManager crafting;
 
 	MyContactListener cl;
@@ -124,19 +112,13 @@ public class GameScreen implements Screen{
 	private Texture challengeMode;
 	private Texture noPkmn;
 
-    public GameScreen(Main game, AssetManager assets, String playerName, boolean load){
+    public GameScreen(Main game, AssetManager assets, Player player) {
         this.game = game;
+        this.assets = assets;
+        this.player = player;
 
         Bullet.init();
         context.init();
-		ItemFactory.init(assets);
-		System.out.println("init just called");
-
-        codex = new FakeCodexLoader().load();
-
-        this.assets = assets;
-
-        // cargar todos los assets usados por el juego incluyendo texturas y modelos
 
         PBRShaderConfig config = PBRShaderProvider.createDefaultConfig();
         config.numBones = 90;
@@ -148,6 +130,7 @@ public class GameScreen implements Screen{
 		float scale_factor = 10f;
 		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
 		sceneManager.addScene(playerScene);
+        player.setupScene(playerScene);
 
 		textlistener = new TextInput();
 
@@ -166,20 +149,15 @@ public class GameScreen implements Screen{
 		// text
 		batch = context.spriteBatch;
 		font = new BitmapFont();
-		inventory = new Satchel();
 
-		crafting = new CraftManager();
-        if (load){
-            loadData(playerName);
-        } else {
-            createData(playerName);
-        }
+		crafting = new CraftManager(game.getItems());
 
-		guiManager = new GUIManager(assets, batch, crafting, player, codex);
+		guiManager = new GUIManager(assets, batch, crafting, player, player.getCodex());
+
         ((PauseMenu)guiManager.getMenu("pause")).setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
-				SaveManager.saveGame(player, items);
+                game.getSaveManager().saveGame(player);
 			}
 			@Override
 			public void onQuitRequest(){
@@ -194,12 +172,14 @@ public class GameScreen implements Screen{
 		InputAdapter adapter = new InputAdapter(){
 			@Override
 			public boolean keyDown(int key){
-                return guiManager.handleInput(key);
-			}
-		};
 
 		multiplexer.addProcessor(guiManager.stage);
-		multiplexer.addProcessor(adapter);
+		multiplexer.addProcessor(new InputAdapter(){
+            @Override
+            public boolean keyDown(int key){
+                return guiManager.handleInput(key);
+            }
+        });
 
 		playerController = new PlayerController(player, camera);
 		multiplexer.addProcessor(playerController);
@@ -236,8 +216,6 @@ public class GameScreen implements Screen{
 		buildTerrain();
 
 		cl = new MyContactListener();
-		iScan = new InteractionScanner();
-		focusedItem = null;
 
         // Setup WebSocket connection
         MultiplayerConfig multiplayerConfig =  new MultiplayerConfigLoader().loadFromPropsFile();
@@ -250,12 +228,11 @@ public class GameScreen implements Screen{
         ecsEngine.addEntityListener(Family.all(RigidbodyComponent.class).get(), new BulletRigidbodyListener(physicsWorld.getDynamicsWorld()));
         ecsEngine.addEntityListener(Family.all(TriggerComponent.class).get(), new BulletTriggerListener(physicsWorld.getDynamicsWorld()));
 
-        // Setup yumenjiang spawners
-        SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
-        YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
-
-        // Setup player spawners
+        // Initialize spawners
+        YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, assets);
         PlayerSpawner playerSpawner = new PlayerSpawner(ecsEngine, assets);
+        ItemSpawner itemSpawner = new ItemSpawner(ecsEngine, assets, game.getItems());
+        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, player.getCodex());
 
         // Initialize systems
         ecsEngine.addSystem(new BulletPhysicsSystem(physicsWorld));
@@ -266,11 +243,11 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
         ecsEngine.addSystem(new CatchableSystem(player, physicsWorld));
         ecsEngine.addSystem(new ChallengeSystem(game, player, physicsWorld, socket));
-        ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera));
-        ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner));
+        ecsEngine.addSystem(new ItemSystem(player, camera, guiManager, multiplexer, socket));
+        ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera, guiManager));
+        ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner, itemSpawner));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
-        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, codex);
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
             new Vector3(30.155998f,-5.723038f,17.230192f),
             new Vector3(1.6152792f,-6.701237f,35.62867f),
@@ -302,37 +279,6 @@ public class GameScreen implements Screen{
         });
     }
 
-    private void loadData(String playerName) {
-		// load assets
-		try{
-			SaveData data = SaveManager.loadGame(playerName);
-			inventory.setItems(data.inventory);
-			items = data.items;
-			for (Item item : items){
-				item.create(item.pos, 2f, 2f, 2f);
-				sceneManager.addScene(item.getScene());
-			}
-			player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory, codex);
-		} catch(Exception e){
-			System.err.println("Error cargando datos: " + e.getLocalizedMessage());
-			createData(playerName);
-		}
-	}
-
-	private void createData(String playerName) {
-		// load assets
-		player = new Player(playerName, playerScene, new Vector3(0,15,0), inventory, codex);
-		for (int i = 0; i<30; i++){
-			Item testItem;
-			if (i > 10){
-				testItem = ItemFactory.createItem(0);
-			} else { testItem = ItemFactory.createItem(2); }
-			testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
-			items.add(testItem);
-			sceneManager.addScene(testItem.getScene());
-		}
-	}
-
 	private void buildTerrain() {
 		if (terrain != null){
 			terrain.dispose();
@@ -344,13 +290,13 @@ public class GameScreen implements Screen{
 		terrainScene = new Scene(terrain.getModelInstance());
 		sceneManager.addScene(terrainScene);
 	}
+
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
         Gdx.input.setCursorCatched(true);
         Gdx.input.setInputProcessor(multiplexer);
 
-        game.playMusic("", true);
     }
 
     @Override
@@ -362,18 +308,6 @@ public class GameScreen implements Screen{
 		if (Const.currentState == GameState.INGAME)
 			updateCamera();
 
-		focusedItem = iScan.findTarget(player.playerPos, camera, items);
-
-        if (focusedItem != null && Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-			if (inventory.addItem(focusedItem)){
-				items.remove(focusedItem);
-				guiManager.update();
-				focusedItem.dispose();
-				sceneManager.removeScene(focusedItem.getScene());
-				focusedItem = null;
-			}
-        }
-
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
@@ -382,8 +316,8 @@ public class GameScreen implements Screen{
 		// HUD
 		batch.begin();
 		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond() + "\ndelta: " + deltaTime, 20, Gdx.graphics.getHeight() - 20);
-		if (focusedItem != null){ // TODO
-			Vector3 uiPos = camera.project(focusedItem.pos.cpy().add(0,2,0));
+		if (player.getFocusedItemPosition().isPresent()) {
+			Vector3 uiPos = camera.project(player.getFocusedItemPosition().get().cpy().add(0,2,0));
 			font.draw(batch, "F: agarrar", uiPos.x, uiPos.y);
 
 		}

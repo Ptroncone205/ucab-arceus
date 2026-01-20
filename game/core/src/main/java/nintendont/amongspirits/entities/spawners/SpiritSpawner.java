@@ -47,6 +47,12 @@ public class SpiritSpawner {
         return spirit;
     }
 
+    public Entity spawnPhoenix(Vector3 spawnPoint, Vector3[] patrolPoints) {
+        SceneAsset modelAsset = assetManager.get("models/lion/scene.gltf", SceneAsset.class);
+        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.LION_ID));
+        return spawnSpirit(spirit, modelAsset, null, 2f, spawnPoint, patrolPoints);
+    }
+
     public Entity spawnLion(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get("models/lion/scene.gltf", SceneAsset.class);
         Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.LION_ID));

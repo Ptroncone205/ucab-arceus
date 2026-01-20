@@ -6,4 +6,5 @@ public class CodexCommons {
     public static final int BUNNY_ID = 3;
     public static final int FOX_ID = 4;
     public static final int LION_ID = 5;
+    public static final int PHOENIX_ID = 6;
 }

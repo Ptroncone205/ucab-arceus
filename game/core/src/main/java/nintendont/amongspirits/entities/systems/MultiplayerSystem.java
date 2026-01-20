@@ -19,32 +19,41 @@ import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Enemy;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.TransformComponent;
+import nintendont.amongspirits.entities.spawners.ItemSpawner;
 import nintendont.amongspirits.entities.spawners.PlayerSpawner;
 import nintendont.amongspirits.screens.BattleScreen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MultiplayerSystem extends EntitySystem {
     private final Json json = new Json();
     private final Main game;
+    private final WebSocket socket;
     private final Player player;
     private final PlayerSpawner playerSpawner;
-    private final WebSocket socket;
+    private final ItemSpawner itemSpawner;
     private final HashMap<Integer, Entity> onlinePlayers = new HashMap<>();
+    private final HashMap<Integer, OnlineItem> onlineItems = new HashMap<>();
+    private PlayerCoordinatesPacket lastPlayerPacket;
     private Enemy challenger = null;
 
     public MultiplayerSystem(
         Main game,
         WebSocket socket,
         Player player,
-        PlayerSpawner playerSpawner
+        PlayerSpawner playerSpawner,
+        ItemSpawner itemSpawner
     ) {
         this.game = game;
         this.socket = socket;
         this.player = player;
         this.playerSpawner = playerSpawner;
+        this.itemSpawner = itemSpawner;
 
         json.setOutputType(JsonWriter.OutputType.json);
+        json.setUsePrototypes(false);
 
         socket.addListener(new WebSocketListener() {
             @Override
@@ -80,6 +89,12 @@ public class MultiplayerSystem extends EntitySystem {
                     case "player_disconnected":
                         handlePlayerDisconnected(root);
                         break;
+                    case "item_collected_broadcast":
+                        handleItemCollectedBroadcast(root);
+                        break;
+                    case "item_respawned":
+                        handleItemRespawned(root);
+                        break;
                     default:
                         Gdx.app.log("WS", "Unknown message type received: " + type);
                 }
@@ -101,6 +116,19 @@ public class MultiplayerSystem extends EntitySystem {
             @Override
             public boolean onError(WebSocket webSocket, Throwable error) {
                 Gdx.app.error("WS", "Error!", error);
+
+                itemSpawner.spawnTumblestone(new Vector3(-17.838638f,-4.3560739f,-47.24584f));
+                itemSpawner.spawnOranBerry(new Vector3(1.8027654f,-2.9660032f,-41.948856f));
+                itemSpawner.spawnOranBerry(new Vector3(48.982178f,1.8653733f,-9.645581f));
+                itemSpawner.spawnOranBerry(new Vector3(54.165665f,1.508391f,0.024594655f));
+                itemSpawner.spawnOranBerry(new Vector3(67.40762f,4.045167f,5.6782846f));
+                itemSpawner.spawnTumblestone(new Vector3(54.230034f,-3.6913362f,-20.758377f));
+                itemSpawner.spawnTumblestone(new Vector3(83.13638f,-2.0633545f,-0.5703411f));
+                itemSpawner.spawnTumblestone(new Vector3(102.18394f,1.1988071f,7.637454f));
+                itemSpawner.spawnTumblestone(new Vector3(127.85025f,1.4623288f,-19.181307f));
+                itemSpawner.spawnTumblestone(new Vector3(133.04187f,-3.0535147f,-52.89993f));
+                itemSpawner.spawnTumblestone(new Vector3(142.18419f,-4.625522f,-78.41611f));
+
                 return FULLY_HANDLED;
             }
         });
@@ -119,7 +147,10 @@ public class MultiplayerSystem extends EntitySystem {
         }
 
         PlayerCoordinatesPacket packet = createPlayerPacketFrom("player_update");
-        socket.send(json.toJson(packet));
+        if (lastPlayerPacket == null || packet.x - lastPlayerPacket.x > 0.001 || packet.y - lastPlayerPacket.y > 0.001 || packet.z - lastPlayerPacket.z > 0.001) {
+            socket.send(json.toJson(packet));
+        }
+        lastPlayerPacket = packet;
     }
 
     private void handleWorldSetup(JsonValue root) {
@@ -127,6 +158,32 @@ public class MultiplayerSystem extends EntitySystem {
             PlayerCoordinatesPacket coords = json.readValue(PlayerCoordinatesPacket.class, player);
             Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
             onlinePlayers.put(coords.id, companion);
+        }
+
+        for (JsonValue item : root.get("items")) {
+            int itemId = item.getInt("id");
+            OnlineItem onlineItem = new OnlineItem();
+            onlineItems.put(itemId, onlineItem);
+
+            for (int i = 0; i < item.get("spawns").size; i++) {
+                JsonValue spawn = item.get("spawns").get(i);
+                int x = spawn.getInt(1);
+                int y = spawn.getInt(2);
+                int z = spawn.getInt(3);
+
+                OnlineItemSpawn onlineItemSpawn = new OnlineItemSpawn();
+                onlineItemSpawn.available = spawn.getBoolean(0);
+                onlineItemSpawn.position = new Vector3(x, y, z);
+                if (onlineItemSpawn.available) {
+                    onlineItemSpawn.entity = itemSpawner.spawnItemByIdForOnline(itemId, i, new Vector3(x, y, z));
+                }
+
+                if (onlineItemSpawn.entity == null) {
+                    Gdx.app.log("WS", "Unsupported item ID for spawning: " + itemId);
+                }
+
+                onlineItem.spawns.add(onlineItemSpawn);
+            }
         }
     }
 
@@ -168,12 +225,36 @@ public class MultiplayerSystem extends EntitySystem {
         }
     }
 
+    private void handleItemCollectedBroadcast(JsonValue root) {
+        int itemId = root.getInt("itemId");
+        int spawnIndex = root.getInt("spawnIndex");
+
+        OnlineItem targetItem = onlineItems.get(itemId);
+        OnlineItemSpawn targetSpawn = targetItem.spawns.get(spawnIndex);
+
+        targetSpawn.available = false;
+        if (targetSpawn.entity != null) {
+            getEngine().removeEntity(targetSpawn.entity);
+        }
+    }
+
+    private void handleItemRespawned(JsonValue root) {
+        int itemId = root.getInt("itemId");
+        int spawnIndex = root.getInt("spawnIndex");
+
+        OnlineItem targetItem = onlineItems.get(itemId);
+        OnlineItemSpawn targetSpawn = targetItem.spawns.get(spawnIndex);
+
+        targetSpawn.available = true;
+        targetSpawn.entity = itemSpawner.spawnItemByIdForOnline(itemId, spawnIndex, new Vector3(targetSpawn.position));
+    }
+
     private Enemy createEnemyFromPacket(BattlePlayerPacket packet) {
         Team enemyTeam = new Team();
         for (TeamInvocationPacket p : packet.team) {
             enemyTeam.getMembers().add(new Invocation(new Spirit(0, p.name, p.lastName, "", p.gender, player.getCodex().getFormById(p.spiritFormId))));
         }
-        return new Enemy(packet.name, enemyTeam);
+        return new Enemy(packet.name, enemyTeam, false);
     }
 
     private PlayerCoordinatesPacket createPlayerPacketFrom(String type) {
@@ -199,5 +280,15 @@ public class MultiplayerSystem extends EntitySystem {
         if (socket.isOpen()) {
             socket.close();
         }
+    }
+
+    class OnlineItem {
+        public List<OnlineItemSpawn> spawns = new ArrayList<>();
+    }
+
+    class OnlineItemSpawn {
+        public boolean available;
+        public Vector3 position;
+        public Entity entity;
     }
 }

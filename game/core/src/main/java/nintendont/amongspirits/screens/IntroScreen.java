@@ -15,10 +15,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.data.assets.GameAssets;
 import nintendont.amongspirits.data.codex.BattleSpiritAssets;
+import nintendont.amongspirits.data.codex.CodexIconAssets;
 import nintendont.amongspirits.data.codex.CodexPreviewAssets;
 import nintendont.amongspirits.utils.AssetUtils;
 
@@ -47,6 +47,8 @@ public class IntroScreen implements Screen {
         assets.load(GameAssets.DEER_SCENE);
         assets.load(GameAssets.BUNNY_SCENE);
         assets.load(GameAssets.FOX_SCENE);
+        assets.load(GameAssets.ORAN_BERRY_SCENE);
+        assets.load(GameAssets.TUMBLESTONE_SCENE);
         assets.load(BattleSpiritAssets.MALE_DEER);
         assets.load(BattleSpiritAssets.FEMALE_DEER);
         assets.load(BattleSpiritAssets.MALE_WOLF);
@@ -58,7 +60,6 @@ public class IntroScreen implements Screen {
         assets.load(BattleSpiritAssets.MALE_LION);
         assets.load(BattleSpiritAssets.FEMALE_LION);
 
-
         assets.load("sfx/ui/open_page_foley.ogg", Sound.class);
         assets.load("sprites/icons/lion.png", Texture.class);
         assets.load("sprites/backgrounds/codex-scroll.png", Texture.class);
@@ -67,6 +68,13 @@ public class IntroScreen implements Screen {
         assets.load(CodexPreviewAssets.BUNNY);
         assets.load(CodexPreviewAssets.FOX);
         assets.load(CodexPreviewAssets.LION);
+        assets.load(CodexPreviewAssets.PHOENIX);
+        assets.load(CodexIconAssets.DEER);
+        assets.load(CodexIconAssets.WOLF);
+        assets.load(CodexIconAssets.BUNNY);
+        assets.load(CodexIconAssets.FOX);
+        assets.load(CodexIconAssets.LION);
+        assets.load(CodexIconAssets.PHOENIX);
 
         AssetUtils.setTrueTypeFontLoaders(assets);
         AssetUtils.loadFont(assets, "roboto_xs.ttf", "fonts/roboto.ttf", 12);
@@ -192,7 +200,7 @@ public class IntroScreen implements Screen {
     public void render(float delta) {
         assets.update();
         if (!assets.isFinished()) System.out.println("LOADING: " + assets.getLoadedAssets() * 100 / 34 + "%");
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT_BRACKET)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT_BRACKET) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             goToMainMenu();
         }
         Gdx.gl.glClearColor(0, 0, 0, 1);

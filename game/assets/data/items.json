@@ -1,19 +1,11 @@
 [
     {
-        "id": 0,
+        "id": 1,
         "name": "Tumblestone",
         "desc": "This mysterious stone can draw out the properties required to forge a pokeball",
         "isMaterial": "true",
         "icon": "textures/tumblestone.png",
-        "type": "MATERIAL"
-    },
-    {
-        "id": 1,
-        "name": "Pokeball",
-        "desc": "Basic pokeball used to catch wild pokemon",
-        "isMaterial": "false",
-        "icon": "textures/pokeball.png",
-        "type": "POKEBALL"
+        "type": "REGULAR"
     },
     {
         "id": 2,
@@ -26,5 +18,13 @@
             "type": "HEAL",
             "value": "20"
         }
+    },
+    {
+        "id": 3,
+        "name": "Pokeball",
+        "desc": "Basic pokeball used to catch wild pokemon",
+        "isMaterial": "false",
+        "icon": "textures/pokeball.png",
+        "type": "THROWABLE"
     }
 ]

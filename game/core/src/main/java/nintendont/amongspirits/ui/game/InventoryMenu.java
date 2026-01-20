@@ -4,7 +4,9 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,15 +20,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Value;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
-import nintendont.amongspirits.Const.GameState;
-import nintendont.amongspirits.Const;
-import nintendont.amongspirits.entities.ItemStack;
-import nintendont.amongspirits.entities.items.Consumable;
-import nintendont.amongspirits.entities.items.Item;
+import nintendont.amongspirits.data.satchel.ConsumableItem;
+import nintendont.amongspirits.data.satchel.Item;
+import nintendont.amongspirits.data.satchel.ItemStack;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.Satchel;
+import nintendont.amongspirits.data.satchel.Satchel;
 
 public class InventoryMenu extends MenuTable{
+    private final AssetManager assets;
     private Satchel invManager;
     private CraftManager craftManager;
     private Table grid;
@@ -55,6 +56,7 @@ public class InventoryMenu extends MenuTable{
 
     public InventoryMenu (Satchel invManager, CraftManager craftManager, Skin skin, GUIManager gui, AssetManager assets){
         super(gui);
+        this.assets = assets;
         this.invManager = invManager;
         this.craftManager = craftManager;
         this.skin = skin;
@@ -132,7 +134,7 @@ public class InventoryMenu extends MenuTable{
         // actualizar descripcion
         switch (invState) {
             case SELECT_ITEM:
-                desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDesc() + "\n selected");
+                desc.setText(itemA.getItem().getName() + ": " + itemA.getCount() + "\n" + itemA.getItem().getDescription() + "\n selected");
                 break;
 
             default:
@@ -141,7 +143,7 @@ public class InventoryMenu extends MenuTable{
                 } else {
                     selected = selected >= invManager.getItems().size() ? invManager.getItems().size()-1 : selected;
                     selItem = invManager.getItems().get(selected);
-                    desc.setText( selItem.getItem().getName() + ": "+ selItem.getCount() + "\n" + selItem.getItem().getDesc());
+                    desc.setText( selItem.getItem().getName() + ": "+ selItem.getCount() + "\n" + selItem.getItem().getDescription());
                 }
                 break;
         }
@@ -209,8 +211,9 @@ public class InventoryMenu extends MenuTable{
         if (stack == null) return slotStack;
 
         Image icon;
-        if (stack.getItem().icon != null){
-            icon = new Image(stack.getItem().icon);
+        if (stack.getItem().getIconAsset() != null){
+            Texture iconTexture = assets.get(stack.getItem().getIconAsset());
+            icon = new Image(iconTexture);
         } else{
             icon = new Image(skin.newDrawable("white", Color.CYAN)); // Placeholder Icon
         }
@@ -291,7 +294,8 @@ public class InventoryMenu extends MenuTable{
                 if (output != null){
                     invManager.addItem(output);
                     selected = selected <= 0 ? 0 : selected - 1;
-                    itemA.count--; itemB.count--;
+                    itemA.decrease();
+                    itemB.decrease();
                     update();
                 }
                 invState = InvState.NONE;

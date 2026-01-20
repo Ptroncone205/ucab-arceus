@@ -4,5 +4,14 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Texture;
 
 public class CodexIconAssets {
-    public static final AssetDescriptor<Texture> LION = new AssetDescriptor<>("sprites/icons/lion.png", Texture.class);
+    public static final AssetDescriptor<Texture> DEER = createDescriptor("deer");
+    public static final AssetDescriptor<Texture> WOLF = createDescriptor("wolf");
+    public static final AssetDescriptor<Texture> BUNNY = createDescriptor("bunny");
+    public static final AssetDescriptor<Texture> FOX = createDescriptor("fox");
+    public static final AssetDescriptor<Texture> LION = createDescriptor("lion");
+    public static final AssetDescriptor<Texture> PHOENIX = createDescriptor("phoenix");
+
+    public static AssetDescriptor<Texture> createDescriptor(String animalName) {
+        return  new AssetDescriptor<>(String.format("sprites/icons/%s.png", animalName), Texture.class);
+    }
 }

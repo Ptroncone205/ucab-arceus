@@ -6,20 +6,23 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Json;
-
-import nintendont.amongspirits.entities.items.Item;
+import nintendont.amongspirits.data.satchel.Item;
+import nintendont.amongspirits.data.satchel.ItemDB;
 
 public final class CraftManager {
     private final HashMap<String, Integer> recipes = new HashMap<>();
-    public CraftManager(){
+    private final ItemDB items;
+
+    public CraftManager(ItemDB items){
+        this.items = items;
         this.load();
     }
 
     public Item craft(Item itemA, Item itemB){
-        String key = generateKey(itemA.name, itemB.name);
-        Integer output = recipes.get(key);
-        if (output == null) return null;
-        return ItemFactory.createItem(output);
+        String key = generateKey(itemA.getName(), itemB.getName());
+        Integer itemId = recipes.get(key);
+        if (itemId == null) return null;
+        return items.getItemById(itemId);
     }
 
     public void load(){

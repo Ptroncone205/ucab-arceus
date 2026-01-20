@@ -2,6 +2,7 @@ package nintendont.amongspirits.entities.spawners;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -11,22 +12,24 @@ import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
+import nintendont.amongspirits.data.assets.GameAssets;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
 
 public class YumenjiangSpawner {
     private final Engine engine;
-    private final SceneAsset modelAsset;
+    private final AssetManager assets;
 
-    public YumenjiangSpawner(Engine engine, SceneAsset modelAsset) {
+    public YumenjiangSpawner(Engine engine, AssetManager assets) {
         this.engine = engine;
-        this.modelAsset = modelAsset;
+        this.assets = assets;
     }
 
     public Entity spawnYumenjiang(Vector3 spawnPoint) {
         Entity entity = engine.createEntity();
 
+        SceneAsset modelAsset = assets.get(GameAssets.YUMENJIANG_SCENE);
         ModelComponent model = engine.createComponent(ModelComponent.class);
         model.gltfScene = new Scene(modelAsset.scene);
 

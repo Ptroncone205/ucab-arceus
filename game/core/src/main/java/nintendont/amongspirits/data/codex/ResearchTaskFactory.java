@@ -12,4 +12,10 @@ public class ResearchTaskFactory {
         SolutionAlgorithm algorithm = new DefeatSolutionAlgorithm();
         return new ResearchTask(description, algorithm);
     }
+
+    public ResearchTask createWinTask() {
+        String description = "Fights won";
+        SolutionAlgorithm algorithm = new WinSolutionAlgorithm();
+        return new ResearchTask(description, algorithm);
+    }
 }

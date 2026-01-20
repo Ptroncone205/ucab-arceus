@@ -2,6 +2,7 @@ package nintendont.amongspirits.data.codex;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,5 +104,19 @@ public class SpiritForm {
 
     public void addTaskSet(ResearchTaskSet taskSet) {
         tasks.add(taskSet);
+    }
+
+    public void validateTask(ResearchTaskAction action) {
+        for (ResearchTaskSet taskSet : getTasks()) {
+            SolutionAlgorithm algorithm = taskSet.getBase().getSolutionAlgorithm();
+            if (algorithm.validate(new ResearchTaskValidationContext(this, action, taskSet))) {
+                taskSet.increaseCount();
+            }
+        }
+        calcResearchLevel();
+    }
+
+    private void calcResearchLevel() {
+        researchLevel = Math.min(getTasks().stream().mapToInt(ResearchTaskSet::getResearchPoints).sum(), 10);
     }
 }

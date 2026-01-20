@@ -5,7 +5,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -13,11 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
-import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
-import nintendont.amongspirits.data.codex.SpiritMove;
+import nintendont.amongspirits.data.codex.*;
 import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.entities.Enemy;
+import nintendont.amongspirits.data.satchel.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.utils.*;
 
@@ -45,21 +44,10 @@ public class BattleScreen implements Screen, MenuListener {
         this.player = player;
         this.enemy = enemy;
         this.playerActiveIndex = initialPlayerActiveIndex;
-        game.playMusic("", true);
 
         Gdx.input.setCursorCatched(false);
 
         this.assets = assets;
-//        assets.load(BattleSpiritAssets.MALE_DEER);
-//        assets.load(BattleSpiritAssets.FEMALE_DEER);
-//        assets.load(BattleSpiritAssets.MALE_WOLF);
-//        assets.load(BattleSpiritAssets.FEMALE_WOLF);
-//        assets.load(BattleSpiritAssets.MALE_BUNNY);
-//        assets.load(BattleSpiritAssets.FEMALE_BUNNY);
-//        assets.load(BattleSpiritAssets.MALE_FOX);
-//        assets.load(BattleSpiritAssets.FEMALE_FOX);
-//        assets.load(BattleSpiritAssets.MALE_LION);
-//        assets.load(BattleSpiritAssets.FEMALE_LION);
 
         batch = new SpriteBatch();
         stage = new Stage();
@@ -85,6 +73,7 @@ public class BattleScreen implements Screen, MenuListener {
         root.setFillParent(true);
         stage.addActor(root);
 
+        game.playMusic("music and sounds/music/wild-battle.mp3", true);
 
         // UI ENEMIGO
         Invocation enemyInvocation = getEnemyActiveInvocation();
@@ -143,20 +132,20 @@ public class BattleScreen implements Screen, MenuListener {
 
         btnBag.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
-                game.playSound("");
+                game.playSound("music and sounds/sounds/button_sel.mp3");
             tableB.clearChildren();
             tableB.add(new BagMenu(styleBlue, BattleScreen.this, player.getSatchel().getItems())).fill();
         }});
 
         btnTeam.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
-                game.playSound("");
+                game.playSound("music and sounds/sounds/button_sel.mp3");
             stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, false, assets));
         }});
 
         btnRun.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
-                game.playSound("");
+                game.playSound("music and sounds/sounds/button_sel.mp3");
                 game.setScreen(game.gameScreen);
             }
         });
@@ -170,7 +159,7 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void onAttackSelected(String attackName) {
-        game.playSound("");
+        game.playSound("music and sounds/sounds/button_sel.mp3");
         Invocation playerInvocation = getPlayerActiveInvocation();
         Invocation enemyInvocation = getEnemyActiveInvocation();
         SpiritMove moveUsed = playerInvocation.getMoves().stream().filter(m -> m.getName().equals(attackName)).findFirst().orElse(null);
@@ -178,7 +167,7 @@ public class BattleScreen implements Screen, MenuListener {
         if (moveUsed != null) {
             int damageToGive = moveUsed.getBasePower();
             enemyInvocation.takeDamage(damageToGive);
-            game.playSound("");
+            game.playSound("music and sounds/sounds/button_sel.mp3");
             messageLabel.setText("¡" + enemyInvocation.getFullName() + " usó " + attackName + "!");
         }
 
@@ -203,7 +192,6 @@ public class BattleScreen implements Screen, MenuListener {
                 Invocation enemyInvocation = getEnemyActiveInvocation();
 
                 if (enemyInvocation.isFainted()){
-                    game.playSound("");
                     messageLabel.setText("¡El enemigo ha sido derrotado!");
                 } else {
                     SpiritMove move = enemyInvocation.getRandomMove();
@@ -236,11 +224,30 @@ public class BattleScreen implements Screen, MenuListener {
     private void checkEndgame() {
         if (player.getTeam().areAllMembersDefeated()) {
             messageLabel.setText("El jugador ha perdido!");
+            game.playSound("music and sounds/sounds/defeat.mp3");
             tableB.clearChildren();
+
+            ItemStack itemStack = player.getSatchel().getRandomItem();
+            itemStack.decrease();
+
             requestGoBackToGameAfter();
         } else if (enemy.getTeam().areAllMembersDefeated()) {
             messageLabel.setText("El jugador ha ganado!");
+            game.playSound("music and sounds/sounds/win.mp3");
             tableB.clearChildren();
+
+            if (enemy.isWild()) {
+                for (Invocation invocation : enemy.getTeam().getMembers()) {
+                    SpiritForm spiritForm = invocation.getSpirit().getForm();
+                    spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.DEFEAT));
+                }
+            } else {
+                for (Invocation invocation : player.getTeam().getMembers()) {
+                    SpiritForm spiritForm = invocation.getSpirit().getForm();
+                    spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.WIN));
+                }
+            }
+
             requestGoBackToGameAfter();
         }
     }
@@ -315,13 +322,13 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void onBackSelected(){
-        game.playSound("");
+        game.playSound("music and sounds/sounds/button_sel.mp3");
         setupMainButtons(190);
     }
 
     @Override
     public void onFightSelected(){
-        game.playSound("");
+        game.playSound("music and sounds/sounds/button_sel.mp3");
         tableB.clearChildren();
         tableB.add(new AttackMenu(styleRed, this, getPlayerActiveInvocation().getMoves())).fill();
     }
@@ -338,7 +345,7 @@ public class BattleScreen implements Screen, MenuListener {
     }
 
     private void goBackToGame() {
-        game.setScreen(new GameScreen(game, assets, player.getName(), true));
+        game.setScreen(new GameScreen(game, assets, player));
     }
 
     @Override

@@ -6,12 +6,19 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import nintendont.amongspirits.Const.GameState;
+import nintendont.amongspirits.data.satchel.ItemDB;
+import nintendont.amongspirits.data.satchel.ItemDBLoader;
+import nintendont.amongspirits.entities.Player;
+import nintendont.amongspirits.entities.factories.PlayerFactory;
+import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.screens.GameScreen;
 import nintendont.amongspirits.screens.IntroScreen;
 import nintendont.amongspirits.screens.MainMenu;
 
 public class Main extends Game {
     private final Const context = Const.get();
+    private ItemDB items;
+    private SaveManager saveManager;
     public AssetManager assets;
     public GameScreen gameScreen;
     private Music currentMusic;
@@ -20,6 +27,8 @@ public class Main extends Game {
     public void create() {
         context.init();
         assets = context.assets;
+        items = new ItemDBLoader().load();
+        saveManager = new SaveManager(items);
         this.setScreen(new IntroScreen(this, assets));
     }
 
@@ -34,7 +43,8 @@ public class Main extends Game {
         playMusic("", true);
 
         Const.currentState = GameState.INGAME;
-        gameScreen = new GameScreen(this, assets, playerName, load);
+        Player player = new PlayerFactory(saveManager).loadPlayerFromSaveData(playerName);
+        gameScreen = new GameScreen(this, assets, player);
         this.setScreen(gameScreen);
     }
 
@@ -56,7 +66,7 @@ public class Main extends Game {
         try {
             currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
             currentMusic.setLooping(loop);
-            currentMusic.setVolume(0.5f);
+            currentMusic.setVolume(0.2f);
             currentMusic.play();
         } catch (Exception e) {
             Gdx.app.error("Music", "No se pudo cargar el archivo: " + path);
@@ -72,11 +82,19 @@ public class Main extends Game {
     public void playSound(String path) {
         try {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal(path));
-            sound.play(0.7f);
+            sound.play(0.3f);
 
         } catch (Exception e) {
             Gdx.app.error("Sound", "No se pudo reproducir el sonido: " + path);
         }
+    }
+
+    public ItemDB getItems() {
+        return items;
+    }
+
+    public SaveManager getSaveManager() {
+        return saveManager;
     }
 
     @Override
