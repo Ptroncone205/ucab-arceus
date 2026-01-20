@@ -26,7 +26,6 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 
 public class Player implements Disposable{
     private final String name;
-    private final ClosestNotMeRayResultCallback callback;
     private final Vector3 tmpPosition = new Vector3();
 
     private Codex codex;
@@ -41,6 +40,7 @@ public class Player implements Disposable{
     private Scene scene;
     private MotionState motionState;
     private btRigidBody rigidBody;
+    private ClosestNotMeRayResultCallback callback;
     private btCapsuleShape shape;
     private float angle;
 
@@ -52,15 +52,17 @@ public class Player implements Disposable{
     private float maxSpeed;
     private Vector3 tempVec;
 
-    public Player (String name, Scene scene, Vector3 position, Satchel satchel, Codex codex){
+    public Player (String name, Vector3 position, Satchel satchel, Codex codex){
         this.name = name;
         this.satchel = satchel;
         this.codex = codex;
-        callback = new ClosestNotMeRayResultCallback(rigidBody);
+        this.playerPos = position;
+    }
+
+    public void setupScene(Scene scene) {
         this.scene = scene;
         this.scene.modelInstance.transform.scale(0.1f, 0.1f, 0.1f);
-        this.playerPos = position;
-        this.scene.modelInstance.transform.setTranslation(position);
+        this.scene.modelInstance.transform.setTranslation(this.playerPos);
         motionState = new MotionState(this.scene.modelInstance.transform);
 
         tempVec = new Vector3();
@@ -73,6 +75,7 @@ public class Player implements Disposable{
         info.dispose();
         rigidBody.setAngularFactor(0);
         rigidBody.setUserValue(Const.PF_PLAYER);
+        callback = new ClosestNotMeRayResultCallback(rigidBody);
         // rigidBody.setCcdMotionThreshold(0.0001f);
         // rigidBody.setCcdSweptSphereRadius(0.2f);
     }

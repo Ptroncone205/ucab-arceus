@@ -239,6 +239,14 @@ public class BattleScreen implements Screen, MenuListener {
             messageLabel.setText("El jugador ha perdido!");
             tableB.clearChildren();
 
+            ItemStack itemStack = player.getSatchel().getRandomItem();
+            itemStack.decrease();
+
+            requestGoBackToGameAfter();
+        } else if (enemy.getTeam().areAllMembersDefeated()) {
+            messageLabel.setText("El jugador ha ganado!");
+            tableB.clearChildren();
+
             if (enemy.isWild()) {
                 for (Invocation invocation : enemy.getTeam().getMembers()) {
                     SpiritForm spiritForm = invocation.getSpirit().getForm();
@@ -250,14 +258,6 @@ public class BattleScreen implements Screen, MenuListener {
                     spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.WIN));
                 }
             }
-
-            requestGoBackToGameAfter();
-        } else if (enemy.getTeam().areAllMembersDefeated()) {
-            messageLabel.setText("El jugador ha ganado!");
-            tableB.clearChildren();
-
-            ItemStack itemStack = player.getSatchel().getRandomItem();
-            itemStack.decrease();
 
             requestGoBackToGameAfter();
         }
@@ -356,7 +356,7 @@ public class BattleScreen implements Screen, MenuListener {
     }
 
     private void goBackToGame() {
-        game.setScreen(new GameScreen(game, assets, player.getName(), true));
+        game.setScreen(new GameScreen(game, assets, player));
     }
 
     @Override
