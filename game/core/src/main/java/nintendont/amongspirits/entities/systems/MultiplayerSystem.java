@@ -19,30 +19,37 @@ import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Enemy;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.TransformComponent;
+import nintendont.amongspirits.entities.spawners.ItemSpawner;
 import nintendont.amongspirits.entities.spawners.PlayerSpawner;
 import nintendont.amongspirits.screens.BattleScreen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MultiplayerSystem extends EntitySystem {
     private final Json json = new Json();
     private final Main game;
+    private final WebSocket socket;
     private final Player player;
     private final PlayerSpawner playerSpawner;
-    private final WebSocket socket;
+    private final ItemSpawner itemSpawner;
     private final HashMap<Integer, Entity> onlinePlayers = new HashMap<>();
+    private final HashMap<Integer, OnlineItem> onlineItems = new HashMap<>();
     private Enemy challenger = null;
 
     public MultiplayerSystem(
         Main game,
         WebSocket socket,
         Player player,
-        PlayerSpawner playerSpawner
+        PlayerSpawner playerSpawner,
+        ItemSpawner itemSpawner
     ) {
         this.game = game;
         this.socket = socket;
         this.player = player;
         this.playerSpawner = playerSpawner;
+        this.itemSpawner = itemSpawner;
 
         json.setOutputType(JsonWriter.OutputType.json);
 
@@ -80,6 +87,10 @@ public class MultiplayerSystem extends EntitySystem {
                     case "player_disconnected":
                         handlePlayerDisconnected(root);
                         break;
+                    case "item_collected_broadcast":
+                        handleItemCollectedBroadcast(root);
+                    case "item_respawned":
+                        handleItemRespawned(root);
                     default:
                         Gdx.app.log("WS", "Unknown message type received: " + type);
                 }
@@ -128,6 +139,30 @@ public class MultiplayerSystem extends EntitySystem {
             Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
             onlinePlayers.put(coords.id, companion);
         }
+
+        for (JsonValue item : root.get("items")) {
+            int itemId = item.getInt("id");
+            OnlineItem onlineItem = new OnlineItem();
+            onlineItems.put(itemId, onlineItem);
+
+            for (int i = 0; i < item.get("spawns").size; i++) {
+                JsonValue spawn = item.get("spawns").get(i);
+                int x = spawn.getInt(1);
+                int y = spawn.getInt(2);
+                int z = spawn.getInt(3);
+
+                OnlineItemSpawn onlineItemSpawn = new OnlineItemSpawn();
+                onlineItemSpawn.available = spawn.getBoolean(0);
+                onlineItemSpawn.position = new Vector3(x, y, z);
+                onlineItemSpawn.entity = itemSpawner.spawnItemByIdForOnline(itemId, i, new Vector3(x, y, z));
+
+                if (onlineItemSpawn.entity == null) {
+                    Gdx.app.log("WS", "Unsupported item ID for spawning: " + itemId);
+                }
+
+                onlineItem.spawns.add(onlineItemSpawn);
+            }
+        }
     }
 
     private void handlePlayerSignedIn(JsonValue root) {
@@ -168,6 +203,30 @@ public class MultiplayerSystem extends EntitySystem {
         }
     }
 
+    private void handleItemCollectedBroadcast(JsonValue root) {
+        int itemId = root.getInt("itemId");
+        int spawnIndex = root.getInt("spawnIndex");
+
+        OnlineItem targetItem = onlineItems.get(itemId);
+        OnlineItemSpawn targetSpawn = targetItem.spawns.get(spawnIndex);
+
+        targetSpawn.available = false;
+        if (targetSpawn.entity != null) {
+            getEngine().removeEntity(targetSpawn.entity);
+        }
+    }
+
+    private void handleItemRespawned(JsonValue root) {
+        int itemId = root.getInt("itemId");
+        int spawnIndex = root.getInt("spawnIndex");
+
+        OnlineItem targetItem = onlineItems.get(itemId);
+        OnlineItemSpawn targetSpawn = targetItem.spawns.get(spawnIndex);
+
+        targetSpawn.available = true;
+        targetSpawn.entity = itemSpawner.spawnItemByIdForOnline(itemId, spawnIndex, new Vector3(targetSpawn.position));
+    }
+
     private Enemy createEnemyFromPacket(BattlePlayerPacket packet) {
         Team enemyTeam = new Team();
         for (TeamInvocationPacket p : packet.team) {
@@ -199,5 +258,15 @@ public class MultiplayerSystem extends EntitySystem {
         if (socket.isOpen()) {
             socket.close();
         }
+    }
+
+    class OnlineItem {
+        public List<OnlineItemSpawn> spawns = new ArrayList<>();
+    }
+
+    class OnlineItemSpawn {
+        public boolean available;
+        public Vector3 position;
+        public Entity entity;
     }
 }

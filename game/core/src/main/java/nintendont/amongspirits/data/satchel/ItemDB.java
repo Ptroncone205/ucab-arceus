@@ -3,9 +3,9 @@ package nintendont.amongspirits.data.satchel;
 import java.util.List;
 
 public class ItemDB {
-    public static final int TUMBLESTONE_ID = 0;
-    public static final int YUMENJIANG_ID = 1;
+    public static final int TUMBLESTONE_ID = 1;
     public static final int ORAN_BERRY_ID = 2;
+    public static final int YUMENJIANG_ID = 3;
 
     private List<Item> items;
 

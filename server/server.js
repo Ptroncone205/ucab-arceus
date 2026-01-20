@@ -1,9 +1,13 @@
+const { time } = require("console");
 const WebSocket = require("ws");
 
 const wssWorld = new WebSocket.Server({ port: 8080 });
 
 const playerSockets = new Map();
 let players = [];
+let items = JSON.parse(
+  require("fs").readFileSync("./items_spawns.json", "utf8"),
+);
 let idCounter = 1;
 
 wssWorld.on("connection", (ws) => {
@@ -78,6 +82,68 @@ wssWorld.on("connection", (ws) => {
           challenger: packet.challenger,
         }),
       );
+    } else if (packet.type == "item_collected") {
+      const targetItemId = packet.itemId;
+      const targetSpawnIndex = items.spawnIndex;
+      const targetItem = items.find((item) => item.id === targetItemId);
+
+      if (!targetItem) {
+        ws.send(
+          JSON.stringify({
+            type: "item_not_found",
+            itemId: targetItemId,
+            spawnIndex: targetSpawnIndex,
+          }),
+        );
+        return;
+      }
+
+      const targetSpawn = targetItem.spawns[targetSpawnIndex];
+
+      if (!targetSpawn) {
+        ws.send(
+          JSON.stringify({
+            type: "item_not_found",
+            itemId: targetItemId,
+            spawnIndex: targetSpawnIndex,
+          }),
+        );
+        return;
+      }
+
+      const available = targetSpawn[0];
+      if (!available) {
+        ws.send(
+          JSON.stringify({
+            type: "item_unavailable",
+            itemId: targetItemId,
+            spawnIndex: targetSpawnIndex,
+          }),
+        );
+        return;
+      }
+
+      targetSpawn[0] = false;
+      broadcast(
+        JSON.stringify({
+          type: "item_collected_broadcast",
+          itemId: targetItemId,
+          spawnIndex: targetSpawnIndex,
+        }),
+        ws,
+      );
+
+      timeout(() => {
+        targetItemId[0] = true;
+        broadcast(
+          JSON.stringify({
+            type: "item_respawned",
+            itemId: targetItemId,
+            spawnIndex: targetSpawnIndex,
+          }),
+          ws,
+        );
+      }, 60000);
     }
   });
 
@@ -98,6 +164,7 @@ wssWorld.on("connection", (ws) => {
     JSON.stringify({
       type: "world_setup",
       players: players,
+      items: items,
     }),
   );
 });

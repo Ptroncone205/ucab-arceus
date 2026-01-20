@@ -24,6 +24,27 @@ public class ItemSpawner {
         this.items = items;
     }
 
+    public Entity spawnItemByIdForOnline(int itemId, int spawnIndex, Vector3 spawnPoint) {
+        Entity entity = null;
+        switch (itemId) {
+            case ItemDB.TUMBLESTONE_ID:
+                entity = spawnTumblestone(spawnPoint);
+                break;
+            case ItemDB.ORAN_BERRY_ID:
+                entity = spawnOranBerry(spawnPoint);
+                break;
+        }
+
+        if (entity == null) return null;
+
+        OnlineItemTagComponent onlineItemTag = engine.createComponent(OnlineItemTagComponent.class);
+        onlineItemTag.itemId = itemId;
+        onlineItemTag.spawnIndex = spawnIndex;
+        entity.add(onlineItemTag);
+
+        return entity;
+    }
+
     public Entity spawnOranBerry(Vector3 spawnPoint) {
         SceneAsset modelAsset = assets.get(ORAN_BERRY_SCENE);
         Item item = items.getItemById(ItemDB.ORAN_BERRY_ID);

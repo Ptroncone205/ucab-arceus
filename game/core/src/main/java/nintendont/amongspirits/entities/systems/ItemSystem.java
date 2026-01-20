@@ -11,8 +11,13 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.github.czyzby.websocket.WebSocket;
+import nintendont.amongspirits.data.online.packets.ItemCollectedPacket;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ItemTagComponent;
+import nintendont.amongspirits.entities.components.OnlineItemTagComponent;
 import nintendont.amongspirits.entities.components.TransformComponent;
 import nintendont.amongspirits.ui.game.GUIManager;
 
@@ -22,17 +27,22 @@ public class ItemSystem extends IteratingSystem {
     public static final float INTERACTION_DIST = 10f;
     private static final ComponentMapper<TransformComponent> transformMapper = ComponentMapper.getFor(TransformComponent.class);
     private static final ComponentMapper<ItemTagComponent> itemTagMapper = ComponentMapper.getFor(ItemTagComponent.class);
+    private static final ComponentMapper<OnlineItemTagComponent> onlineItemTagMapper = ComponentMapper.getFor(OnlineItemTagComponent.class);
 
+    private final Json json = new Json();
     private final Player player;
     private final Camera camera;
+    private final WebSocket socket;
     private final Vector2 screenCenter = new Vector2();
     private Entity focusedItemEntity;
     private float currentBestDistance;
 
-    public ItemSystem(Player player, Camera camera, GUIManager guiManager, InputMultiplexer input) {
+    public ItemSystem(Player player, Camera camera, GUIManager guiManager, InputMultiplexer input, WebSocket socket) {
         super(Family.all(TransformComponent.class, ItemTagComponent.class).get());
         this.player = player;
         this.camera = camera;
+        this.socket = socket;
+        json.setOutputType(JsonWriter.OutputType.json);
         input.addProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
@@ -40,6 +50,11 @@ public class ItemSystem extends IteratingSystem {
                     ItemTagComponent itemTag = itemTagMapper.get(focusedItemEntity);
                     if (player.getSatchel().addItem(itemTag.item)){
                         guiManager.update();
+                        if (socket.isOpen()) {
+                            OnlineItemTagComponent onlineItemTag = onlineItemTagMapper.get(focusedItemEntity);
+                            ItemCollectedPacket itemCollectedPacket = new ItemCollectedPacket("item_collected", onlineItemTag.itemId, onlineItemTag.spawnIndex);
+                            socket.send(json.toJson(itemCollectedPacket));
+                        };
                         getEngine().removeEntity(focusedItemEntity);
                     }
                 }
