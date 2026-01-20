@@ -12,6 +12,9 @@ public class Invocation {
     private Spirit spirit;
     private Stats stats;
 
+    
+    public Invocation() {}
+
     public Invocation(Spirit spirit) {
         this.spirit = spirit;
         this.stats = new Stats();

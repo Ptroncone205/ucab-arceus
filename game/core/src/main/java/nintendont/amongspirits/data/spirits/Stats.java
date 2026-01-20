@@ -3,7 +3,7 @@ package nintendont.amongspirits.data.spirits;
 public class Stats {
     private final RangedStatValue hp;
     private final StatValue attack, defense, specialAttack, specialDefense, speed;
-
+    
     public Stats() {
         hp = new RangedStatValue(100, 100);
         attack =  new StatValue(15);

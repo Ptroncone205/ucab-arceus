@@ -62,11 +62,13 @@ public class YumenjiangSystem extends EntitySystem {
                 }
 
                 int memberCount = player.getTeam().getMembers().size();
-                if (amountY > 0) {
-                    player.setSelectedTeamMemberIndex((memberCount + player.getSelectedTeamMemberIndex() - 1) % memberCount);
-                } else {
-                    player.setSelectedTeamMemberIndex((player.getSelectedTeamMemberIndex() + 1) % memberCount);
-                }
+                // if (amountY > 0) { division entre 0 bruh
+                //     player.setSelectedTeamMemberIndex((memberCount + player.getSelectedTeamMemberIndex() - 1) % memberCount);
+                // } else {
+                //     player.setSelectedTeamMemberIndex((player.getSelectedTeamMemberIndex() + 1) % memberCount);
+                // }
+                if (memberCount > 0) player.setSelectedTeamMemberIndex((int)(
+                    (memberCount + player.getSelectedTeamMemberIndex() + amountY) % memberCount ));
 
                 return super.scrolled(amountX, amountY);
             }

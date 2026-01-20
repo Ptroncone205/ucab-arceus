@@ -3,6 +3,9 @@ package nintendont.amongspirits.data.spirits;
 public class StatValue {
     protected int current;
 
+    public StatValue() {
+    }
+
     public StatValue(int current) {
         this.current = current;
     }

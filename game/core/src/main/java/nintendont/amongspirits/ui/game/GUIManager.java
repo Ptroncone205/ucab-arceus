@@ -33,6 +33,8 @@ public class GUIManager implements Disposable{
     private HashMap<String, MenuTable> tables = new HashMap<>();
     private Stack<MenuTable> stack = new Stack<>();
     private Codex codex;
+    private AssetManager assets;
+    private CodexMainUI codexUI;
 
     public GUIManager (AssetManager assets, SpriteBatch batch, CraftManager craftManager, Player player, Codex codex){
         stage =new Stage(new ScreenViewport(), batch){
@@ -44,12 +46,12 @@ public class GUIManager implements Disposable{
         };
         this.player = player;
         this.codex = codex;
-
+        this.assets = assets;
         createSkin();
 
         TeamMenu teamMenu = new TeamMenu(skin,this, assets);
         PastureUI pastureUI = new PastureUI(skin, player.getPasture(),teamMenu, this, assets);
-        CodexMainUI codexUI = new CodexMainUI(assets, codex, skin, this);
+        codexUI = new CodexMainUI(assets, codex, skin, this);
 
         InventoryMenu inventoryMenu = new InventoryMenu(player.getSatchel(), craftManager, skin, this, assets);
         PauseMenu pauseMenu = new PauseMenu(skin, this);
@@ -99,12 +101,12 @@ public class GUIManager implements Disposable{
     }
 
     public void goBack(){
+        stage.unfocusAll();
         if (stack.isEmpty()){
             openMenu("pause");
             return;
         }
         stack.pop().setVisible(false);
-        stage.unfocusAll();
         updateState();
     }
 
@@ -182,11 +184,8 @@ public class GUIManager implements Disposable{
                 toggleMenu("pasture");
                 return true;
             case Input.Keys.C:
-                toggleMenu("codex");
                 Actor cmenu = tables.get("codex").findActor("codex_menu");
-                if (cmenu != null) {
-                    stage.setKeyboardFocus(cmenu);
-                }
+                toggleMenu("codex");
                 return true;
             default:
                 return false;

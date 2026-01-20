@@ -199,4 +199,11 @@ public class Player implements Disposable{
         TO_CATCH,
         TO_ENCOUNTER,
     }
+
+    public void setTeam(Team team){
+        this.team = team;
+    }
+    public void setPasture(Pasture pasture){
+        this.pasture = pasture;
+    }
 }

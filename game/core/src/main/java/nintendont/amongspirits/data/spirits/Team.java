@@ -5,6 +5,11 @@ import java.util.ArrayList;
 public class Team{
     private ArrayList<Invocation> members = new ArrayList<>();
 
+    public Team(){}
+    public Team (ArrayList<Invocation> members){
+        this.members = members;
+    }
+    
     public ArrayList<Invocation> getMembers(){
         return members;
     }

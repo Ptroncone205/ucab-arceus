@@ -3,6 +3,7 @@ package nintendont.amongspirits.data.spirits;
 public class RangedStatValue extends StatValue {
     private int max;
 
+    public RangedStatValue(){}
     public RangedStatValue(int current, int max) {
         super(current);
         this.max = max;

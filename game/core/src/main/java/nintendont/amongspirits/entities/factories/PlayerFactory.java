@@ -4,6 +4,8 @@ import com.badlogic.gdx.math.Vector3;
 import nintendont.amongspirits.data.codex.Codex;
 import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.spirits.Pasture;
+import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.data.satchel.Satchel;
 import nintendont.amongspirits.managers.SaveManager;
@@ -23,11 +25,17 @@ public class PlayerFactory {
 
     public Player loadPlayerFromSaveData(String playerName) {
         try {
-            SaveData data = saveManager.loadGame(playerName);
+            Codex codex = new FakeCodexLoader().load();
+            SaveData data = saveManager.loadGame(playerName, codex);
+            if (data.codex != null) codex = data.codex;
             Satchel inventory = new Satchel();
             inventory.setItems(data.inventory);
-            Codex codex = new FakeCodexLoader().load();
+            Team team = new Team(data.team);
+            Pasture pasture = new Pasture(data.pasture);
+
             Player player = new Player(data.name, new Vector3(0,15,0), inventory, codex);
+            player.setTeam(team);
+            player.setPasture(pasture);
             return player;
         } catch(Exception e) {
             System.err.println("Error cargando datos: " + e.getLocalizedMessage());

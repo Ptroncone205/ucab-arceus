@@ -34,6 +34,8 @@ import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.assets.GameAssets;
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.SpiritForm;
 import nintendont.amongspirits.data.config.MultiplayerConfig;
 import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
 import nintendont.amongspirits.data.spirits.Invocation;
@@ -322,8 +324,8 @@ public class GameScreen implements Screen{
 			batch.draw(catchMode, 50, 50, 50,50);
 
 		}else if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER){
-			Invocation active = player.getTeam().getMembers().get(player.getSelectedTeamMemberIndex());
-			batch.draw(assets.get(active.getBattleAsset()), 50, 50, 50,50);
+			SpiritForm active = player.getTeam().getMembers().get(player.getSelectedTeamMemberIndex()).getSpirit().getForm();
+			batch.draw(assets.get(active.getIconAsset()), 50, 50, 50,50);
 		}
 		batch.end();
 		guiManager.render(deltaTime);
