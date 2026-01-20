@@ -13,7 +13,7 @@ public class FakeCodexLoader extends CodexLoader {
             "Forest spirit guide",
             "Crowned with branches, it steps through silver mist, guiding lost travelers back to the safety of ancient forest trails.",
             SpiritElement.ICE,
-            CodexIconAssets.LION,
+            CodexIconAssets.DEER,
             CodexPreviewAssets.DEER,
             BattleSpiritAssets.MALE_DEER,
             BattleSpiritAssets.FEMALE_DEER);
@@ -23,7 +23,7 @@ public class FakeCodexLoader extends CodexLoader {
             "Moon-howling guardian",
             "A shadow with yellow eyes, it sings to the pale moon and guards the snowy mountain passes from those who carry hate.",
             SpiritElement.ICE,
-            CodexIconAssets.LION,
+            CodexIconAssets.WOLF,
             CodexPreviewAssets.WOLF,
             BattleSpiritAssets.MALE_WOLF,
             BattleSpiritAssets.FEMALE_WOLF);
@@ -33,7 +33,7 @@ public class FakeCodexLoader extends CodexLoader {
             "Meadow luck bringer",
             "Small and soft, it hides luck within its twitching nose and burrows deep to whisper secrets to the roots of the world.",
             SpiritElement.ICE,
-            CodexIconAssets.LION,
+            CodexIconAssets.BUNNY,
             CodexPreviewAssets.BUNNY,
             BattleSpiritAssets.MALE_BUNNY,
             BattleSpiritAssets.FEMALE_BUNNY);
@@ -43,7 +43,7 @@ public class FakeCodexLoader extends CodexLoader {
             "Cunning fire tail",
             "With a tail of flickering flame, it weaves through the tall grass, outsmarting dark spirits with a clever, toothy grin.",
             SpiritElement.ICE,
-            CodexIconAssets.LION,
+            CodexIconAssets.FOX,
             CodexPreviewAssets.FOX,
             BattleSpiritAssets.MALE_FOX,
             BattleSpiritAssets.FEMALE_FOX);
@@ -57,6 +57,16 @@ public class FakeCodexLoader extends CodexLoader {
             CodexPreviewAssets.LION,
             BattleSpiritAssets.MALE_LION,
             BattleSpiritAssets.FEMALE_LION);
+        SpiritForm phoenix = new SpiritForm(
+            CodexCommons.PHOENIX_ID,
+            "Phoenix",
+            "Eternal flame sentinel",
+            "The celestial sentinel of the South, embodying the eternal element of fire. Its shimmering crimson wings bring omens of peace, prosperity, and the sun’s rebirth.",
+            SpiritElement.FIRE,
+            CodexIconAssets.PHOENIX,
+            CodexPreviewAssets.PHOENIX,
+            BattleSpiritAssets.WU_ZETIAN,
+            BattleSpiritAssets.WU_ZETIAN);
 
         SpiritMove thunderstruck = new SpiritMove(
             1,
@@ -202,6 +212,42 @@ public class FakeCodexLoader extends CodexLoader {
             70,
             70,
             90);
+        SpiritMove superFlare = new SpiritMove(
+            9,
+            "Super Llamarada",
+            "",
+            SpiritMoveCategory.PHYSICAL,
+            14,
+            70,
+            70,
+            90);
+        SpiritMove hotRay = new SpiritMove(
+            10,
+            "Rayo Ardiente",
+            "",
+            SpiritMoveCategory.PHYSICAL,
+            10,
+            70,
+            70,
+            90);
+        SpiritMove solarWave = new SpiritMove(
+            11,
+            "Onda Solar",
+            "",
+            SpiritMoveCategory.ESPECIAL,
+            25,
+            70,
+            70,
+            90);
+        SpiritMove rebirth = new SpiritMove(
+            12,
+            "Renacer",
+            "",
+            SpiritMoveCategory.STATUS,
+            6,
+            70,
+            70,
+            90);
 
         deer.addMove(thunderstruck);
         deer.addMove(quickAttack);
@@ -223,6 +269,10 @@ public class FakeCodexLoader extends CodexLoader {
         lion.addMove(fireFang);
         lion.addMove(scare);
         lion.addMove(tackle);
+        phoenix.addMove(superFlare);
+        phoenix.addMove(hotRay);
+        phoenix.addMove(solarWave);
+        phoenix.addMove(rebirth);
 
         ResearchTaskFactory researchTaskFactory = new ResearchTaskFactory();
         ResearchTask catchTask = researchTaskFactory.createCatchTask();
@@ -263,11 +313,14 @@ public class FakeCodexLoader extends CodexLoader {
         lion.addTaskSet(new ResearchTaskSet(defeatTask, easyMilestones, true, 0));
         lion.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
+        phoenix.addTaskSet(new ResearchTaskSet(winTask, new Milestone[] { new Milestone(1) }, false, 0));
+
         codex.addForm(deer);
         codex.addForm(wolf);
         codex.addForm(bunny);
         codex.addForm(fox);
         codex.addForm(lion);
+        codex.addForm(phoenix);
 
         return codex;
     }

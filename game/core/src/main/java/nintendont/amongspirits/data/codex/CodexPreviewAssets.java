@@ -9,6 +9,7 @@ public class CodexPreviewAssets {
     public static final AssetDescriptor<Texture> BUNNY = createDescriptor("bunny");
     public static final AssetDescriptor<Texture> FOX = createDescriptor("fox");
     public static final AssetDescriptor<Texture> LION = createDescriptor("lion");
+    public static final AssetDescriptor<Texture> PHOENIX = createDescriptor("phoenix");
 
     public static AssetDescriptor<Texture> createDescriptor(String animalName) {
         return  new AssetDescriptor<>(String.format("sprites/previews/%s.png", animalName), Texture.class);
