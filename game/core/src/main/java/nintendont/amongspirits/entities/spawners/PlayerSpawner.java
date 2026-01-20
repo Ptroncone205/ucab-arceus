@@ -40,11 +40,22 @@ public class PlayerSpawner {
         float modelScale = 1f;
         transform.matrix.scale(modelScale, modelScale, modelScale);
 
+        TriggerComponent trigger = engine.createComponent(TriggerComponent.class);
+        btCollisionShape triggerShape = new btSphereShape(3f);
+        trigger.group = PhysicsLayers.HITBOX;
+        trigger.mask = PhysicsLayers.HITBOX;
+        trigger.bulletObject = new btCollisionObject();
+        trigger.bulletObject.setCollisionFlags(trigger.bulletObject.getCollisionFlags() | btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+        trigger.bulletObject.setCollisionShape(triggerShape);
+        trigger.bulletObject.setWorldTransform(transform.matrix);
+        trigger.bulletObject.userData = entity;
+
         PlayerTagComponent playerTag = engine.createComponent(PlayerTagComponent.class);
         playerTag.onlineID = onlineId;
 
         entity.add(transform);
         entity.add(model);
+        entity.add(trigger);
         entity.add(playerTag);
 
         engine.addEntity(entity);

@@ -1,10 +1,8 @@
 package nintendont.amongspirits.screens;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -22,13 +20,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonWriter;
 import com.github.czyzby.websocket.WebSocket;
-import com.github.czyzby.websocket.WebSocketListener;
-import com.github.czyzby.websocket.WebSockets;
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
@@ -45,20 +37,18 @@ import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.codex.Codex;
 import nintendont.amongspirits.data.codex.FakeCodexLoader;
-import nintendont.amongspirits.data.online.packets.PlayerCoordinates;
+import nintendont.amongspirits.data.config.MultiplayerConfig;
+import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
 import nintendont.amongspirits.data.savedata.SaveData;
-import nintendont.amongspirits.data.spirits.Team;
-import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
-import nintendont.amongspirits.entities.components.TransformComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
+import nintendont.amongspirits.entities.factories.MultiplayerWSFactory;
 import nintendont.amongspirits.entities.spawners.PlayerSpawner;
 import nintendont.amongspirits.entities.spawners.SpiritSpawner;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
 import nintendont.amongspirits.entities.items.Item;
-import nintendont.amongspirits.entities.items.Pokeball;
 import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
 import nintendont.amongspirits.managers.InteractionScanner;
@@ -74,20 +64,15 @@ import nintendont.amongspirits.ui.game.BtnEventListener;
 import nintendont.amongspirits.ui.game.GUIManager;
 import nintendont.amongspirits.utils.AssetUtils;
 
-import static com.github.czyzby.websocket.WebSocketListener.FULLY_HANDLED;
-
 public class GameScreen implements Screen{
     private Main game;
-    private WebSocket socket;
     private final Const context = Const.get();
 	private SceneManager sceneManager;
 	private SceneAsset sceneAsset;
 	public static AssetManager assets;
 	private Scene playerScene;
-    private HashMap<Integer, Entity> onlinePlayers = new  HashMap<>();
 
     private Engine ecsEngine;
-    private PlayerSpawner playerSpawner;
 
 	private Cubemap diffuseCubemap;
 	private Cubemap environmentCubemap;
@@ -121,6 +106,7 @@ public class GameScreen implements Screen{
 
 	private GUIManager guiManager;
 	private Satchel inventory;
+    private Codex codex;
 	private CraftManager crafting;
 
 	MyContactListener cl;
@@ -137,6 +123,9 @@ public class GameScreen implements Screen{
 		ItemFactory.init();
 		assets = new AssetManager();
 		System.out.println("init just called");
+
+        // Loading data
+        codex = new FakeCodexLoader().load();
 
 		// cargar todos los assets usados por el juego incluyendo texturas y modelos
         AssetUtils.loadGLTF(assets, "models/mc/lukitm501.gltf");
@@ -182,8 +171,6 @@ public class GameScreen implements Screen{
 		font = new BitmapFont();
 		inventory = new Satchel();
 
-
-        Codex codex = new FakeCodexLoader().load();
 		crafting = new CraftManager();
         if (load){
             loadData(playerName);
@@ -193,12 +180,10 @@ public class GameScreen implements Screen{
 
 		guiManager = new GUIManager(batch, crafting, player, codex);
 		guiManager.getPauseMenu().setSaveListener(new BtnEventListener() {
-
 			@Override
 			public void onSaveRequest(){
 				SaveManager.saveGame(player, items);
 			}
-
 			@Override
 			public void onQuitRequest(){
 				game.quitGame();
@@ -256,8 +241,9 @@ public class GameScreen implements Screen{
 		iScan = new InteractionScanner();
 		focusedItem = null;
 
-        // Loading data
-
+        // Setup WebSocket connection
+        MultiplayerConfig multiplayerConfig =  new MultiplayerConfigLoader().loadFromPropsFile();
+        WebSocket socket = new MultiplayerWSFactory().createWebSocket(multiplayerConfig, "world");
 
         // Setup ECS engine
         ecsEngine = new Engine();
@@ -266,13 +252,14 @@ public class GameScreen implements Screen{
         ecsEngine.addEntityListener(Family.all(RigidbodyComponent.class).get(), new BulletRigidbodyListener(physicsWorld.getDynamicsWorld()));
         ecsEngine.addEntityListener(Family.all(TriggerComponent.class).get(), new BulletTriggerListener(physicsWorld.getDynamicsWorld()));
 
-        // Setup yumenjiang factory
+        // Setup yumenjiang spawners
         SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
         YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
 
-        // Setup player factory
-        playerSpawner = new PlayerSpawner(ecsEngine, assets);
+        // Setup player spawners
+        PlayerSpawner playerSpawner = new PlayerSpawner(ecsEngine, assets);
 
+        // Initialize systems
         ecsEngine.addSystem(new BulletPhysicsSystem(physicsWorld));
         ecsEngine.addSystem(new PlayerSystem(player, playerController));
         ecsEngine.addSystem(new TriggerTransformSystem());
@@ -280,8 +267,9 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new SpiritSystem());
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
         ecsEngine.addSystem(new CatchableSystem(player, physicsWorld));
-        ecsEngine.addSystem(new EncounterSystem(game, player, physicsWorld));
+        ecsEngine.addSystem(new ChallengeSystem(game, player, physicsWorld, socket));
         ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera));
+        ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
         SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, codex);
@@ -314,94 +302,6 @@ public class GameScreen implements Screen{
             new Vector3(-13.61148f,-4.642546f,90.47211f),
             new Vector3(22.177233f,-7.333871f,62.20569f),
         });
-
-        String address = "localhost";
-        int port = 8080;
-
-        socket = WebSockets.newSocket(WebSockets.toWebSocketUrl(address, port));
-
-        socket.addListener(new WebSocketListener() {
-            @Override
-            public boolean onOpen(WebSocket webSocket) {
-                Gdx.app.log("WS", "Connected!");
-                Json json = new Json();
-                json.setOutputType(JsonWriter.OutputType.json);
-                PlayerCoordinates packet = new PlayerCoordinates();
-                packet.type = "player_signin";
-                packet.x = player.playerPos.x;
-                packet.y = player.playerPos.y;
-                packet.z = player.playerPos.z;
-                webSocket.send(json.toJson(packet));
-                return FULLY_HANDLED;
-            }
-
-            @Override
-            public boolean onMessage(WebSocket webSocket, String packet) {
-                Gdx.app.log("WS", "Received: " + packet);
-
-                Json json = new Json();
-                JsonValue root = new JsonReader().parse(packet);
-                String type = root.getString("type");
-                PlayerCoordinates coords;
-                switch (type) {
-                    case "player_signedin":
-                        int signedInID = root.getInt("id");
-                        Gdx.app.log("WS", "Player " + signedInID + " signed in!");
-                        break;
-                    case "all_players":
-                        for (JsonValue player : root.get("players")) {
-                            coords = json.readValue(PlayerCoordinates.class, player);
-                            Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
-                            onlinePlayers.put(coords.id, companion);
-                        }
-                        break;
-                    case "player_connected":
-                        coords = json.readValue(PlayerCoordinates.class, root.get("player"));
-                        Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
-                        onlinePlayers.put(coords.id, companion);
-                        break;
-                    case "player_moved":
-                        coords = json.readValue(PlayerCoordinates.class, root.get("player"));
-                        Entity target = onlinePlayers.get(coords.id);
-                        if (target != null) {
-                            TransformComponent transform = target.getComponent(TransformComponent.class);
-                            transform.matrix.setTranslation(coords.x, coords.y, coords.z);
-//                            transform.matrix.setFromEulerAnglesRad(coords.rotX, coords.rotY, coords.rotZ);
-                        }
-                        break;
-                    case "player_disconnected":
-                        int disconnectedID = root.getInt("id");
-                        Entity removed = onlinePlayers.remove(disconnectedID);
-                        if (removed != null) {
-                            Gdx.app.log("WS", "Player " + disconnectedID + " disconnected!");
-                        }
-                        break;
-                    default:
-                        Gdx.app.log("WS", "Unknown message type received: " + type);
-                }
-
-                return FULLY_HANDLED;
-            }
-
-            @Override
-            public boolean onMessage(WebSocket webSocket, byte[] bytes) {
-                return false;
-            }
-
-            @Override
-            public boolean onClose(WebSocket webSocket, int closeCode, String reason) {
-                Gdx.app.log("WS", "Closed: " + reason);
-                return FULLY_HANDLED;
-            }
-
-            @Override
-            public boolean onError(WebSocket webSocket, Throwable error) {
-                Gdx.app.error("WS", "Error!", error);
-                return FULLY_HANDLED;
-            }
-        });
-
-        socket.connect();
     }
 
     private void loadData(String playerName) {
@@ -414,7 +314,7 @@ public class GameScreen implements Screen{
 				item.create(item.pos, 2f, 2f, 2f);
 				sceneManager.addScene(item.getScene());
 			}
-			player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory);
+			player = new Player(data.name, playerScene, new Vector3(0,15,0), inventory, codex);
 		} catch(Exception e){
 			System.err.println("Error cargando datos: " + e.getLocalizedMessage());
 			createData(playerName);
@@ -423,7 +323,7 @@ public class GameScreen implements Screen{
 
 	private void createData(String playerName) {
 		// load assets
-		player = new Player(playerName, playerScene, new Vector3(0,15,0), inventory);
+		player = new Player(playerName, playerScene, new Vector3(0,15,0), inventory, codex);
 		for (int i = 0; i<30; i++){
 			Item testItem;
 			if (i > 10){
@@ -463,7 +363,6 @@ public class GameScreen implements Screen{
 
 		focusedItem = iScan.findTarget(player.playerPos, camera, items);
 
-
         if (focusedItem != null && Gdx.input.isKeyJustPressed(Input.Keys.F)) {
 			if (inventory.addItem(focusedItem)){
 				items.remove(focusedItem);
@@ -474,24 +373,6 @@ public class GameScreen implements Screen{
 			}
         }
 
-        if (Const.currentState == GameState.INGAME && Gdx.input.justTouched()) {
-			boolean flag = false;
-			for (ItemStack iS : player.getSatchel().getItems()){
-				if (iS.getItem() instanceof Pokeball){
-					iS.count--;
-                    guiManager.update();
-					flag = true;
-					break;
-				}
-			}
-			if (!flag) return;
-
-            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
-            Vector3 throwDirection = camera.direction.cpy();
-            throwDirection.add(new Vector3(0, 0.5f, 0));
-    //            yumenjiangFactory.spawnThrowableYumenjiang(spawnPoint, throwDirection, 50);
-            }
-
 		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
 			player.getTeam().getMembers().forEach(spirit -> System.out.printf(spirit.getSpirit().getName() + ", "));
             System.out.println();
@@ -499,18 +380,6 @@ public class GameScreen implements Screen{
         if (Gdx.input.isKeyJustPressed(Input.Keys.C)){
             guiManager.toggleCodex();
         }
-
-        if (socket.isOpen()) {
-            Json json = new Json();
-            json.setOutputType(JsonWriter.OutputType.json);
-            PlayerCoordinates packet = new PlayerCoordinates();
-            packet.type = "player_update";
-            packet.x = player.playerPos.x;
-            packet.y = player.playerPos.y;
-            packet.z = player.playerPos.z;
-            socket.send(json.toJson(packet));
-        }
-
 
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -622,8 +491,5 @@ public class GameScreen implements Screen{
 		skybox.dispose();
 		font.dispose();
 		physicsWorld.dispose();
-        if (socket.isOpen()) {
-            socket.close();
-        }
     }
 }

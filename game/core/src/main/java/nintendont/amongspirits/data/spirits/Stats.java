@@ -16,4 +16,24 @@ public class Stats {
     public RangedStatValue getHP() {
         return hp;
     }
+
+    public StatValue getAttack() {
+        return attack;
+    }
+
+    public StatValue getDefense() {
+        return defense;
+    }
+
+    public StatValue getSpecialAttack() {
+        return specialAttack;
+    }
+
+    public StatValue getSpecialDefense() {
+        return specialDefense;
+    }
+
+    public StatValue getSpeed() {
+        return speed;
+    }
 }

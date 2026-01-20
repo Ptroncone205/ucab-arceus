@@ -1,13 +1,12 @@
 const WebSocket = require("ws");
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wssWorld = new WebSocket.Server({ port: 8080 });
 
-console.log("Servidor WebSocket corriendo en ws://localhost:8080");
+const playerSockets = new Map();
+let players = [];
+let idCounter = 1;
 
-idCounter = 0;
-players = [];
-
-wss.on("connection", (ws) => {
+wssWorld.on("connection", (ws) => {
   console.log("Nuevo cliente conectado");
   let currentPlayer = {};
 
@@ -28,13 +27,14 @@ wss.on("connection", (ws) => {
       };
 
       players.push(currentPlayer);
+      playerSockets.set(currentPlayer.id, ws);
       idCounter++;
 
       ws.send(
         JSON.stringify({
           type: "player_signedin",
           id: currentPlayer.id,
-        })
+        }),
       );
 
       broadcast(
@@ -42,7 +42,7 @@ wss.on("connection", (ws) => {
           type: "player_connected",
           player: currentPlayer,
         }),
-        ws
+        ws,
       );
     } else if (packet.type == "player_update") {
       currentPlayer.x = packet.x;
@@ -57,33 +57,53 @@ wss.on("connection", (ws) => {
           type: "player_moved",
           player: currentPlayer,
         }),
-        ws
+        ws,
+      );
+    } else if (packet.type == "player_challenge") {
+      const targetSocket = playerSockets.get(packet.targetPlayerId);
+      if (!targetSocket) {
+        ws.send(
+          JSON.stringify({
+            type: "player_not_found",
+            targetPlayerId: packet.targetPlayerId,
+          }),
+        );
+        return;
+      }
+
+      targetSocket.send(
+        JSON.stringify({
+          type: "player_challenged",
+          challengerID: currentPlayer.id,
+          challenger: packet.challenger,
+        }),
       );
     }
   });
 
   ws.on("close", () => {
+    playerSockets.delete(currentPlayer.id);
     players = players.filter((p) => p.id !== currentPlayer.id);
     broadcast(
       JSON.stringify({
         type: "player_disconnected",
         id: currentPlayer.id,
       }),
-      ws
+      ws,
     );
     console.log("Cliente desconectado");
   });
 
   ws.send(
     JSON.stringify({
-      type: "all_players",
+      type: "world_setup",
       players: players,
-    })
+    }),
   );
 });
 
 function broadcast(message, sender) {
-  wss.clients.forEach((client) => {
+  wssWorld.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN && client !== sender) {
       client.send(message);
     }

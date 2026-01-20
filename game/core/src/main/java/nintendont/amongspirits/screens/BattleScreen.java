@@ -157,7 +157,7 @@ public class BattleScreen implements Screen, MenuListener {
         btnRun.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
                 game.playSound("");
-                game.setScreen(new GameScreen(game, player.getName(), true));
+                goBackToGame();
             }
         });
 
@@ -172,16 +172,13 @@ public class BattleScreen implements Screen, MenuListener {
     public void onAttackSelected(String attackName) {
         game.playSound("");
         Invocation playerInvocation = getPlayerActiveInvocation();
-        SpiritMove moveUsed = null;
-
-        for(SpiritMove m : playerInvocation.getMoves()) {
-            if(m.getName().equals(attackName)) {
-                moveUsed = m; break;
-            }
-        }
+        SpiritMove moveUsed = playerInvocation.getMoves().stream().filter(m -> m.getName().equals(attackName)).findFirst().orElse(null);
 
         if (moveUsed != null) {
+            int damageToGive = moveUsed.getBasePower() / 2;
+
             Invocation enemyInvocation = getEnemyActiveInvocation();
+            enemyInvocation.takeDamage(damageToGive);
             enemyInvocation.takeDamage(moveUsed.getBasePower() / 2);
             game.playSound("");
             messageLabel.setText("¡" + enemyInvocation.getFullName() + " usó " + attackName + "!");
@@ -195,13 +192,15 @@ public class BattleScreen implements Screen, MenuListener {
         tableB.clearChildren();
         Timer.schedule(new Timer.Task(){
             @Override public void run(){
+                Invocation playerInvocation = getPlayerActiveInvocation();
+
                 if (getEnemyActiveInvocation().isFainted()){
                     game.playSound("");
                     messageLabel.setText("¡El enemigo ha sido derrotado!");
-                }else{
-                    messageLabel.setText("¡El enemigo contraataca!");
-                    Invocation playerInvocation = getPlayerActiveInvocation();
+                } else {
                     playerInvocation.takeDamage(15);
+
+                    messageLabel.setText("¡El enemigo contraataca!");
                     updateHealth();
                     Timer.schedule(new Timer.Task(){
                         @Override
@@ -301,6 +300,10 @@ public class BattleScreen implements Screen, MenuListener {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin(); bgSprite.draw(batch); batch.end();
         stage.act(); stage.draw();
+    }
+
+    private void goBackToGame() {
+        game.setScreen(new GameScreen(game, player.getName(), true));
     }
 
     @Override

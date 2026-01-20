@@ -30,6 +30,26 @@ public class Invocation {
         return stats.getHP().getCurrent();
     }
 
+    public int getAttack() {
+        return stats.getAttack().getCurrent();
+    }
+
+    public int getSpecialAttack() {
+        return stats.getSpecialAttack().getCurrent();
+    }
+
+    public int getDefense() {
+        return stats.getDefense().getCurrent();
+    }
+
+    public int getSpecialDefense() {
+        return stats.getSpecialDefense().getCurrent();
+    }
+
+    public int getSpeed() {
+        return stats.getSpeed().getCurrent();
+    }
+
     public ArrayList<SpiritMove> getMoves(){
         return spirit.getForm().getMoves();
     }

@@ -11,6 +11,10 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import nintendont.amongspirits.Const;
+import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.online.packets.BattlePlayerPacket;
+import nintendont.amongspirits.data.online.packets.TeamInvocationPacket;
+import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Pasture;
 import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.data.spirits.Team;
@@ -25,6 +29,7 @@ public class Player implements Disposable{
     private final ClosestNotMeRayResultCallback callback;
     private final Vector3 tmpPosition = new Vector3();
 
+    private Codex codex;
     private Satchel satchel;
     private Team team = new Team();
     private Pasture pasture = new Pasture();
@@ -47,9 +52,10 @@ public class Player implements Disposable{
     private float maxSpeed;
     private Vector3 tempVec;
 
-    public Player (String name, Scene scene, Vector3 position, Satchel satchel){
+    public Player (String name, Scene scene, Vector3 position, Satchel satchel, Codex codex){
         this.name = name;
         this.satchel = satchel;
+        this.codex = codex;
         callback = new ClosestNotMeRayResultCallback(rigidBody);
         this.scene = scene;
         this.scene.modelInstance.transform.scale(0.1f, 0.1f, 0.1f);
@@ -139,6 +145,10 @@ public class Player implements Disposable{
         return pasture;
     }
 
+    public Codex getCodex(){
+        return codex;
+    }
+
     public ThrowingMode getMode() {
         return mode;
     }
@@ -153,6 +163,18 @@ public class Player implements Disposable{
 
     public void setSelectedTeamMemberIndex(int selectedTeamMemberIndex) {
         this.selectedTeamMemberIndex = selectedTeamMemberIndex;
+    }
+
+    public BattlePlayerPacket getAsChallenger() {
+        TeamInvocationPacket[] teamPacket = team.getMembers().stream()
+            .map(m -> createInvocationPacketFrom(m))
+            .toArray(TeamInvocationPacket[]::new);
+
+        return new BattlePlayerPacket(name, selectedTeamMemberIndex, teamPacket);
+    }
+
+    private TeamInvocationPacket createInvocationPacketFrom(Invocation m) {
+        return new TeamInvocationPacket(m.getSpirit().getName(), m.getSpirit().getLastName(), m.getSpirit().getGender(), m.getHP(), m.getMaxHP(), m.getAttack(), m.getSpecialAttack(), m.getDefense(), m.getSpecialDefense(), m.getSpeed(), m.getSpirit().getForm().getId());
     }
 
     @Override

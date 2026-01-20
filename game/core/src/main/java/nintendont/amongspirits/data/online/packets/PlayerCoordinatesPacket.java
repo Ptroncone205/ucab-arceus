@@ -1,6 +1,6 @@
 package nintendont.amongspirits.data.online.packets;
 
-public class PlayerCoordinates {
+public class PlayerCoordinatesPacket {
     public String type;
     public int id;
     public float x;
