@@ -372,7 +372,6 @@ public class GameScreen implements Screen{
 			boolean flag = false;
 			for (ItemStack iS : player.getSatchel().getItems()){
 				if (iS.getItem() instanceof Pokeball){
-					iS.count--;
                     guiManager.update();
 					flag = true;
 					break;
@@ -380,23 +379,10 @@ public class GameScreen implements Screen{
 			}
 			if (!flag) return;
 
-            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
-            Vector3 throwDirection = camera.direction.cpy();
-            throwDirection.add(new Vector3(0, 0.5f, 0));
-    //            yumenjiangFactory.spawnThrowableYumenjiang(spawnPoint, throwDirection, 50);
+//            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
+//            Vector3 throwDirection = camera.direction.cpy();
+//            throwDirection.add(new Vector3(0, 0.5f, 0));
             }
-
-//		if (Gdx.input.isKeyJustPressed(Input.Keys.F9)){
-//			player.getTeam().getMembers().forEach(spirit -> System.out.printf(spirit.getSpirit().getName() + ", "));
-//            System.out.println();
-//		}
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.C)){
-//            guiManager.toggleCodex();
-//        }
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.P)){
-//            guiManager.update();
-//            guiManager.togglePasture();
-//        }
 
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -414,15 +400,6 @@ public class GameScreen implements Screen{
 		batch.end();
 		guiManager.render(deltaTime);
 
-//		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-//            guiManager.togglePause();
-//        }
-//        if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
-//            System.out.println("tab");
-//            guiManager.openMenu("satchel");
-//        }
-
-        // FOR DEBUGGING: Remember to delete
         if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             System.out.println(player.playerPos);
         }

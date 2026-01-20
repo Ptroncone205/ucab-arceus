@@ -147,7 +147,7 @@ public class PastureUI extends MenuTable {
             return;
         }
 
-        Texture tex = Const.get().assets.get(spirit.getBattleAsset());
+        Texture tex = assets.get(spirit.getBattleAsset());
 
         Label name = new Label(spirit.getFullName(), skin);
         name.setFontScale(1.5f);
