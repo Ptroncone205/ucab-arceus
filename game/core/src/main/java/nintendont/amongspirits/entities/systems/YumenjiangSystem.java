@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import nintendont.amongspirits.Const;
@@ -104,6 +105,18 @@ public class YumenjiangSystem extends EntitySystem {
             } else {
                 spawner.spawnThrowableYumenjiangToChallenge(spawnPoint, throwDirection, 50, player.getSelectedTeamMemberIndex());
             }
+            playSound("music and sounds/sounds/throw.mp3");
+        }
+
+    }
+
+    public void playSound(String path) {
+        try {
+            Sound sound = Gdx.audio.newSound(Gdx.files.internal(path));
+            sound.play(0.3f);
+
+        } catch (Exception e) {
+            Gdx.app.error("Sound", "No se pudo reproducir el sonido: " + path);
         }
     }
 }

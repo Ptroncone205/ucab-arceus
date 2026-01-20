@@ -293,7 +293,6 @@ public class GameScreen implements Screen{
         Gdx.input.setCursorCatched(true);
         Gdx.input.setInputProcessor(multiplexer);
 
-        game.playMusic("", true);
     }
 
     @Override

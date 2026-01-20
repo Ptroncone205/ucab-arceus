@@ -87,11 +87,10 @@ public class BagMenu extends Table {
                     @Override
                     public void clicked(InputEvent e, float x, float y){
                         if (!inv.isFullyHealthy()){
-
                             int healPower = stack.getItem().getName().contains("Super") ? 50 : 20;
                             inv.heal(healPower);
                             stack.setCount(stack.getCount() - 1);
-                            game.getGame().playSound("");
+                            game.getGame().playSound("music and sounds/sounds/heal.mp3");
                             game.updateHealth();
                             HealMenu.this.remove();
                             game.startEnemyTurn();
@@ -108,7 +107,7 @@ public class BagMenu extends Table {
             btnCancel.addListener(new ClickListener(){
                 @Override
                 public void clicked(InputEvent e, float x, float y) {
-                    game.getGame().playSound("");
+                    game.getGame().playSound("music and sounds/sounds/button_sel.mp3");
                     HealMenu.this.remove();
                 }
             });

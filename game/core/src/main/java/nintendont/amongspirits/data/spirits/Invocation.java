@@ -1,5 +1,7 @@
 package nintendont.amongspirits.data.spirits;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import nintendont.amongspirits.data.codex.SpiritMove;
@@ -82,6 +84,7 @@ public class Invocation {
     }
 
     public void takeDamage(int damage) {
+        playSound("music and sounds/sounds/dmg.mp3");
         stats.getHP().setCurrent(stats.getHP().getCurrent() - damage);
     }
 
@@ -93,5 +96,15 @@ public class Invocation {
 
     public String getFullName() {
         return spirit.getName() + " " + spirit.getLastName();
+    }
+
+    public void playSound(String path) {
+        try {
+            Sound sound = Gdx.audio.newSound(Gdx.files.internal(path));
+            sound.play(0.3f);
+
+        } catch (Exception e) {
+            Gdx.app.error("Sound", "No se pudo reproducir el sonido: " + path);
+        }
     }
 }

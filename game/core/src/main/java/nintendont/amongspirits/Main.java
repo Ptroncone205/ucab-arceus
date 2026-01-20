@@ -66,7 +66,7 @@ public class Main extends Game {
         try {
             currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
             currentMusic.setLooping(loop);
-            currentMusic.setVolume(0.5f);
+            currentMusic.setVolume(0.2f);
             currentMusic.play();
         } catch (Exception e) {
             Gdx.app.error("Music", "No se pudo cargar el archivo: " + path);
@@ -82,7 +82,7 @@ public class Main extends Game {
     public void playSound(String path) {
         try {
             Sound sound = Gdx.audio.newSound(Gdx.files.internal(path));
-            sound.play(0.7f);
+            sound.play(0.3f);
 
         } catch (Exception e) {
             Gdx.app.error("Sound", "No se pudo reproducir el sonido: " + path);
