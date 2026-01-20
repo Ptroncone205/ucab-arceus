@@ -8,4 +8,12 @@ public class Team{
     public ArrayList<Invocation> getMembers(){
         return members;
     }
+
+    public boolean areAllMembersDefeated() {
+        return getMembers().stream().allMatch(Invocation::isFainted);
+    }
+
+    public boolean isAnyMemberActive() {
+        return getMembers().stream().anyMatch(Invocation::isActive);
+    }
 }

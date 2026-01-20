@@ -13,7 +13,7 @@ public class StatValue {
 
     public void setCurrent(int current) {
         if (current <= 0) {
-            current = 0;
+            this.current = 0;
         } else {
             this.current = current;
         }

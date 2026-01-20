@@ -1,6 +1,7 @@
 package nintendont.amongspirits.data.spirits;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import nintendont.amongspirits.data.codex.SpiritMove;
 
 import java.util.ArrayList;
@@ -54,8 +55,18 @@ public class Invocation {
         return spirit.getForm().getMoves();
     }
 
+
+    public SpiritMove getRandomMove(){
+        if (getMoves().isEmpty()) return null;
+        return getMoves().get(MathUtils.random(0, getMoves().size() - 1));
+    }
+
     public boolean isFainted() {
         return stats.getHP().isEmpty();
+    }
+
+    public boolean isActive() {
+        return stats.getHP().getCurrent() > 0;
     }
 
     public boolean isFullyHealthy() {

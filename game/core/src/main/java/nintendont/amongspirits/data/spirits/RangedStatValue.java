@@ -15,7 +15,7 @@ public class RangedStatValue extends StatValue {
     @Override
     public void setCurrent(int current) {
         if (current >= max) {
-            max = current;
+            this.current = max;
         } else {
             super.setCurrent(current);
         }

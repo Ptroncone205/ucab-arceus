@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -33,6 +34,7 @@ public class BattleScreen implements Screen, MenuListener {
     private Enemy enemy;
     private int playerActiveIndex = 0;
     private int enemyActiveIndex = 0;
+    private boolean shouldGoBackToGame = false;
 
     private Image healthBarPlayer, healthBarEnemy;
     private BitmapFont font;
@@ -172,18 +174,25 @@ public class BattleScreen implements Screen, MenuListener {
     public void onAttackSelected(String attackName) {
         game.playSound("");
         Invocation playerInvocation = getPlayerActiveInvocation();
+        Invocation enemyInvocation = getEnemyActiveInvocation();
         SpiritMove moveUsed = playerInvocation.getMoves().stream().filter(m -> m.getName().equals(attackName)).findFirst().orElse(null);
 
         if (moveUsed != null) {
-            int damageToGive = moveUsed.getBasePower() / 2;
-
-            Invocation enemyInvocation = getEnemyActiveInvocation();
+            int damageToGive = moveUsed.getBasePower();
             enemyInvocation.takeDamage(damageToGive);
-            enemyInvocation.takeDamage(moveUsed.getBasePower() / 2);
             game.playSound("");
             messageLabel.setText("¡" + enemyInvocation.getFullName() + " usó " + attackName + "!");
         }
 
+        if (enemyInvocation.isFainted()) {
+            for (int i = 0; i < enemy.getTeam().getMembers().size(); i++) {
+                if (enemy.getTeam().getMembers().get(i).isActive()) {
+                    enemyActiveIndex = i;
+                }
+            }
+        }
+
+        checkEndgame();
         updateHealth();
         startEnemyTurn();
     }
@@ -193,24 +202,27 @@ public class BattleScreen implements Screen, MenuListener {
         Timer.schedule(new Timer.Task(){
             @Override public void run(){
                 Invocation playerInvocation = getPlayerActiveInvocation();
+                Invocation enemyInvocation = getEnemyActiveInvocation();
 
-                if (getEnemyActiveInvocation().isFainted()){
+                if (enemyInvocation.isFainted()){
                     game.playSound("");
                     messageLabel.setText("¡El enemigo ha sido derrotado!");
                 } else {
-                    playerInvocation.takeDamage(15);
+                    SpiritMove move = enemyInvocation.getRandomMove();
+                    playerInvocation.takeDamage(move.getBasePower());
 
                     messageLabel.setText("¡El enemigo contraataca!");
                     updateHealth();
                     Timer.schedule(new Timer.Task(){
                         @Override
                         public void run(){
-                            if (playerInvocation.isFainted()){
+                            if (playerInvocation.isFainted() && player.getTeam().isAnyMemberActive()){
                                 stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, true, assets));
                             }else{
                                 messageLabel.setText("¿Qué hará " + playerInvocation.getFullName() + "?");
                                 setupMainButtons(190);
                             }
+                            checkEndgame();
                         }
                     }, 1.5f);
                 }
@@ -221,6 +233,27 @@ public class BattleScreen implements Screen, MenuListener {
     public void updateHealth(){
         healthBarPlayer.setDrawable(createBarDrawable(getPlayerActiveInvocation().getHealthRatio()));
         healthBarEnemy.setDrawable(createBarDrawable(getEnemyActiveInvocation().getHealthRatio()));
+    }
+
+    private void checkEndgame() {
+        if (player.getTeam().areAllMembersDefeated()) {
+            messageLabel.setText("El jugador ha perdido!");
+            tableB.clearChildren();
+            requestGoBackToGameAfter();
+        } else if (enemy.getTeam().areAllMembersDefeated()) {
+            messageLabel.setText("El jugador ha ganado!");
+            tableB.clearChildren();
+            requestGoBackToGameAfter();
+        }
+    }
+
+    private void requestGoBackToGameAfter() {
+        Timer.schedule(new Timer.Task(){
+            @Override
+            public void run(){
+                shouldGoBackToGame = true;
+            }
+        }, 3f);
     }
 
     private Invocation getPlayerActiveInvocation() {
@@ -297,6 +330,10 @@ public class BattleScreen implements Screen, MenuListener {
 
     @Override
     public void render(float delta){
+        if (shouldGoBackToGame){
+            goBackToGame();
+        }
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin(); bgSprite.draw(batch); batch.end();
         stage.act(); stage.draw();
