@@ -41,7 +41,7 @@ public class MenuUI extends InputAdapter implements Disposable {
 
     public MenuUI(Main game) {
         this.game = game;
-        this.stage = new Stage(new ScreenViewport(), Const.get().spriteBatch){
+        this.stage = new Stage(new ScreenViewport(), Const.spriteBatch){
             @Override
             public boolean keyDown(int key){
                 switch (key) {
@@ -87,10 +87,12 @@ public class MenuUI extends InputAdapter implements Disposable {
         // MainMenuUI menu = new MainMenuUI(skin, this);
         Help help = new Help(skin, this);
         Options options =new Options(skin, this);
+        PlayMenu playMenu = new PlayMenu(skin, this);
         Account account = new Account(skin, this);
 
         // addMenu("menu", menu);
         addMenu("help", help);
+        addMenu("play", playMenu);
         addMenu("account", account);
         addMenu("options", options);
         setMenu("account");

@@ -64,7 +64,7 @@ public class MenuOverlay extends Table{
     }
 
     protected void back(){
-        menu.setMenu("account");
+        menu.setMenu("play");
     }
 
     protected TextField creaTextField(Skin skin){

@@ -368,22 +368,6 @@ public class GameScreen implements Screen{
 			}
         }
 
-        if (Const.currentState == GameState.INGAME && Gdx.input.justTouched()) {
-			boolean flag = false;
-			for (ItemStack iS : player.getSatchel().getItems()){
-				if (iS.getItem() instanceof Pokeball){
-                    guiManager.update();
-					flag = true;
-					break;
-				}
-			}
-			if (!flag) return;
-
-//            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
-//            Vector3 throwDirection = camera.direction.cpy();
-//            throwDirection.add(new Vector3(0, 0.5f, 0));
-            }
-
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
