@@ -1,10 +1,12 @@
 package nintendont.amongspirits.data.codex;
 
+import java.util.Arrays;
+
 public class ResearchTaskSet {
     private final ResearchTask base;
     private final Milestone[] milestones;
     private final boolean boosted;
-    private final int currentCount;
+    private int currentCount;
 
     public ResearchTaskSet(
         ResearchTask base,
@@ -36,5 +38,19 @@ public class ResearchTaskSet {
 
     public int getCurrentCount() {
         return currentCount;
+    }
+
+    public void setCurrentCount(int currentCount) {
+        this.currentCount = currentCount;
+    }
+
+    public void increaseCount() {
+        setCurrentCount(getCurrentCount() + 1);
+    }
+
+    public int getResearchPoints() {
+        int multiplier = boosted ? 2 : 1;
+        int milestonesReached = (int)Arrays.stream(milestones).filter(m -> m.getTargetCount() <= currentCount).count();
+        return milestonesReached * multiplier;
     }
 }

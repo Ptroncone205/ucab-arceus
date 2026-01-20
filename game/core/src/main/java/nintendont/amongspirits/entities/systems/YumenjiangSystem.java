@@ -12,6 +12,7 @@ import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.items.Pokeball;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
+import nintendont.amongspirits.ui.game.GUIManager;
 
 import java.util.Optional;
 
@@ -19,16 +20,19 @@ public class YumenjiangSystem extends EntitySystem {
     private final Player player;
     private final YumenjiangSpawner spawner;
     private final Camera camera;
+    private final GUIManager guiManager;
 
     public YumenjiangSystem(
         InputMultiplexer multiplexer,
         Player player,
         YumenjiangSpawner spawner,
-        Camera camera
+        Camera camera,
+        GUIManager guiManager
     ) {
         this.player = player;
         this.spawner = spawner;
         this.camera = camera;
+        this.guiManager = guiManager;
         multiplexer.addProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
@@ -79,13 +83,14 @@ public class YumenjiangSystem extends EntitySystem {
                 Optional<ItemStack> stack = player.getSatchel().getItems().stream()
                     .filter(i -> i.getItem() instanceof Pokeball).findFirst();
 
-                if (stack.isPresent()) {
-                    if (stack.get().count > 0) {
-                        stack.get().count -= 1;
-                    } else {
-                        return;
-                    }
+                if (stack.isPresent() && stack.get().count > 0) {
+                    stack.get().count -= 1;
+                    guiManager.update();
                 } else {
+                    return;
+                }
+            } else if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER) {
+                if (player.getTeam().getMembers().isEmpty()) {
                     return;
                 }
             }

@@ -2,6 +2,7 @@ package nintendont.amongspirits.managers;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.math.MathUtils;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.items.Item;
 
@@ -45,6 +46,10 @@ public class Satchel {
 
     public void setItems(ArrayList<ItemStack> items){
         this.items = items;
+    }
+
+    public ItemStack getRandomItem() {
+        return items.get(MathUtils.random(0, items.size() - 1));
     }
 
     public boolean hasYumenjiang() {

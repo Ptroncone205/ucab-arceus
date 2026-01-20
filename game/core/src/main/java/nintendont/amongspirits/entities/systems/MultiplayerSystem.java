@@ -173,7 +173,7 @@ public class MultiplayerSystem extends EntitySystem {
         for (TeamInvocationPacket p : packet.team) {
             enemyTeam.getMembers().add(new Invocation(new Spirit(0, p.name, p.lastName, "", p.gender, player.getCodex().getFormById(p.spiritFormId))));
         }
-        return new Enemy(packet.name, enemyTeam);
+        return new Enemy(packet.name, enemyTeam, false);
     }
 
     private PlayerCoordinatesPacket createPlayerPacketFrom(String type) {

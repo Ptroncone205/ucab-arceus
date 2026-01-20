@@ -15,9 +15,10 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
-import nintendont.amongspirits.data.codex.SpiritMove;
+import nintendont.amongspirits.data.codex.*;
 import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.entities.Enemy;
+import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.utils.*;
 
@@ -237,10 +238,27 @@ public class BattleScreen implements Screen, MenuListener {
         if (player.getTeam().areAllMembersDefeated()) {
             messageLabel.setText("El jugador ha perdido!");
             tableB.clearChildren();
+
+            if (enemy.isWild()) {
+                for (Invocation invocation : enemy.getTeam().getMembers()) {
+                    SpiritForm spiritForm = invocation.getSpirit().getForm();
+                    spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.DEFEAT));
+                }
+            } else {
+                for (Invocation invocation : player.getTeam().getMembers()) {
+                    SpiritForm spiritForm = invocation.getSpirit().getForm();
+                    spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.WIN));
+                }
+            }
+
             requestGoBackToGameAfter();
         } else if (enemy.getTeam().areAllMembersDefeated()) {
             messageLabel.setText("El jugador ha ganado!");
             tableB.clearChildren();
+
+            ItemStack itemStack = player.getSatchel().getRandomItem();
+            itemStack.decrease();
+
             requestGoBackToGameAfter();
         }
     }

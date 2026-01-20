@@ -1,9 +1,6 @@
 package nintendont.amongspirits.data.codex;
 
-import nintendont.amongspirits.data.spirits.Spirit;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class Codex {
@@ -22,8 +19,6 @@ public class Codex {
     }
 
     public void addForm(SpiritForm spiritForm) {
-        // TODO actualizar la entrada si ya existe :v
         forms.add(spiritForm);
-        System.out.println(forms);
     }
 }

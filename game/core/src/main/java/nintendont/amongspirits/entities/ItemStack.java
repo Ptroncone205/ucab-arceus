@@ -36,4 +36,8 @@ public class ItemStack {
     public void setCount(int count) {
         this.count = count;
     }
+
+    public void decrease() {
+        setCount(getCount() - 1);
+    }
 }

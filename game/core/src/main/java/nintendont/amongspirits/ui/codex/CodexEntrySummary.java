@@ -1,16 +1,13 @@
 package nintendont.amongspirits.ui.codex;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 import nintendont.amongspirits.data.codex.*;
 
@@ -19,6 +16,8 @@ public class CodexEntrySummary extends Table {
     private static final Color HEADER_BG_COLOR = Color.valueOf("273a4e");
     private static final Color HEADER_BG_COLOR_SECONDARY = Color.valueOf("394a5a");
     private static final Color HEADER_BG_COLOR_TERTIARY = Color.valueOf("1d2630");
+    private static final Color MILESTONE_BG_COLOR_UNDONE = Color.valueOf("e7deb2");
+    private static final Color MILESTONE_BG_COLOR_DONE = Color.valueOf("6cbc72");
 
     private AssetManager manager;
     private SpiritForm spiritForm;
@@ -69,6 +68,10 @@ public class CodexEntrySummary extends Table {
         Label.LabelStyle bodyStyle = new Label.LabelStyle();
         bodyStyle.font = mainFont;
         bodyStyle.fontColor = Color.BLACK;
+
+        Label.LabelStyle bodyOnDarkStyle = new Label.LabelStyle();
+        bodyOnDarkStyle.font = mainFont;
+        bodyOnDarkStyle.fontColor = Color.WHITE;
 
         Label.LabelStyle levelStyle = new Label.LabelStyle();
         levelStyle.font = levelFont;
@@ -143,10 +146,13 @@ public class CodexEntrySummary extends Table {
             Table milestoneTable = new Table();
             milestoneTable.defaults().space(8);
             for (Milestone milestone : set.getMilestones()) {
-                Label milestoneLabel = new Label(String.valueOf(milestone.getTargetCount()), bodyStyle);
+                boolean milestoneDone = set.getCurrentCount() >= milestone.getTargetCount();
+                Color milestoneBGColor = milestoneDone ? MILESTONE_BG_COLOR_DONE : MILESTONE_BG_COLOR_UNDONE;
+                Label.LabelStyle milestoneTextStyle = milestoneDone ? bodyOnDarkStyle : bodyStyle;
+                Label milestoneLabel = new Label(String.valueOf(milestone.getTargetCount()), milestoneTextStyle);
                 Container<Label> milestoneContainer = new  Container<>(milestoneLabel);
                 milestoneContainer.setBackground(backgroundDrawable);
-                milestoneContainer.setColor(Color.valueOf("e7deb2"));
+                milestoneContainer.setColor(milestoneBGColor);
                 milestoneTable.add(milestoneContainer).size(40, 24);
             }
             countsTable.add(milestoneTable);

@@ -192,7 +192,7 @@ public class IntroScreen implements Screen {
     public void render(float delta) {
         assets.update();
         if (!assets.isFinished()) System.out.println("LOADING: " + assets.getLoadedAssets() * 100 / 34 + "%");
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT_BRACKET)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT_BRACKET) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             goToMainMenu();
         }
         Gdx.gl.glClearColor(0, 0, 0, 1);

@@ -104,4 +104,18 @@ public class SpiritForm {
     public void addTaskSet(ResearchTaskSet taskSet) {
         tasks.add(taskSet);
     }
+
+    public void validateTask(ResearchTaskAction action) {
+        for (ResearchTaskSet taskSet : getTasks()) {
+            SolutionAlgorithm algorithm = taskSet.getBase().getSolutionAlgorithm();
+            if (algorithm.validate(new ResearchTaskValidationContext(this, action, taskSet))) {
+                taskSet.increaseCount();
+            }
+        }
+        calcResearchLevel();
+    }
+
+    private void calcResearchLevel() {
+        researchLevel = getTasks().stream().mapToInt(ResearchTaskSet::getResearchPoints).sum();
+    }
 }

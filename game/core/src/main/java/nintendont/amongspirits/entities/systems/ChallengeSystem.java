@@ -85,7 +85,7 @@ public class ChallengeSystem extends IteratingSystem {
         if (spiritTag != null) {
             Team enemyTeam = new Team();
             enemyTeam.getMembers().add(new Invocation(spiritTag.spirit));
-            Enemy enemy = new Enemy("Wild Spirit", enemyTeam);
+            Enemy enemy = new Enemy("Wild Spirit", enemyTeam, true);
 
             if (socket.isOpen()) {
                 socket.close();

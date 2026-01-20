@@ -228,103 +228,71 @@ public class FakeCodexLoader extends CodexLoader {
         lion.addMove(scare);
         lion.addMove(tackle);
 
+        Milestone[] easyMilestones = new Milestone[] {
+            new Milestone(1),
+            new Milestone(2),
+            new Milestone(4),
+            new Milestone(10),
+            new Milestone(15),
+        };
+
+        Milestone[] normalMilestones = new Milestone[] {
+            new Milestone(1),
+            new Milestone(3),
+            new Milestone(6),
+            new Milestone(12),
+            new Milestone(25),
+        };
+
         deer.addTaskSet(new ResearchTaskSet(
             catchTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(2, false),
-                new Milestone(4, false),
-                new Milestone(10, false),
-                new Milestone(15, false),
-            },
+            easyMilestones,
             true,
             0
         ));
 
         wolf.addTaskSet(new ResearchTaskSet(
             catchTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(3, false),
-                new Milestone(6, false),
-                new Milestone(12, false),
-                new Milestone(25, false),
-            },
+            normalMilestones,
             true,
             0
         ));
         wolf.addTaskSet(new ResearchTaskSet(
             defeatTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(3, false),
-                new Milestone(6, false),
-                new Milestone(12, false),
-                new Milestone(25, false),
-            },
+            normalMilestones,
             true,
             0
         ));
 
         bunny.addTaskSet(new ResearchTaskSet(
             catchTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(3, false),
-                new Milestone(6, false),
-                new Milestone(12, false),
-                new Milestone(25, false),
-            },
+            normalMilestones,
             true,
             0
         ));
 
         fox.addTaskSet(new ResearchTaskSet(
             catchTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(3, false),
-                new Milestone(6, false),
-                new Milestone(12, false),
-                new Milestone(25, false),
-            },
+            normalMilestones,
             true,
             0
         ));
         fox.addTaskSet(new ResearchTaskSet(
             defeatTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(2, false),
-                new Milestone(4, false),
-                new Milestone(10, false),
-                new Milestone(15, false),
-            },
+            easyMilestones,
             false,
             0
         ));
 
         lion.addTaskSet(new ResearchTaskSet(
             catchTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(3, false),
-                new Milestone(6, false),
-                new Milestone(12, false),
-                new Milestone(25, false),
-            },
+            normalMilestones,
             false,
             0
         ));
         lion.addTaskSet(new ResearchTaskSet(
             defeatTask,
-            new Milestone[]{
-                new Milestone(1, false),
-                new Milestone(2, false),
-                new Milestone(4, false),
-                new Milestone(10, false),
-                new Milestone(15, false),
-            },
+            easyMilestones,
             true,
             0
         ));

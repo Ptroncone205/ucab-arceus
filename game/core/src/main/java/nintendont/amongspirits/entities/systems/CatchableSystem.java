@@ -10,6 +10,10 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btManifoldPoint;
 
+import nintendont.amongspirits.data.codex.ResearchTaskAction;
+import nintendont.amongspirits.data.codex.ResearchTaskActionType;
+import nintendont.amongspirits.data.codex.ResearchTaskValidationContext;
+import nintendont.amongspirits.data.codex.SpiritForm;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Player;
@@ -81,6 +85,9 @@ public class CatchableSystem extends IteratingSystem {
                 //
             }
             player.getPasture().getInvocations().add(invocation);
+
+            SpiritForm spiritForm = spiritType.spirit.getForm();
+            spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.CATCH));
         }
 
         engine.removeEntity(entity);

@@ -260,7 +260,7 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
         ecsEngine.addSystem(new CatchableSystem(player, physicsWorld));
         ecsEngine.addSystem(new ChallengeSystem(game, player, physicsWorld, socket));
-        ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera));
+        ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera, guiManager));
         ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
