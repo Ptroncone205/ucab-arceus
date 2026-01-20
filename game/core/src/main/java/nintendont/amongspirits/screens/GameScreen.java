@@ -262,18 +262,6 @@ public class GameScreen implements Screen{
             new Vector3(-13.61148f,-4.642546f,90.47211f),
             new Vector3(22.177233f,-7.333871f,62.20569f),
         });
-
-//        itemSpawner.spawnTumblestone(new Vector3(-17.838638f,-4.3560739f,-47.24584f));
-//        itemSpawner.spawnOranBerry(new Vector3(1.8027654f,-2.9660032f,-41.948856f));
-//        itemSpawner.spawnOranBerry(new Vector3(48.982178f,1.8653733f,-9.645581f));
-//        itemSpawner.spawnOranBerry(new Vector3(54.165665f,1.508391f,0.024594655f));
-//        itemSpawner.spawnOranBerry(new Vector3(67.40762f,4.045167f,5.6782846f));
-//        itemSpawner.spawnTumblestone(new Vector3(54.230034f,-3.6913362f,-20.758377f));
-//        itemSpawner.spawnTumblestone(new Vector3(83.13638f,-2.0633545f,-0.5703411f));
-//        itemSpawner.spawnTumblestone(new Vector3(102.18394f,1.1988071f,7.637454f));
-//        itemSpawner.spawnTumblestone(new Vector3(127.85025f,1.4623288f,-19.181307f));
-//        itemSpawner.spawnTumblestone(new Vector3(133.04187f,-3.0535147f,-52.89993f));
-//        itemSpawner.spawnTumblestone(new Vector3(142.18419f,-4.625522f,-78.41611f));
     }
 
 	private void buildTerrain() {
@@ -287,6 +275,7 @@ public class GameScreen implements Screen{
 		terrainScene = new Scene(terrain.getModelInstance());
 		sceneManager.addScene(terrainScene);
 	}
+
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
