@@ -2,6 +2,7 @@ package nintendont.amongspirits.data.codex;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,6 +117,6 @@ public class SpiritForm {
     }
 
     private void calcResearchLevel() {
-        researchLevel = getTasks().stream().mapToInt(ResearchTaskSet::getResearchPoints).sum();
+        researchLevel = Math.min(getTasks().stream().mapToInt(ResearchTaskSet::getResearchPoints).sum(), 10);
     }
 }
