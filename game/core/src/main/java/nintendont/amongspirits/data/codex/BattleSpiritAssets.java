@@ -13,6 +13,6 @@ public class BattleSpiritAssets {
     public static final AssetDescriptor<Texture> FEMALE_BUNNY = new AssetDescriptor<>("sprites/spiritsHuman/femaleBunny.png", Texture.class);
     public static final AssetDescriptor<Texture> MALE_WOLF = new AssetDescriptor<>("sprites/spiritsHuman/maleWolf.png", Texture.class);
     public static final AssetDescriptor<Texture> FEMALE_WOLF = new AssetDescriptor<>("sprites/spiritsHuman/femaleWolf.png", Texture.class);
-    public static final AssetDescriptor<Texture> MALE_FOX = new AssetDescriptor<>("gokuprueba2.png", Texture.class);
-    public static final AssetDescriptor<Texture> FEMALE_FOX = new AssetDescriptor<>("gokuprueba2.png", Texture.class);
+    public static final AssetDescriptor<Texture> MALE_FOX = new AssetDescriptor<>("sprites/spiritsHuman/maleFox.png", Texture.class);
+    public static final AssetDescriptor<Texture> FEMALE_FOX = new AssetDescriptor<>("sprites/spiritsHuman/femaleFox.png", Texture.class);
 }
