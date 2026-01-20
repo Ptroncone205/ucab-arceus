@@ -59,7 +59,7 @@ public class ItemSystem extends IteratingSystem {
                         getEngine().removeEntity(focusedItemEntity);
                     }
                 }
-                return true;
+                return super.keyDown(keycode);
             }
         });
     }
