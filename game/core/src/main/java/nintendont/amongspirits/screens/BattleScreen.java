@@ -64,6 +64,7 @@ public class BattleScreen implements Screen, MenuListener {
         bgSprite = new Sprite(new Texture(Gdx.files.internal("fightbg.png")));
         bgSprite.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
+        game.playMusic("music and sounds/music/wild-battle.mp3", true);
         setupBattleUI();
     }
 
@@ -72,8 +73,6 @@ public class BattleScreen implements Screen, MenuListener {
         Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
-
-        game.playMusic("music and sounds/music/wild-battle.mp3", true);
 
         // UI ENEMIGO
         Invocation enemyInvocation = getEnemyActiveInvocation();

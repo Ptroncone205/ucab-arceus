@@ -18,7 +18,7 @@ public class Extra extends MenuOverlay {
         title.setFontScale(2f);
         title.setColor(Color.WHITE);
 
-        String textoLargo = "Lenguaje de Programación utilizado: Java.\n\nLibrerías externas utilizadas: LibGdx, Bullet.\n\nDesarrolladores: Alfonso Suarez, Daniela Casanova, Paulo Troncone.\n\nDiseñadora artística: Susan Silva.\n\nProfesora: Janelly Bello.\n\nVersión actualizada: 1.0";
+        String textoLargo = "Lenguaje de Programación utilizado: Java.\n\nLibrerías externas utilizadas: LibGdx, Bullet.\n\nDesarrolladores (Estudiantes): Alfonso Suarez, Daniela Casanova, Paulo Troncone.\n\nDiseñadora artística: Susan Silva.\n\nCompositora Musical: Stephanie Serrao.\n\nProfesora: Janelly Bello.\n\nVersión actualizada: 1.0";
 
         Label bodyText = new Label(textoLargo, skin);
         bodyText.setWrap(true);

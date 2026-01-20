@@ -96,6 +96,7 @@ public class MenuUI extends InputAdapter implements Disposable {
         addMenu("account", account);
         // addMenu("options", options);
         setMenu("account");
+        game.playMusic("music and sounds/music/mainMenu.mp3", true);
     }
 
     private void createSkin() {

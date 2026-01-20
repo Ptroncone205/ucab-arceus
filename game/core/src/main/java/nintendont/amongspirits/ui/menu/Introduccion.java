@@ -21,7 +21,7 @@ public class Introduccion extends MenuOverlay {
         title.setFontScale(2f);
         title.setColor(Color.WHITE);
 
-        String textoLargo = "¡Bienvenido a Among Spirits fantástico jugador!\n En este mundo podrás interactuar con espíritus elementales que vagan por el mapa en forma de animales.\n Puedes moverte con W A S D y saltar con el espacio.\nLos atrapa espiritus se tiran con el click izquierdo, debes de tener en cuenta que si lo lanzas mientras está vacio atraparás el espíritu salvaje y si lo lanzas con un espíritu dentro entrarás en un combate.\nLos objetos se recogen con la tecla F, ten en cuenta que estos seran necesarios para fabricar objetos consumibles.\nTodo el equipo de Nintendont espera que tengas una experiencia maravillosa y esperamos que puedes disfrutar este juego <3.";
+        String textoLargo = "¡Bienvenido a Among Spirits fantástico jugador!\n En este mundo podrás interactuar con espíritus elementales que vagan por el mapa en forma de animales.\n Puedes moverte con W A S D y saltar con el espacio.\nLos atrapa espiritus se tiran con el click izquierdo, debes de tener en cuenta que si lo lanzas mientras está vacio atraparás el espíritu salvaje y si lo lanzas con un espíritu dentro entrarás en un combate, puede alternar el modo de tiro con la tecla R.\nLos objetos se recogen con la tecla F, ten en cuenta que estos seran necesarios para fabricar objetos consumibles.\nTodo el equipo de Nintendont espera que tengas una experiencia maravillosa y esperamos que puedes disfrutar este juego <3.";
 
         Label bodyText = new Label(textoLargo, skin);
         bodyText.setWrap(true);

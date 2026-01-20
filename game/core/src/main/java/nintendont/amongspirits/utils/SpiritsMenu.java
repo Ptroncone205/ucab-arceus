@@ -33,7 +33,7 @@ public class SpiritsMenu extends Table {
             Table card = new Table().pad(10);
             card.setBackground(game.getColoredDrawable(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.8f)));
 
-            Texture battleGraphic = assets.get(invocation.getBattleAsset());
+            Texture battleGraphic = assets.get(invocation.getSpirit().getForm().getIconAsset());
             card.add(new Image(battleGraphic)).size(50).padRight(10);
 
             Table info = new Table();

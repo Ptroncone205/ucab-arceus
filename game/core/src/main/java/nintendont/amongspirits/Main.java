@@ -40,7 +40,7 @@ public class Main extends Game {
     public void newGame(String playerName, boolean load){
         if (playerName == null || playerName.isBlank()) return;
 
-        playMusic("", true);
+        playMusic("music and sounds/music/mainMenu.mp3", true);
 
         Const.currentState = GameState.INGAME;
         Player player = new PlayerFactory(saveManager).loadPlayerFromSaveData(playerName);
@@ -66,7 +66,7 @@ public class Main extends Game {
         try {
             currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
             currentMusic.setLooping(loop);
-            currentMusic.setVolume(0.2f);
+            currentMusic.setVolume(0.1f);
             currentMusic.play();
         } catch (Exception e) {
             Gdx.app.error("Music", "No se pudo cargar el archivo: " + path);

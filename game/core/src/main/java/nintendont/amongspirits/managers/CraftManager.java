@@ -22,6 +22,7 @@ public final class CraftManager {
         String key = generateKey(itemA.getName(), itemB.getName());
         Integer itemId = recipes.get(key);
         if (itemId == null) return null;
+        ((nintendont.amongspirits.Main) Gdx.app.getApplicationListener()).playSound("music and sounds/sounds/craft.mp3");
         return items.getItemById(itemId);
     }
 

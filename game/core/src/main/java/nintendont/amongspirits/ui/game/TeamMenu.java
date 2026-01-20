@@ -75,7 +75,7 @@ public class TeamMenu extends MenuTable {
         card.setBackground(skin.newDrawable("white", bgCol));
         card.setTouchable(Touchable.enabled);
 
-        Texture iconTex = assets.get(spirit.getBattleAsset());
+        Texture iconTex = assets.get(spirit.getSpirit().getForm().getIconAsset());
         card.add(new Image(iconTex)).size(50).pad(5);
 
         Table stats = new Table(); // name & health

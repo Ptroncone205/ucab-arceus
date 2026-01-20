@@ -121,6 +121,8 @@ public class GameScreen implements Screen{
         config.numBones = 90;
 		sceneManager = new SceneManager(new CustomShaderProvider(config), PBRShaderProvider.createDefaultDepth(90));
 
+        game.playMusic("music and sounds/music/game.mp3", true);
+
 		// create player scene
 		sceneAsset = assets.get("models/mc/lukitm501.gltf", SceneAsset.class);
 		playerScene = new Scene(sceneAsset.scene);
@@ -287,6 +289,7 @@ public class GameScreen implements Screen{
     @Override
     public void show() {
         Const.currentState = GameState.INGAME;
+        game.playMusic("music and sounds/music/game.mp3", true);
         Gdx.input.setCursorCatched(true);
         Gdx.input.setInputProcessor(multiplexer);
 
@@ -392,7 +395,7 @@ public class GameScreen implements Screen{
     @Override
     public void resume() {
         // TODO Auto-generated method stub
-        game.playMusic("", true);
+        game.playMusic("music and sounds/music/game.mp3", true);
     }
 
     @Override
