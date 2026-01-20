@@ -187,7 +187,7 @@ public class PastureUI extends MenuTable {
         slot.setBackground(skin.newDrawable("white", bgCol));
 
         if (spirit != null) {
-            Texture tex = assets.get(spirit.getBattleAsset());
+            Texture tex = assets.get(spirit.getSpirit().getForm().getIconAsset());
             slot.add(new Image(tex)).size(size - 10);
 
             if (spirit.getHP() <= 0) slot.setColor(1, 0.5f, 0.5f, 1);

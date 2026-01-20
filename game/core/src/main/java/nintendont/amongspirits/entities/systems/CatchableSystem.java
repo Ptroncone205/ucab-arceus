@@ -83,9 +83,8 @@ public class CatchableSystem extends IteratingSystem {
             if (team.getMembers().size() < 6) {
                 team.getMembers().add(invocation);
             } else {
-                //
+                player.getPasture().getInvocations().add(invocation);
             }
-            player.getPasture().getInvocations().add(invocation);
 
             SpiritForm spiritForm = spiritTag.spirit.getForm();
             spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.CATCH));
