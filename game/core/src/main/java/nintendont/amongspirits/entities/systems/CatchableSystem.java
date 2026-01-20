@@ -10,10 +10,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObjectWrapper;
 import com.badlogic.gdx.physics.bullet.collision.btManifoldPoint;
 
-import nintendont.amongspirits.data.codex.ResearchTaskAction;
-import nintendont.amongspirits.data.codex.ResearchTaskActionType;
-import nintendont.amongspirits.data.codex.ResearchTaskValidationContext;
-import nintendont.amongspirits.data.codex.SpiritForm;
+import nintendont.amongspirits.data.codex.*;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Player;
@@ -74,9 +71,13 @@ public class CatchableSystem extends IteratingSystem {
             return;
         }
 
-        SpiritTagComponent spiritType = entity.getComponent(SpiritTagComponent.class);
-        if (spiritType != null) {
-            Invocation invocation = new Invocation(spiritType.spirit);
+        SpiritTagComponent spiritTag = entity.getComponent(SpiritTagComponent.class);
+        if (spiritTag != null) {
+            if (spiritTag.spirit.getForm().getId() == CodexCommons.PHOENIX_ID && spiritTag.spirit.getForm().getTasks().stream().noneMatch(t -> t.getCurrentCount() > 0)) {
+                return;
+            }
+
+            Invocation invocation = new Invocation(spiritTag.spirit);
 
             Team team = player.getTeam();
             if (team.getMembers().size() < 6) {
@@ -86,7 +87,7 @@ public class CatchableSystem extends IteratingSystem {
             }
             player.getPasture().getInvocations().add(invocation);
 
-            SpiritForm spiritForm = spiritType.spirit.getForm();
+            SpiritForm spiritForm = spiritTag.spirit.getForm();
             spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.CATCH));
         }
 

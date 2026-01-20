@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.bullet.collision.btManifoldPoint;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.github.czyzby.websocket.WebSocket;
+import nintendont.amongspirits.data.codex.CodexCommons;
 import nintendont.amongspirits.data.online.packets.PlayerChallengeRequestPacket;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Team;
