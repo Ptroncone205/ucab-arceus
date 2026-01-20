@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import nintendont.amongspirits.data.codex.Codex;
+import nintendont.amongspirits.data.codex.CodexCommons;
 import nintendont.amongspirits.data.codex.SpiritForm;
 
 import java.util.ArrayList;
@@ -36,6 +37,10 @@ public class CodexEntryMenu extends Table {
 
         int index = 0;
         for (SpiritForm form : codex.getForms()) {
+            if (form.getId() == CodexCommons.PHOENIX_ID && !codex.isComplete()) {
+                continue;
+            }
+
             Texture iconTexture = manager.get(form.getIconAsset());
             TextureRegion iconRegion = new TextureRegion(iconTexture);
             TextureRegionDrawable icon = new TextureRegionDrawable(iconRegion);

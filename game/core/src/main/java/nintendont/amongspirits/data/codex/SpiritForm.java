@@ -118,5 +118,8 @@ public class SpiritForm {
 
     private void calcResearchLevel() {
         researchLevel = Math.min(getTasks().stream().mapToInt(ResearchTaskSet::getResearchPoints).sum(), 10);
+        if (this.getId() == CodexCommons.PHOENIX_ID && this.tasks.stream().anyMatch(t -> t.getCurrentCount() > 0)) {
+            researchLevel = 10;
+        }
     }
 }

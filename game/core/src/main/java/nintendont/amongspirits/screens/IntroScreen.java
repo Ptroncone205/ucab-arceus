@@ -41,8 +41,10 @@ public class IntroScreen implements Screen {
         AssetUtils.loadGLTF(assets, "models/mc/lukitm501.gltf");
         assets.load(GameAssets.ORAN_BERRY);
         assets.load(GameAssets.POKEBALL);
+        assets.load(GameAssets.NO_POKEBALL);
         assets.load(GameAssets.TUMBLESTONE);
         assets.load(GameAssets.YUMENJIANG_SCENE);
+        assets.load(GameAssets.PHOENIX_SCENE);
         assets.load(GameAssets.LION_SCENE);
         assets.load(GameAssets.WOLF_SCENE);
         assets.load(GameAssets.DEER_SCENE);
@@ -50,6 +52,7 @@ public class IntroScreen implements Screen {
         assets.load(GameAssets.FOX_SCENE);
         assets.load(GameAssets.ORAN_BERRY_SCENE);
         assets.load(GameAssets.TUMBLESTONE_SCENE);
+        assets.load(BattleSpiritAssets.WU_ZETIAN);
         assets.load(BattleSpiritAssets.MALE_DEER);
         assets.load(BattleSpiritAssets.FEMALE_DEER);
         assets.load(BattleSpiritAssets.MALE_WOLF);

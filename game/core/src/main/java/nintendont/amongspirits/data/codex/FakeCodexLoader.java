@@ -313,7 +313,7 @@ public class FakeCodexLoader extends CodexLoader {
         lion.addTaskSet(new ResearchTaskSet(defeatTask, easyMilestones, true, 0));
         lion.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
-        phoenix.addTaskSet(new ResearchTaskSet(winTask, new Milestone[] { new Milestone(1) }, false, 0));
+        phoenix.addTaskSet(new ResearchTaskSet(defeatTask, new Milestone[] { new Milestone(1) }, false, 0));
 
         codex.addForm(deer);
         codex.addForm(wolf);
