@@ -58,10 +58,6 @@ public class FakeCodexLoader extends CodexLoader {
             BattleSpiritAssets.MALE_LION,
             BattleSpiritAssets.FEMALE_LION);
 
-        ResearchTaskFactory researchTaskFactory = new ResearchTaskFactory();
-        ResearchTask catchTask = researchTaskFactory.createCatchTask();
-        ResearchTask defeatTask = researchTaskFactory.createDefeatTask();
-
         SpiritMove thunderstruck = new SpiritMove(
             1,
             "Impactrueno",
@@ -228,6 +224,11 @@ public class FakeCodexLoader extends CodexLoader {
         lion.addMove(scare);
         lion.addMove(tackle);
 
+        ResearchTaskFactory researchTaskFactory = new ResearchTaskFactory();
+        ResearchTask catchTask = researchTaskFactory.createCatchTask();
+        ResearchTask defeatTask = researchTaskFactory.createDefeatTask();
+        ResearchTask winTask = researchTaskFactory.createWinTask();
+
         Milestone[] easyMilestones = new Milestone[] {
             new Milestone(1),
             new Milestone(2),
@@ -244,58 +245,23 @@ public class FakeCodexLoader extends CodexLoader {
             new Milestone(25),
         };
 
-        deer.addTaskSet(new ResearchTaskSet(
-            catchTask,
-            easyMilestones,
-            true,
-            0
-        ));
+        deer.addTaskSet(new ResearchTaskSet(catchTask, easyMilestones, true, 0));
+        deer.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
-        wolf.addTaskSet(new ResearchTaskSet(
-            catchTask,
-            normalMilestones,
-            true,
-            0
-        ));
-        wolf.addTaskSet(new ResearchTaskSet(
-            defeatTask,
-            normalMilestones,
-            true,
-            0
-        ));
+        wolf.addTaskSet(new ResearchTaskSet(catchTask, normalMilestones, true, 0));
+        wolf.addTaskSet(new ResearchTaskSet(defeatTask, normalMilestones, true, 0));
+        wolf.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
-        bunny.addTaskSet(new ResearchTaskSet(
-            catchTask,
-            normalMilestones,
-            true,
-            0
-        ));
+        bunny.addTaskSet(new ResearchTaskSet(catchTask, easyMilestones, true, 0));
+        bunny.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
-        fox.addTaskSet(new ResearchTaskSet(
-            catchTask,
-            normalMilestones,
-            true,
-            0
-        ));
-        fox.addTaskSet(new ResearchTaskSet(
-            defeatTask,
-            easyMilestones,
-            false,
-            0
-        ));
+        fox.addTaskSet(new ResearchTaskSet(catchTask, normalMilestones, true, 0));
+        fox.addTaskSet(new ResearchTaskSet(defeatTask, easyMilestones, false, 0));
+        fox.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
-        lion.addTaskSet(new ResearchTaskSet(
-            catchTask,
-            normalMilestones,
-            false,
-            0
-        ));
-        lion.addTaskSet(new ResearchTaskSet(
-            defeatTask,
-            easyMilestones,
-            true,
-            0
-        ));
+        lion.addTaskSet(new ResearchTaskSet(catchTask, normalMilestones, false, 0));
+        lion.addTaskSet(new ResearchTaskSet(defeatTask, easyMilestones, true, 0));
+        lion.addTaskSet(new ResearchTaskSet(winTask, easyMilestones, false, 0));
 
         codex.addForm(deer);
         codex.addForm(wolf);

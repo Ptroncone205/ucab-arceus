@@ -51,7 +51,7 @@ public class GUIManager implements Disposable{
         PastureUI pastureUI = new PastureUI(skin, player.getPasture(),teamMenu, this, assets);
         CodexMainUI codexUI = new CodexMainUI(assets, codex, skin, this);
 
-        InventoryMenu inventoryMenu = new InventoryMenu(player.getSatchel(), craftManager, skin, teamMenu, this);
+        InventoryMenu inventoryMenu = new InventoryMenu(assets, player.getSatchel(), craftManager, skin, teamMenu, this);
         PauseMenu pauseMenu = new PauseMenu(skin, this);
 
         stage.addActor(codexUI);

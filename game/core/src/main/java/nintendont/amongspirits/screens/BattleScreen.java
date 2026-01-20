@@ -5,7 +5,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -13,12 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
-import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.data.codex.*;
 import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.entities.Enemy;
-import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.data.satchel.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.utils.*;
 
@@ -51,16 +49,6 @@ public class BattleScreen implements Screen, MenuListener {
         Gdx.input.setCursorCatched(false);
 
         this.assets = assets;
-//        assets.load(BattleSpiritAssets.MALE_DEER);
-//        assets.load(BattleSpiritAssets.FEMALE_DEER);
-//        assets.load(BattleSpiritAssets.MALE_WOLF);
-//        assets.load(BattleSpiritAssets.FEMALE_WOLF);
-//        assets.load(BattleSpiritAssets.MALE_BUNNY);
-//        assets.load(BattleSpiritAssets.FEMALE_BUNNY);
-//        assets.load(BattleSpiritAssets.MALE_FOX);
-//        assets.load(BattleSpiritAssets.FEMALE_FOX);
-//        assets.load(BattleSpiritAssets.MALE_LION);
-//        assets.load(BattleSpiritAssets.FEMALE_LION);
 
         batch = new SpriteBatch();
         stage = new Stage();

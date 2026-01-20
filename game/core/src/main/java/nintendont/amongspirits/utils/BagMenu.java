@@ -5,11 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import nintendont.amongspirits.data.satchel.ConsumableItem;
 import nintendont.amongspirits.screens.BattleScreen;
 import nintendont.amongspirits.data.spirits.Invocation;
-import nintendont.amongspirits.data.spirits.Spirit;
-import nintendont.amongspirits.entities.ItemStack;
-import nintendont.amongspirits.entities.items.Consumable;
+import nintendont.amongspirits.data.satchel.ItemStack;
 import java.util.ArrayList;
 
 public class BagMenu extends Table {
@@ -21,7 +20,7 @@ public class BagMenu extends Table {
         Table scrollTable = new Table();
         if (items != null && !items.isEmpty()){
             for (final ItemStack stack : items){
-                if (stack.getItem() instanceof Consumable){
+                if (stack.getItem() instanceof ConsumableItem){
                     TextButton btn = new TextButton(stack.getItem().getName() + " x" + stack.getCount(), style);
                     btn.addListener(new ClickListener(){
                         @Override

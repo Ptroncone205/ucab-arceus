@@ -8,9 +8,9 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import nintendont.amongspirits.Const;
-import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.data.satchel.ItemDB;
+import nintendont.amongspirits.data.satchel.ItemStack;
 import nintendont.amongspirits.entities.Player;
-import nintendont.amongspirits.entities.items.Pokeball;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
 import nintendont.amongspirits.ui.game.GUIManager;
 
@@ -81,10 +81,10 @@ public class YumenjiangSystem extends EntitySystem {
         if (Gdx.input.justTouched()) {
             if (player.getMode() == Player.ThrowingMode.TO_CATCH) {
                 Optional<ItemStack> stack = player.getSatchel().getItems().stream()
-                    .filter(i -> i.getItem() instanceof Pokeball).findFirst();
+                    .filter(i -> i.getItem().getId() == ItemDB.YUMENJIANG_ID).findFirst();
 
-                if (stack.isPresent() && stack.get().count > 0) {
-                    stack.get().count -= 1;
+                if (stack.isPresent() && stack.get().getCount() > 0) {
+                    stack.get().decrease();
                     guiManager.update();
                 } else {
                     return;

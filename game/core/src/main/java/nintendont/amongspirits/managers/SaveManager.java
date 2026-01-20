@@ -6,17 +6,22 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 
+import nintendont.amongspirits.data.satchel.ItemDB;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.data.savedata.StackSerializer;
-import nintendont.amongspirits.entities.ItemStack;
+import nintendont.amongspirits.data.satchel.ItemStack;
 import nintendont.amongspirits.entities.Player;
-import nintendont.amongspirits.entities.items.Item;
 
 public class SaveManager {
     public static FileHandle file = Gdx.files.local("data/saves/save.json");
-    
-    public static void saveGame(Player player, ArrayList<Item> items){
-        SaveData data = new SaveData(player, items);
+    private final ItemDB items;
+
+    public SaveManager(ItemDB items) {
+        this.items = items;
+    }
+
+    public void saveGame(Player player){
+        SaveData data = new SaveData(player);
 
         file = Gdx.files.local(String.format("data/saves/save_%s.json", player.getName()));
 
@@ -24,11 +29,10 @@ public class SaveManager {
         json.setOutputType(JsonWriter.OutputType.json);
         json.setUsePrototypes(false);
 
-        json.setSerializer(ItemStack.class, new StackSerializer());
+        json.setSerializer(ItemStack.class, new StackSerializer(items));
 
         String jsonString = json.prettyPrint(data);
 
-        
         try{
             file.writeString(jsonString, false);
             System.out.println("saved to: " + file.file().getAbsolutePath());
@@ -38,12 +42,12 @@ public class SaveManager {
         }
     }
 
-    public static SaveData loadGame(String playerName){
+    public SaveData loadGame(String playerName){
         Json json = new Json();
         json.setUsePrototypes(false);
 
-        json.setSerializer(ItemStack.class, new StackSerializer());
-        
+        json.setSerializer(ItemStack.class, new StackSerializer(items));
+
         try{
             file = Gdx.files.local(String.format("data/saves/save_%s.json", playerName));
             SaveData data = json.fromJson(SaveData.class, file);

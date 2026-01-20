@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestNotMeRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import nintendont.amongspirits.Const;
 import nintendont.amongspirits.data.codex.Codex;
@@ -16,13 +15,13 @@ import nintendont.amongspirits.data.online.packets.BattlePlayerPacket;
 import nintendont.amongspirits.data.online.packets.TeamInvocationPacket;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Pasture;
-import nintendont.amongspirits.data.spirits.Spirit;
 import nintendont.amongspirits.data.spirits.Team;
-import nintendont.amongspirits.entities.systems.YumenjiangSystem;
-import nintendont.amongspirits.managers.Satchel;
+import nintendont.amongspirits.data.satchel.Satchel;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import net.mgsx.gltf.scene3d.scene.Scene;
+
+import java.util.Optional;
 
 public class Player implements Disposable{
     private final String name;
@@ -32,6 +31,7 @@ public class Player implements Disposable{
     private Satchel satchel;
     private Team team = new Team();
     private Pasture pasture = new Pasture();
+    private Optional<Vector3> focusedItemPosition = Optional.empty();
 
 
     private ThrowingMode mode = ThrowingMode.TO_CATCH;
@@ -158,6 +158,14 @@ public class Player implements Disposable{
 
     public void setMode(ThrowingMode mode) {
         this.mode = mode;
+    }
+
+    public Optional<Vector3> getFocusedItemPosition() {
+        return focusedItemPosition;
+    }
+
+    public void setFocusedItemPosition(Optional<Vector3> focusedItemPosition) {
+        this.focusedItemPosition = focusedItemPosition;
     }
 
     public int getSelectedTeamMemberIndex() {

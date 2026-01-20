@@ -1,7 +1,5 @@
 package nintendont.amongspirits.screens;
 
-import java.util.ArrayList;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
@@ -35,25 +33,21 @@ import nintendont.amongspirits.Const;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
-import nintendont.amongspirits.data.codex.Codex;
-import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.config.MultiplayerConfig;
 import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
-import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.satchel.ItemDB;
+import nintendont.amongspirits.data.satchel.ItemDBLoader;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
 import nintendont.amongspirits.entities.factories.MultiplayerWSFactory;
+import nintendont.amongspirits.entities.spawners.ItemSpawner;
 import nintendont.amongspirits.entities.spawners.PlayerSpawner;
 import nintendont.amongspirits.entities.spawners.SpiritSpawner;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
-import nintendont.amongspirits.entities.items.Item;
 import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.InteractionScanner;
-import nintendont.amongspirits.managers.ItemFactory;
-import nintendont.amongspirits.managers.Satchel;
 import nintendont.amongspirits.managers.SaveManager;
 import nintendont.amongspirits.managers.TextInput;
 import nintendont.amongspirits.physics.MyContactListener;
@@ -110,9 +104,6 @@ public class GameScreen implements Screen{
 
 	MyContactListener cl;
 	TextInput textlistener;
-	private InteractionScanner iScan;
-	private Item focusedItem;
-	private ArrayList<Item> items = new ArrayList<>();
 
     public GameScreen(Main game, AssetManager assets, Player player) {
         this.game = game;
@@ -121,8 +112,6 @@ public class GameScreen implements Screen{
 
         Bullet.init();
         context.init();
-		ItemFactory.init(assets);
-		System.out.println("init just called");
 
         PBRShaderConfig config = PBRShaderProvider.createDefaultConfig();
         config.numBones = 90;
@@ -154,13 +143,14 @@ public class GameScreen implements Screen{
 		batch = context.spriteBatch;
 		font = new BitmapFont();
 
-		crafting = new CraftManager();
+		crafting = new CraftManager(game.getItems());
 
 		guiManager = new GUIManager(assets, batch, crafting, player, player.getCodex());
+
         ((PauseMenu)guiManager.getMenu("pause")).setSaveListener(new BtnEventListener() {
 			@Override
 			public void onSaveRequest(){
-				SaveManager.saveGame(player, items);
+                game.getSaveManager().saveGame(player);
 			}
 			@Override
 			public void onQuitRequest(){
@@ -168,17 +158,13 @@ public class GameScreen implements Screen{
 			}
 		});
 
-
-
-		InputAdapter adapter = new InputAdapter(){
-			@Override
-			public boolean keyDown(int key){
-                return guiManager.handleInput(key);
-			}
-		};
-
 		multiplexer.addProcessor(guiManager.stage);
-		multiplexer.addProcessor(adapter);
+		multiplexer.addProcessor(new InputAdapter(){
+            @Override
+            public boolean keyDown(int key){
+                return guiManager.handleInput(key);
+            }
+        });
 
 		playerController = new PlayerController(player, camera);
 		multiplexer.addProcessor(playerController);
@@ -215,8 +201,6 @@ public class GameScreen implements Screen{
 		buildTerrain();
 
 		cl = new MyContactListener();
-		iScan = new InteractionScanner();
-		focusedItem = null;
 
         // Setup WebSocket connection
         MultiplayerConfig multiplayerConfig =  new MultiplayerConfigLoader().loadFromPropsFile();
@@ -229,12 +213,11 @@ public class GameScreen implements Screen{
         ecsEngine.addEntityListener(Family.all(RigidbodyComponent.class).get(), new BulletRigidbodyListener(physicsWorld.getDynamicsWorld()));
         ecsEngine.addEntityListener(Family.all(TriggerComponent.class).get(), new BulletTriggerListener(physicsWorld.getDynamicsWorld()));
 
-        // Setup yumenjiang spawners
-        SceneAsset yumenjiangAsset = assets.get("models/yumenjiang/scene.gltf");
-        YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, yumenjiangAsset);
-
-        // Setup player spawners
+        // Initialize spawners
+        YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, assets);
         PlayerSpawner playerSpawner = new PlayerSpawner(ecsEngine, assets);
+        ItemSpawner itemSpawner = new ItemSpawner(ecsEngine, assets, game.getItems());
+        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, player.getCodex());
 
         // Initialize systems
         ecsEngine.addSystem(new BulletPhysicsSystem(physicsWorld));
@@ -245,11 +228,11 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new ThrowablePhysicsSystem());
         ecsEngine.addSystem(new CatchableSystem(player, physicsWorld));
         ecsEngine.addSystem(new ChallengeSystem(game, player, physicsWorld, socket));
+        ecsEngine.addSystem(new ItemSystem(player, camera, guiManager, multiplexer));
         ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera, guiManager));
         ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
-        SpiritSpawner spiritSpawner = new SpiritSpawner(ecsEngine, assets, player.getCodex());
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
             new Vector3(30.155998f,-5.723038f,17.230192f),
             new Vector3(1.6152792f,-6.701237f,35.62867f),
@@ -280,15 +263,17 @@ public class GameScreen implements Screen{
             new Vector3(22.177233f,-7.333871f,62.20569f),
         });
 
-        for (int i = 0; i<30; i++){
-            Item testItem;
-            if (i > 10){
-                testItem = ItemFactory.createItem(0);
-            } else { testItem = ItemFactory.createItem(2); }
-            testItem.create(new Vector3(2,-5,-5 * (i+1)), 2f, 2f, 2f);
-            items.add(testItem);
-            sceneManager.addScene(testItem.getScene());
-        }
+        itemSpawner.spawnTumblestone(new Vector3(-17.838638f,-4.3560739f,-47.24584f));
+        itemSpawner.spawnOranBerry(new Vector3(1.8027654f,-2.9660032f,-41.948856f));
+        itemSpawner.spawnOranBerry(new Vector3(48.982178f,1.8653733f,-9.645581f));
+        itemSpawner.spawnOranBerry(new Vector3(54.165665f,1.508391f,0.024594655f));
+        itemSpawner.spawnOranBerry(new Vector3(67.40762f,4.045167f,5.6782846f));
+        itemSpawner.spawnTumblestone(new Vector3(54.230034f,-3.6913362f,-20.758377f));
+        itemSpawner.spawnTumblestone(new Vector3(83.13638f,-2.0633545f,-0.5703411f));
+        itemSpawner.spawnTumblestone(new Vector3(102.18394f,1.1988071f,7.637454f));
+        itemSpawner.spawnTumblestone(new Vector3(127.85025f,1.4623288f,-19.181307f));
+        itemSpawner.spawnTumblestone(new Vector3(133.04187f,-3.0535147f,-52.89993f));
+        itemSpawner.spawnTumblestone(new Vector3(142.18419f,-4.625522f,-78.41611f));
     }
 
 	private void buildTerrain() {
@@ -320,18 +305,6 @@ public class GameScreen implements Screen{
 		if (Const.currentState == GameState.INGAME)
 			updateCamera();
 
-		focusedItem = iScan.findTarget(player.playerPos, camera, items);
-
-        if (focusedItem != null && Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-			if (player.getSatchel().addItem(focusedItem)){
-				items.remove(focusedItem);
-				guiManager.update();
-				focusedItem.dispose();
-				sceneManager.removeScene(focusedItem.getScene());
-				focusedItem = null;
-			}
-        }
-
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
@@ -340,10 +313,9 @@ public class GameScreen implements Screen{
 		// HUD
 		batch.begin();
 		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond() + "\ndelta: " + deltaTime, 20, Gdx.graphics.getHeight() - 20);
-		if (focusedItem != null){ // TODO
-			Vector3 uiPos = camera.project(focusedItem.pos.cpy().add(0,2,0));
+		if (player.getFocusedItemPosition().isPresent()) {
+			Vector3 uiPos = camera.project(player.getFocusedItemPosition().get().cpy().add(0,2,0));
 			font.draw(batch, "F: agarrar", uiPos.x, uiPos.y);
-
 		}
 		batch.end();
 		guiManager.render(deltaTime);

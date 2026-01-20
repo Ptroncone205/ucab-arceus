@@ -5,7 +5,7 @@
         "desc": "This mysterious stone can draw out the properties required to forge a pokeball",
         "isMaterial": "true",
         "icon": "textures/tumblestone.png",
-        "type": "MATERIAL"
+        "type": "REGULAR"
     },
     {
         "id": 1,
@@ -13,7 +13,7 @@
         "desc": "Basic pokeball used to catch wild pokemon",
         "isMaterial": "false",
         "icon": "textures/pokeball.png",
-        "type": "POKEBALL"
+        "type": "THROWABLE"
     },
     {
         "id": 2,

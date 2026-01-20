@@ -5,10 +5,16 @@ import nintendont.amongspirits.data.codex.Codex;
 import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.savedata.SaveData;
 import nintendont.amongspirits.entities.Player;
-import nintendont.amongspirits.managers.Satchel;
+import nintendont.amongspirits.data.satchel.Satchel;
 import nintendont.amongspirits.managers.SaveManager;
 
 public class PlayerFactory {
+    private final SaveManager saveManager;
+
+    public PlayerFactory(SaveManager saveManager) {
+        this.saveManager = saveManager;
+    }
+
     public Player createPlayer(String playerName) {
         Satchel inventory = new Satchel();
         Codex codex = new FakeCodexLoader().load();
@@ -17,7 +23,7 @@ public class PlayerFactory {
 
     public Player loadPlayerFromSaveData(String playerName) {
         try {
-            SaveData data = SaveManager.loadGame(playerName);
+            SaveData data = saveManager.loadGame(playerName);
             Satchel inventory = new Satchel();
             inventory.setItems(data.inventory);
             Codex codex = new FakeCodexLoader().load();
