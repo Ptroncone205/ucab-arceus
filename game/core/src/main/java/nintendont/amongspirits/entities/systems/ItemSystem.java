@@ -51,6 +51,7 @@ public class ItemSystem extends IteratingSystem {
                     ItemTagComponent itemTag = itemTagMapper.get(focusedItemEntity);
                     if (player.getSatchel().addItem(itemTag.item)){
                         guiManager.update();
+                        ((nintendont.amongspirits.Main) Gdx.app.getApplicationListener()).playSound("music and sounds/sounds/item.mp3");
                         if (socket.isOpen()) {
                             OnlineItemTagComponent onlineItemTag = onlineItemTagMapper.get(focusedItemEntity);
                             ItemCollectedPacket itemCollectedPacket = new ItemCollectedPacket("item_collected", onlineItemTag.itemId, onlineItemTag.spawnIndex);
