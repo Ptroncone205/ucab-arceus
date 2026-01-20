@@ -17,10 +17,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class TeamMenu extends MenuTable {
-    private AssetManager assets;
-    private int selectedIndex = -1;
-    private int switchIndex = -1;
-    private boolean swapMode = false;
+    protected AssetManager assets;
+    protected int selectedIndex = -1;
+    protected int switchIndex = -1;
+    protected boolean swapMode = false;
 
     private Table grid;
     private Skin skin;

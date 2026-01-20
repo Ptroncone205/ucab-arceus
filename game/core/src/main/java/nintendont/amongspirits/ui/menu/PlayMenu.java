@@ -40,7 +40,6 @@ public class PlayMenu extends MenuOverlay {
         actores.add(btnHelp);
         actores.add(btnBack);
 
-        this.setDebug(true);
     }
 
     public void onClick(TextButton a){

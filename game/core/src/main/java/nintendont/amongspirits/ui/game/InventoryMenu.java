@@ -81,7 +81,7 @@ public class InventoryMenu extends MenuTable{
         header.add(new Label("E: Recetas", skin)).left().pad(15);
         header.add(title).expandX().center().pad(15);
         header.add(new Label("Q: Team", skin)).right().pad(15);
-        // header.setDebug(true);
+  
         this.add(header).growX().height(60).top();
         this.row();
 
@@ -90,7 +90,7 @@ public class InventoryMenu extends MenuTable{
 
         //  contenedor de items
         Table leftPanel = new Table();
-        // leftPanel.setDebug(true);
+
 
         grid = new Table();
         grid.align(Align.topLeft);
@@ -108,7 +108,9 @@ public class InventoryMenu extends MenuTable{
             @Override
             public void onClick(int index){
                 if (invState != InvState.NONE){
-                    ((Consumable)itemA.getItem()).useItem(this.getSelSpirit());
+                    selectedIndex = index;
+                    ((ConsumableItem)itemA.getItem()).getEffect().apply(getSelSpirit());
+                    itemA.decrease();
                     update();
                     return;
                 }
@@ -119,7 +121,6 @@ public class InventoryMenu extends MenuTable{
         team.center().top().pad(20);
         team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.2f));
         team.add(teamTable);
-//        team.setDebug(true);
 
         body.add(leftPanel).width(Value.percentWidth(0.55f, body)).expandY().fillY();
         body.add(team).width(Value.percentWidth(0.45f, body)).expandY().fillY();

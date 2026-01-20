@@ -47,7 +47,6 @@ public class PastureUI extends MenuTable {
         this.pasture = pasture;
         this.teamTable = teamTable;
         this.setFillParent(true);
-        this.setDebug(true);
 
         Table root = new Table();
         root.setFillParent(true);
@@ -166,7 +165,6 @@ public class PastureUI extends MenuTable {
         bioLabel.setWrap(true);
         bio.add(bioLabel).width(200);
 
-        infoPanel.setDebug(true);
         infoPanel.add(new Image(tex)).size(150).pad(20).row();
         infoPanel.add(name).padBottom(10).row();
         infoPanel.add(bar).size(200, 15).padBottom(5).row();

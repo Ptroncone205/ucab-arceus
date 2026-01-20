@@ -86,7 +86,7 @@ public class MenuUI extends InputAdapter implements Disposable {
 
         // MainMenuUI menu = new MainMenuUI(skin, this);
         Help help = new Help(skin, this);
-        Options options =new Options(skin, this);
+        // Options options =new Options(skin, this);
         PlayMenu playMenu = new PlayMenu(skin, this);
         Account account = new Account(skin, this);
 
@@ -94,7 +94,7 @@ public class MenuUI extends InputAdapter implements Disposable {
         addMenu("help", help);
         addMenu("play", playMenu);
         addMenu("account", account);
-        addMenu("options", options);
+        // addMenu("options", options);
         setMenu("account");
     }
 

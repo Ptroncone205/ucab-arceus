@@ -67,7 +67,6 @@ public class Options extends MenuOverlay {
         actors.add(btnQuit);
         actors.add(btnBack);
 
-        this.setDebug(true);
     }
 
     public void onClick(){

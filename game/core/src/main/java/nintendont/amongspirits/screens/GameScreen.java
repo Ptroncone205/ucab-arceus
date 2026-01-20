@@ -105,9 +105,6 @@ public class GameScreen implements Screen{
 
 	MyContactListener cl;
 	TextInput textlistener;
-	private InteractionScanner iScan;
-	private Item focusedItem;
-	private ArrayList<Item> items = new ArrayList<>();
 	private Texture catchMode;
 	private Texture challengeMode;
 	private Texture noPkmn;
@@ -168,10 +165,6 @@ public class GameScreen implements Screen{
 		catchMode = new Texture("textures/pokeball.png");
 		noPkmn = new Texture("textures/pokeball2.png");
 
-
-		InputAdapter adapter = new InputAdapter(){
-			@Override
-			public boolean keyDown(int key){
 
 		multiplexer.addProcessor(guiManager.stage);
 		multiplexer.addProcessor(new InputAdapter(){
