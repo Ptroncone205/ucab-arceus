@@ -3,6 +3,7 @@ package nintendont.amongspirits.ui.game;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -52,7 +53,7 @@ public class InventoryMenu extends MenuTable{
     private int selected = 0;
 
 
-    public InventoryMenu (Satchel invManager, CraftManager craftManager, Skin skin,TeamMenu teamTable, GUIManager gui){
+    public InventoryMenu (Satchel invManager, CraftManager craftManager, Skin skin, GUIManager gui, AssetManager assets){
         super(gui);
         this.invManager = invManager;
         this.craftManager = craftManager;
@@ -101,7 +102,17 @@ public class InventoryMenu extends MenuTable{
 
 
         // contenedor de equipos (aqui salen los pokemon o lo q sea)
-        this.teamTable = teamTable;
+        this.teamTable = new TeamMenu(skin, gui, assets){
+            @Override
+            public void onClick(int index){
+                if (invState != InvState.NONE){
+                    ((Consumable)itemA.getItem()).useItem(this.getSelSpirit());
+                    update();
+                    return;
+                }
+                super.onClick(index);
+            }
+        };
         Table team = new Table();
         team.center().top().pad(20);
         team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.2f));
@@ -262,6 +273,13 @@ public class InventoryMenu extends MenuTable{
     }
 
     public void onClick(ItemStack stack){
+        // if (stack.getItem() instanceof Consumable){
+        //     if (invState == InvState.NONE){
+        //         itemA = stack;
+        //         invState = InvState.SELECT_PKMN;
+        //         update();
+        //     }
+        // }
         if (stack.getItem().isMaterial()){
             if (invState == InvState.NONE){
                     itemA = stack;
@@ -278,14 +296,8 @@ public class InventoryMenu extends MenuTable{
                 }
                 invState = InvState.NONE;
             }
-        } else
-        if (stack.getItem() instanceof Consumable){
-            if (invState == InvState.NONE){
-                itemA = stack;
-                invState = InvState.SELECT_PKMN;
-                update();
-            }
         }
+        
     }
 
     @Override

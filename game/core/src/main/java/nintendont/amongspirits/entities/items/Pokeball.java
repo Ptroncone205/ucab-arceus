@@ -5,6 +5,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.JsonValue;
+
+import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.entities.Entity;
 
 public class Pokeball extends Item{
@@ -16,9 +18,5 @@ public class Pokeball extends Item{
     }
     public Pokeball (JsonValue data, AssetManager assets){
         super(data, assets);
-    }
-    @Override
-    public void useItem(Entity target){
-        // TODO debe contnener la logica de atrapar pokemon
     }
 }

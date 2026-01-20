@@ -42,6 +42,7 @@ import nintendont.amongspirits.data.codex.FakeCodexLoader;
 import nintendont.amongspirits.data.config.MultiplayerConfig;
 import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
 import nintendont.amongspirits.data.savedata.SaveData;
+import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.entities.ItemStack;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
@@ -119,6 +120,9 @@ public class GameScreen implements Screen{
 	private InteractionScanner iScan;
 	private Item focusedItem;
 	private ArrayList<Item> items = new ArrayList<>();
+	private Texture catchMode;
+	private Texture challengeMode;
+	private Texture noPkmn;
 
     public GameScreen(Main game, AssetManager assets, String playerName, boolean load){
         this.game = game;
@@ -182,7 +186,9 @@ public class GameScreen implements Screen{
 				game.quitGame();
 			}
 		});
-
+		
+		catchMode = new Texture("textures/pokeball.png");
+		noPkmn = new Texture("textures/pokeball2.png");
 
 
 		InputAdapter adapter = new InputAdapter(){
@@ -380,6 +386,16 @@ public class GameScreen implements Screen{
 			Vector3 uiPos = camera.project(focusedItem.pos.cpy().add(0,2,0));
 			font.draw(batch, "F: agarrar", uiPos.x, uiPos.y);
 
+		}
+		if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER && player.getTeam().getMembers().isEmpty()){
+			batch.draw(noPkmn, 50, 50, 50,50);
+			
+		}else if (player.getMode() == Player.ThrowingMode.TO_CATCH){
+			batch.draw(catchMode, 50, 50, 50,50);
+			
+		}else if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER){
+			Invocation active = player.getTeam().getMembers().getFirst();
+			batch.draw(assets.get(active.getBattleAsset()), 50, 50, 50,50);
 		}
 		batch.end();
 		guiManager.render(deltaTime);

@@ -105,7 +105,7 @@ public class TeamMenu extends MenuTable {
         return card;
     }
 
-    private void onClick(int index) {
+    public void onClick(int index) {
         if (swapMode) {
             if (index == switchIndex) {
                 swapMode = false;
@@ -123,7 +123,8 @@ public class TeamMenu extends MenuTable {
         if (selectedIndex == index){
             swapMode = true;
             switchIndex = index;
-        } else{ this.selectedIndex = index; }
+        } else{
+            selectedIndex = index; }
         update();
     }
 
@@ -136,7 +137,10 @@ public class TeamMenu extends MenuTable {
             update();
         }
     }
-
+    public Invocation getSelSpirit(){
+        List<Invocation> team = gui.getPlayer().getTeam().getMembers();
+        return team.get(selectedIndex);
+    }
     @Override
     public boolean handleInput(int key) {
         return false;

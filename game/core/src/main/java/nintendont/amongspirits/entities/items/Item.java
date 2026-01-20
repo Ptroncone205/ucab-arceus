@@ -17,6 +17,7 @@ import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.JsonValue;
 import nintendont.amongspirits.Const;
+import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.entities.Entity;
 import nintendont.amongspirits.screens.GameScreen;
 import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
@@ -105,7 +106,7 @@ public class Item extends Entity{
         return icon;
     }
 
-    public void useItem(Entity target){
+    public void useItem(Invocation target){
         System.out.println("item used on" + target.toString());
     }
 
