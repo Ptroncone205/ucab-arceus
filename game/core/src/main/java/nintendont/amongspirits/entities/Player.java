@@ -3,13 +3,11 @@ package nintendont.amongspirits.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestNotMeRayResultCallback;
-import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Disposable;
-import nintendont.amongspirits.Const;
 import nintendont.amongspirits.data.codex.Codex;
 import nintendont.amongspirits.data.online.packets.BattlePlayerPacket;
 import nintendont.amongspirits.data.online.packets.TeamInvocationPacket;
@@ -17,7 +15,6 @@ import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Pasture;
 import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.data.satchel.Satchel;
-import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import net.mgsx.gltf.scene3d.scene.Scene;
 
@@ -33,59 +30,31 @@ public class Player implements Disposable{
     private Pasture pasture = new Pasture();
     private Optional<Vector3> focusedItemPosition = Optional.empty();
 
-
     private ThrowingMode mode = ThrowingMode.TO_CATCH;
     private int selectedTeamMemberIndex = 0;
 
     private Scene scene;
-    private MotionState motionState;
     private btRigidBody rigidBody;
     private ClosestNotMeRayResultCallback callback;
-    private btCapsuleShape shape;
-    private float angle;
 
     private Matrix4 playerTransform = new Matrix4();
-    public Vector3 playerPos;
-    private Vector3 inertia;
-    private Quaternion roation = new Quaternion(); // la rotacion no funciona, pero eventualmente
+    private Vector3 position;
+    private float angle;
 
     private float maxSpeed;
-    private Vector3 tempVec;
+    private Vector3 tempVec = new Vector3();
 
     public Player (String name, Vector3 position, Satchel satchel, Codex codex){
         this.name = name;
         this.satchel = satchel;
         this.codex = codex;
-        this.playerPos = position;
-    }
-
-    public void setupScene(Scene scene) {
-        this.scene = scene;
-        this.scene.modelInstance.transform.scale(0.1f, 0.1f, 0.1f);
-        this.scene.modelInstance.transform.setTranslation(this.playerPos);
-        motionState = new MotionState(this.scene.modelInstance.transform);
-
-        tempVec = new Vector3();
-        inertia = new Vector3();
-        shape = new btCapsuleShape(0.5f, 2f);
-        shape.calculateLocalInertia(54f, inertia);
-
-        btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(1f,motionState,shape,inertia);
-        rigidBody = new btRigidBody(info);
-        info.dispose();
-        rigidBody.setAngularFactor(0);
-        rigidBody.setUserValue(Const.PF_PLAYER);
-        callback = new ClosestNotMeRayResultCallback(rigidBody);
-        // rigidBody.setCcdMotionThreshold(0.0001f);
-        // rigidBody.setCcdSweptSphereRadius(0.2f);
+        this.position = position;
     }
 
     public void update(){
         rigidBody.getWorldTransform(playerTransform);
-        playerTransform.getTranslation(playerPos);
-        this.scene.modelInstance.transform.setTranslation(playerPos);
-        // scene.modelInstance.transform.rotateTowardDirection(Vector3.Y, angle);
-//
+        playerTransform.getTranslation(position);
+        this.scene.modelInstance.transform.setTranslation(position);
     }
 
     public void move (Vector3 direction, float dt){
@@ -104,9 +73,10 @@ public class Player implements Disposable{
             rigidBody.setLinearVelocity(max);
         }
 
-        angle = (float) Math.toDegrees(Math.atan2(direction.x,direction.z));
+        if (new Vector2(direction.x, direction.z).len2() > 0) {
+            angle = (float) Math.toDegrees(Math.atan2(direction.x,direction.z));
+        }
         scene.modelInstance.transform.rotate(Vector3.Y, angle);
-        // System.out.println(vel);
     }
 
     public void jump (){
@@ -117,19 +87,37 @@ public class Player implements Disposable{
     }
 
     private boolean isGrounded() {
-        // Reset out callback
         callback.setClosestHitFraction(1.0f);
         callback.setCollisionObject(null);
 
-        // System.out.println(playerPos);
-        // The position we are casting a ray to, slightly below the players current position.
-        tmpPosition.set(playerPos).sub(0, 1.6f, 0);
-        PhysicsWorld.raycast(playerPos, tmpPosition, callback);
+        tmpPosition.set(position).sub(0, 1.6f, 0);
+        PhysicsWorld.raycast(position, tmpPosition, callback);
         return callback.hasHit();
+    }
+
+    public Vector3 getPosition() {
+        return position;
+    }
+
+    public float getAngle() {
+        return angle;
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
     }
 
     public btRigidBody getRigidBody() {
         return rigidBody;
+    }
+
+    public void setRigidBody(btRigidBody btRigidBody) {
+        this.rigidBody = btRigidBody;
+        this.callback = new ClosestNotMeRayResultCallback(rigidBody);
     }
 
     public String getName(){
@@ -178,7 +166,7 @@ public class Player implements Disposable{
 
     public BattlePlayerPacket getAsChallenger() {
         TeamInvocationPacket[] teamPacket = team.getMembers().stream()
-            .map(m -> createInvocationPacketFrom(m))
+            .map(this::createInvocationPacketFrom)
             .toArray(TeamInvocationPacket[]::new);
 
         return new BattlePlayerPacket(name, selectedTeamMemberIndex, teamPacket);
@@ -190,9 +178,7 @@ public class Player implements Disposable{
 
     @Override
     public void dispose() {
-        rigidBody.dispose();
-        shape.dispose();
-        scene.modelInstance.model.dispose();
+
     }
 
     public enum ThrowingMode {

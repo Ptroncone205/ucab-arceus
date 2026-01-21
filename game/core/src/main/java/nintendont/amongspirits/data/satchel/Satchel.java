@@ -49,4 +49,8 @@ public class Satchel {
     public ItemStack getRandomItem() {
         return items.get(MathUtils.random(0, items.size() - 1));
     }
+
+    public boolean hasYumenjiang() {
+        return items.stream().anyMatch(is -> is.getItem().getId() == ItemDB.YUMENJIANG_ID && is.getCount() > 0);
+    }
 }

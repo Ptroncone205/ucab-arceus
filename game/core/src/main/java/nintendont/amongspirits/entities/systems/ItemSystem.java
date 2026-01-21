@@ -80,7 +80,7 @@ public class ItemSystem extends IteratingSystem {
         Vector3 itemPos = new Vector3();
         transform.matrix.getTranslation(itemPos);
 
-        float distSq = player.playerPos.dst2(itemPos);
+        float distSq = player.getPosition().dst2(itemPos);
         if (distSq > INTERACTION_DIST) return;
 
         Vector3 screenPos = new Vector3(itemPos);

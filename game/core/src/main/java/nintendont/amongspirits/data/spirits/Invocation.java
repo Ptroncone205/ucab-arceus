@@ -12,7 +12,7 @@ public class Invocation {
     private Spirit spirit;
     private Stats stats;
 
-    
+
     public Invocation() {}
 
     public Invocation(Spirit spirit) {
@@ -33,7 +33,7 @@ public class Invocation {
     }
 
     public int getMaxHP() {
-        return stats.getHP().getCurrent();
+        return stats.getHP().getMax();
     }
 
     public int getAttack() {

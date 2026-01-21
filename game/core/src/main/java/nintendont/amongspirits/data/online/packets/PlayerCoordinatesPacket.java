@@ -6,7 +6,5 @@ public class PlayerCoordinatesPacket {
     public float x;
     public float y;
     public float z;
-    public float rotX;
-    public float rotY;
-    public float rotZ;
+    public float angle;
 }

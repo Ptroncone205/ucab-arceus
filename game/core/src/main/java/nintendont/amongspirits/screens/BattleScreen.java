@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
 import nintendont.amongspirits.Main;
 import nintendont.amongspirits.data.codex.*;
@@ -85,7 +86,9 @@ public class BattleScreen implements Screen, MenuListener {
         playerGroup.add(new Label(playerInvocation.getFullName(), new Label.LabelStyle(font, Color.CYAN))).row();
         playerGroup.add(healthBarPlayer).size(220, 22).padTop(5).row();
 
-        playerGroup.add(new Image((Texture)assets.get(playerInvocation.getBattleAsset()))).size(350);
+        Image playerImage = new Image(assets.get(playerInvocation.getBattleAsset()));
+        playerImage.setScaling(Scaling.contain);
+        playerGroup.add(playerImage).size(350);
 
         gameLayer.add(playerGroup).expand().bottom().left().padLeft(60);
 
@@ -94,9 +97,11 @@ public class BattleScreen implements Screen, MenuListener {
         Table enemyGroup = new Table();
         healthBarEnemy = new Image();
 
+        Image enemyImage = new Image((Texture)assets.get(enemyInvocation.getBattleAsset()));
+        enemyImage.setScaling(Scaling.contain);
         enemyGroup.add(new Label(enemyInvocation.getFullName(), new Label.LabelStyle(font, Color.RED))).row();
         enemyGroup.add(healthBarEnemy).size(220, 22).padBottom(5).row();
-        enemyGroup.add(new Image((Texture)assets.get(enemyInvocation.getBattleAsset()))).size(350);
+        enemyGroup.add(enemyImage).size(350);
 
         gameLayer.add(enemyGroup).expandX().right().padTop(300).padRight(60).row();
 

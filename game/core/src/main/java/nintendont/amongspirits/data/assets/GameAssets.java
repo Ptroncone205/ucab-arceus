@@ -19,4 +19,5 @@ public class GameAssets {
     public static final AssetDescriptor<SceneAsset> FOX_SCENE = new AssetDescriptor<>("models/fox/scene.gltf", SceneAsset.class);
     public static final AssetDescriptor<SceneAsset> ORAN_BERRY_SCENE = new AssetDescriptor<>("models/lupine_plant/scene.gltf", SceneAsset.class);
     public static final AssetDescriptor<SceneAsset> TUMBLESTONE_SCENE = new AssetDescriptor<>("models/crystal_stone_rock/scene.gltf", SceneAsset.class);
+    public static final AssetDescriptor<SceneAsset> GUINEVERE_SCENE = new AssetDescriptor<>("models/guinevere/scene.gltf", SceneAsset.class);
 }
