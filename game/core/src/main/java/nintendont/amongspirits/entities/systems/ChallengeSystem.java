@@ -11,13 +11,12 @@ import com.badlogic.gdx.physics.bullet.collision.btManifoldPoint;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.github.czyzby.websocket.WebSocket;
-import nintendont.amongspirits.data.codex.CodexCommons;
 import nintendont.amongspirits.data.online.packets.PlayerChallengeRequestPacket;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.data.spirits.Team;
 import nintendont.amongspirits.entities.Enemy;
 import nintendont.amongspirits.entities.Player;
-import nintendont.amongspirits.entities.components.PlayerTagComponent;
+import nintendont.amongspirits.entities.components.OnlinePlayerTagComponent;
 import nintendont.amongspirits.entities.components.SpiritTagComponent;
 import nintendont.amongspirits.screens.BattleScreen;
 import nintendont.amongspirits.Main;
@@ -35,7 +34,7 @@ public class ChallengeSystem extends IteratingSystem {
 
     private final ComponentMapper<ChallengerComponent> challengerMapper = ComponentMapper.getFor(ChallengerComponent.class);
     private final ComponentMapper<SpiritTagComponent> spiritTagMapper = ComponentMapper.getFor(SpiritTagComponent.class);
-    private final ComponentMapper<PlayerTagComponent> playerTagMapper = ComponentMapper.getFor(PlayerTagComponent.class);
+    private final ComponentMapper<OnlinePlayerTagComponent> playerTagMapper = ComponentMapper.getFor(OnlinePlayerTagComponent.class);
     private final ComponentMapper<TriggerComponent> triggerMapper = ComponentMapper.getFor(TriggerComponent.class);
 
     public ChallengeSystem(Main game, Player player, PhysicsWorld world, WebSocket socket) {
@@ -81,7 +80,7 @@ public class ChallengeSystem extends IteratingSystem {
         ChallengerComponent challenger = challengerMapper.get(entity);
 
         SpiritTagComponent spiritTag = spiritTagMapper.get(otherEntity);
-        PlayerTagComponent playerTag = playerTagMapper.get(otherEntity);
+        OnlinePlayerTagComponent playerTag = playerTagMapper.get(otherEntity);
 
         if (spiritTag != null) {
             Team enemyTeam = new Team();

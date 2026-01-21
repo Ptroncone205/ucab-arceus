@@ -98,7 +98,7 @@ public class YumenjiangSystem extends EntitySystem {
                 }
             }
 
-            Vector3 spawnPoint = new Vector3(player.playerPos).add(Vector3.Y.cpy().scl(2f));
+            Vector3 spawnPoint = new Vector3(player.getPosition()).add(Vector3.Y.cpy().scl(4f));
             Vector3 throwDirection = camera.direction.cpy();
             throwDirection.add(new Vector3(0, 0.5f, 0));
 

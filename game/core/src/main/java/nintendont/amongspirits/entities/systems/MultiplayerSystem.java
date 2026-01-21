@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
@@ -28,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MultiplayerSystem extends EntitySystem {
+    public static final double EPSILON = 0.0001;
+
     private final Json json = new Json();
     private final Main game;
     private final WebSocket socket;
@@ -38,6 +42,7 @@ public class MultiplayerSystem extends EntitySystem {
     private final HashMap<Integer, OnlineItem> onlineItems = new HashMap<>();
     private PlayerCoordinatesPacket lastPlayerPacket;
     private Enemy challenger = null;
+    private boolean offlineItemsSpawned = false;
 
     public MultiplayerSystem(
         Main game,
@@ -117,17 +122,20 @@ public class MultiplayerSystem extends EntitySystem {
             public boolean onError(WebSocket webSocket, Throwable error) {
                 Gdx.app.error("WS", "Error!", error);
 
-                itemSpawner.spawnTumblestone(new Vector3(-17.838638f,-4.3560739f,-47.24584f));
-                itemSpawner.spawnOranBerry(new Vector3(1.8027654f,-2.9660032f,-41.948856f));
-                itemSpawner.spawnOranBerry(new Vector3(48.982178f,1.8653733f,-9.645581f));
-                itemSpawner.spawnOranBerry(new Vector3(54.165665f,1.508391f,0.024594655f));
-                itemSpawner.spawnOranBerry(new Vector3(67.40762f,4.045167f,5.6782846f));
-                itemSpawner.spawnTumblestone(new Vector3(54.230034f,-3.6913362f,-20.758377f));
-                itemSpawner.spawnTumblestone(new Vector3(83.13638f,-2.0633545f,-0.5703411f));
-                itemSpawner.spawnTumblestone(new Vector3(102.18394f,1.1988071f,7.637454f));
-                itemSpawner.spawnTumblestone(new Vector3(127.85025f,1.4623288f,-19.181307f));
-                itemSpawner.spawnTumblestone(new Vector3(133.04187f,-3.0535147f,-52.89993f));
-                itemSpawner.spawnTumblestone(new Vector3(142.18419f,-4.625522f,-78.41611f));
+                if (!offlineItemsSpawned) {
+                    itemSpawner.spawnTumblestone(new Vector3(-17.838638f,-4.3560739f,-47.24584f));
+                    itemSpawner.spawnOranBerry(new Vector3(1.8027654f,-2.9660032f,-41.948856f));
+                    itemSpawner.spawnOranBerry(new Vector3(48.982178f,1.8653733f,-9.645581f));
+                    itemSpawner.spawnOranBerry(new Vector3(54.165665f,1.508391f,0.024594655f));
+                    itemSpawner.spawnOranBerry(new Vector3(67.40762f,4.045167f,5.6782846f));
+                    itemSpawner.spawnTumblestone(new Vector3(54.230034f,-3.6913362f,-20.758377f));
+                    itemSpawner.spawnTumblestone(new Vector3(83.13638f,-2.0633545f,-0.5703411f));
+                    itemSpawner.spawnTumblestone(new Vector3(102.18394f,1.1988071f,7.637454f));
+                    itemSpawner.spawnTumblestone(new Vector3(127.85025f,1.4623288f,-19.181307f));
+                    itemSpawner.spawnTumblestone(new Vector3(133.04187f,-3.0535147f,-52.89993f));
+                    itemSpawner.spawnTumblestone(new Vector3(142.18419f,-4.625522f,-78.41611f));
+                    offlineItemsSpawned = true;
+                }
 
                 return FULLY_HANDLED;
             }
@@ -147,7 +155,7 @@ public class MultiplayerSystem extends EntitySystem {
         }
 
         PlayerCoordinatesPacket packet = createPlayerPacketFrom("player_update");
-        if (lastPlayerPacket == null || packet.x - lastPlayerPacket.x > 0.001 || packet.y - lastPlayerPacket.y > 0.001 || packet.z - lastPlayerPacket.z > 0.001) {
+        if (lastPlayerPacket == null || packet.x - lastPlayerPacket.x > EPSILON || packet.y - lastPlayerPacket.y > EPSILON || packet.z - lastPlayerPacket.z > EPSILON || packet.angle - player.getAngle() > EPSILON) {
             socket.send(json.toJson(packet));
         }
         lastPlayerPacket = packet;
@@ -195,6 +203,8 @@ public class MultiplayerSystem extends EntitySystem {
     private void handlePlayerConnected(JsonValue root) {
         PlayerCoordinatesPacket coords = json.readValue(PlayerCoordinatesPacket.class, root.get("player"));
         Entity companion = playerSpawner.spawnCompanion(coords.id, new Vector3(coords.x, coords.y, coords.z));
+        TransformComponent transform = companion.getComponent(TransformComponent.class);
+        transform.matrix.rotate(Vector3.Y, coords.angle);
         onlinePlayers.put(coords.id, companion);
     }
 
@@ -202,8 +212,15 @@ public class MultiplayerSystem extends EntitySystem {
         PlayerCoordinatesPacket coords = json.readValue(PlayerCoordinatesPacket.class, root.get("player"));
         Entity target = onlinePlayers.get(coords.id);
         if (target != null) {
+            Matrix4 rotationMatrix = new Matrix4();
+            rotationMatrix.rotate(Vector3.Y, coords.angle);
+
             TransformComponent transform = target.getComponent(TransformComponent.class);
-            transform.matrix.setTranslation(coords.x, coords.y, coords.z);
+            Vector3 position = new  Vector3(coords.x, coords.y, coords.z);
+            Vector3 scale = transform.matrix.getScale(new Vector3());
+            Quaternion rotation = rotationMatrix.getRotation(new Quaternion());
+
+            transform.matrix.set(position, rotation, scale);
         }
     }
 
@@ -260,9 +277,10 @@ public class MultiplayerSystem extends EntitySystem {
     private PlayerCoordinatesPacket createPlayerPacketFrom(String type) {
         PlayerCoordinatesPacket packet = new PlayerCoordinatesPacket();
         packet.type = type;
-        packet.x = player.playerPos.x;
-        packet.y = player.playerPos.y;
-        packet.z = player.playerPos.z;
+        packet.x = player.getPosition().x;
+        packet.y = player.getPosition().y;
+        packet.z = player.getPosition().z;
+        packet.angle = player.getAngle();
         return packet;
     }
 

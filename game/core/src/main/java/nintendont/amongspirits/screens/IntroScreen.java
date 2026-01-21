@@ -52,6 +52,7 @@ public class IntroScreen implements Screen {
         assets.load(GameAssets.FOX_SCENE);
         assets.load(GameAssets.ORAN_BERRY_SCENE);
         assets.load(GameAssets.TUMBLESTONE_SCENE);
+        assets.load(GameAssets.GUINEVERE_SCENE);
         assets.load(BattleSpiritAssets.WU_ZETIAN);
         assets.load(BattleSpiritAssets.MALE_DEER);
         assets.load(BattleSpiritAssets.FEMALE_DEER);

@@ -25,9 +25,7 @@ wssWorld.on("connection", (ws) => {
         x: packet.x,
         y: packet.y,
         z: packet.z,
-        rotX: packet.rotX,
-        rotY: packet.rotY,
-        rotZ: packet.rotZ,
+        angle: packet.angle,
       };
 
       players.push(currentPlayer);
@@ -52,9 +50,7 @@ wssWorld.on("connection", (ws) => {
       currentPlayer.x = packet.x;
       currentPlayer.y = packet.y;
       currentPlayer.z = packet.z;
-      currentPlayer.rotX = packet.rotX;
-      currentPlayer.rotY = packet.rotY;
-      currentPlayer.rotZ = packet.rotZ;
+      currentPlayer.angle = packet.angle;
 
       broadcast(
         JSON.stringify({

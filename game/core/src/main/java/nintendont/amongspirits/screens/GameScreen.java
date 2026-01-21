@@ -23,7 +23,6 @@ import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
 import net.mgsx.gltf.scene3d.scene.Scene;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.shaders.PBRShaderConfig;
@@ -34,13 +33,12 @@ import nintendont.amongspirits.Main;
 import nintendont.amongspirits.Const.GameState;
 import nintendont.amongspirits.controllers.PlayerController;
 import nintendont.amongspirits.data.assets.GameAssets;
-import nintendont.amongspirits.data.codex.Codex;
-import nintendont.amongspirits.data.codex.SpiritForm;
 import nintendont.amongspirits.data.config.MultiplayerConfig;
 import nintendont.amongspirits.data.config.MultiplayerConfigLoader;
 import nintendont.amongspirits.data.spirits.Invocation;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.components.ModelComponent;
+import nintendont.amongspirits.entities.components.PlayerTagComponent;
 import nintendont.amongspirits.entities.components.RigidbodyComponent;
 import nintendont.amongspirits.entities.components.TriggerComponent;
 import nintendont.amongspirits.entities.factories.MultiplayerWSFactory;
@@ -50,7 +48,6 @@ import nintendont.amongspirits.entities.spawners.SpiritSpawner;
 import nintendont.amongspirits.entities.spawners.YumenjiangSpawner;
 import nintendont.amongspirits.entities.systems.*;
 import nintendont.amongspirits.managers.CraftManager;
-import nintendont.amongspirits.managers.TextInput;
 import nintendont.amongspirits.physics.MyContactListener;
 import nintendont.amongspirits.physics.PhysicsWorld;
 import nintendont.amongspirits.shaders.CustomShaderProvider;
@@ -66,8 +63,6 @@ public class GameScreen implements Screen{
 
     private final Const context = Const.get();
 	private SceneManager sceneManager;
-	private SceneAsset sceneAsset;
-	private Scene playerScene;
 
     private Engine ecsEngine;
 
@@ -88,6 +83,7 @@ public class GameScreen implements Screen{
 	private float camPitch = Const.CAMERA_DEFAULT_PITCH;
 	private float distanceFromPlayer = 15f;
 	private float angleAroundPlayer = 0f;
+    private boolean shouldDebugPhysics = false;
 
 	// terrain
 	private HeightMapTerrain terrain;
@@ -104,7 +100,6 @@ public class GameScreen implements Screen{
 	private CraftManager crafting;
 
 	MyContactListener cl;
-	TextInput textlistener;
 	private Texture catchMode;
 	private Texture challengeMode;
 	private Texture noPkmn;
@@ -122,16 +117,6 @@ public class GameScreen implements Screen{
 		sceneManager = new SceneManager(new CustomShaderProvider(config), PBRShaderProvider.createDefaultDepth(156));
 
         game.playMusic("music and sounds/music/game.mp3", true);
-
-		// create player scene
-		sceneAsset = assets.get("models/mc/lukitm501.gltf", SceneAsset.class);
-		playerScene = new Scene(sceneAsset.scene);
-		float scale_factor = 10f;
-		playerScene.modelInstance.transform.scale(scale_factor, scale_factor, scale_factor);
-		sceneManager.addScene(playerScene);
-        player.setupScene(playerScene);
-
-		textlistener = new TextInput();
 
 		camera = new PerspectiveCamera(67f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.near = 0.1f;
@@ -177,7 +162,6 @@ public class GameScreen implements Screen{
 
 		playerController = new PlayerController(player, camera);
 		multiplexer.addProcessor(playerController);
-		physicsWorld.getDynamicsWorld().addRigidBody(player.getRigidBody(), Const.PF_PLAYER, Const.PF_GROUND | Const.PF_ITEM);
 
 		// setup light
 		light = new DirectionalLightEx();
@@ -221,6 +205,7 @@ public class GameScreen implements Screen{
         ecsEngine.addEntityListener(Family.all(ModelComponent.class).get(), new SceneModelListener(sceneManager));
         ecsEngine.addEntityListener(Family.all(RigidbodyComponent.class).get(), new BulletRigidbodyListener(physicsWorld.getDynamicsWorld()));
         ecsEngine.addEntityListener(Family.all(TriggerComponent.class).get(), new BulletTriggerListener(physicsWorld.getDynamicsWorld()));
+        ecsEngine.addEntityListener(Family.all(PlayerTagComponent.class).get(), new PlayerEntityListener(player));
 
         // Initialize spawners
         YumenjiangSpawner yumenjianSpawner = new YumenjiangSpawner(ecsEngine, assets);
@@ -242,6 +227,8 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner, itemSpawner));
         ecsEngine.addSystem(new EndgameSystem(player, spiritSpawner, guiManager));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
+
+        playerSpawner.spawnPlayer(new Vector3(28.804615f,-9.616931f,-111.636635f));
 
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
             new Vector3(30.155998f,-5.723038f,17.230192f),
@@ -307,7 +294,10 @@ public class GameScreen implements Screen{
 		// render
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		sceneManager.render();
-        // physicsWorld.renderDebug(camera);
+
+        if (shouldDebugPhysics) {
+            physicsWorld.renderDebug(camera);
+        }
 
 		// HUD
 		batch.begin();
@@ -317,21 +307,29 @@ public class GameScreen implements Screen{
 			font.draw(batch, "F: agarrar", uiPos.x, uiPos.y);
 
 		}
-		if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER && player.getTeam().getMembers().isEmpty()){
-			batch.draw(noPkmn, 50, 50, 50,50);
-
-		}else if (player.getMode() == Player.ThrowingMode.TO_CATCH){
-			batch.draw(catchMode, 50, 50, 50,50);
-
-		}else if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER){
-			SpiritForm active = player.getTeam().getMembers().get(player.getSelectedTeamMemberIndex()).getSpirit().getForm();
-			batch.draw(assets.get(active.getIconAsset()), 50, 50, 50,50);
-		}
+        int offset = 75;
+		if ((player.getMode() == Player.ThrowingMode.TO_ENCOUNTER && player.getTeam().getMembers().isEmpty())
+            || (player.getMode() == Player.ThrowingMode.TO_CATCH && !player.getSatchel().hasYumenjiang())) {
+			batch.draw(noPkmn, offset, offset, 50,50);
+		} else {
+            if (player.getMode() == Player.ThrowingMode.TO_ENCOUNTER){
+                Invocation active = player.getTeam().getMembers().get(player.getSelectedTeamMemberIndex());
+                Texture battleTexture = assets.get(active.getBattleAsset());
+                float scale = 1/8f;
+                float imgWidth = battleTexture.getWidth() * scale;
+                float imgHeight = battleTexture.getHeight() * scale;
+                batch.draw(battleTexture, offset - imgWidth/2f, offset, imgWidth, imgHeight);
+            }
+            batch.draw(catchMode, offset, offset, 50,50);
+        }
 		batch.end();
 		guiManager.render(deltaTime);
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
-            System.out.println(player.playerPos);
+            System.out.println(player.getPosition());
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+            shouldDebugPhysics = !shouldDebugPhysics;
         }
     }
 
@@ -341,10 +339,10 @@ public class GameScreen implements Screen{
 
 		calculatePitch();
 		calculateAngleAroundPlayer();
-		calculateCameraPos(player.playerPos, horDistance, verDistance);
+		calculateCameraPos(player.getPosition(), horDistance, verDistance);
 
 		camera.up.set(Vector3.Y);
-		camera.lookAt(player.playerPos);
+		camera.lookAt(player.getPosition());
 		camera.update();
 	}
 
