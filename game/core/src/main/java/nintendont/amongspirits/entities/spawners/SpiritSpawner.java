@@ -1,8 +1,12 @@
 package nintendont.amongspirits.entities.spawners;
 
+import java.util.Random;
+
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -23,6 +27,7 @@ import nintendont.amongspirits.data.spirits.SpiritGenders;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
+import nintendont.amongspirits.shaders.GlowAttribute;
 import nintendont.amongspirits.utils.SpiritDataGenerator;
 
 public class SpiritSpawner {
@@ -92,6 +97,12 @@ public class SpiritSpawner {
 
         ModelComponent model = engine.createComponent(ModelComponent.class);
         model.gltfScene = new Scene(modelAsset.scene);
+        Random rand = new Random();
+        GlowAttribute glow = new GlowAttribute(new Color(rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f),1), 1f);
+        for( Material mat: model.gltfScene.modelInstance.materials){
+            mat.set(glow);
+        }
+
 
         TransformComponent transform = engine.createComponent(TransformComponent.class);
         model.gltfScene.modelInstance.transform = transform.matrix;

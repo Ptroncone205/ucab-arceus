@@ -24,7 +24,17 @@ public class CustomShaderProvider extends PBRShaderProvider {
         if (renderable.material.has(TerrainMaterialAttribute.TerrainMaterial)) {
             return createTerrainShader(renderable);
         }
+        if (renderable.material.has(GlowAttribute.Glow)){
+            return createGlowShader(renderable);
+        }
         return super.createShader(renderable);
+    }
+
+    private Shader createGlowShader(Renderable renderable){
+        Shader shader = new GlowShader(renderable);
+        Gdx.app.log(TAG, "Glow Shader Compiled");
+        return shader;
+
     }
 
     private Shader createTerrainShader(Renderable renderable) {
