@@ -1,0 +1,30 @@
+
+default_skin.png
+size: 128, 128
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+button
+  rotate: false
+  xy: 1, 71
+  size: 60, 50
+  split: 29, 29, 0, 0
+  orig: 60, 50
+  offset: 0, 0
+  index: -1
+button_over
+  rotate: false
+  xy: 63, 71
+  size: 60, 50
+  split: 29, 29, 0, 0
+  orig: 60, 50
+  offset: 0, 0
+  index: -1
+button_up
+  rotate: false
+  xy: 1, 19
+  size: 60, 50
+  split: 29, 29, 0, 0
+  orig: 60, 50
+  offset: 0, 0
+  index: -1

@@ -112,7 +112,8 @@ public class IntroScreen implements Screen {
         Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
         Label titleLabel = new Label("AMONG SPIRITS", style);
         Label authorLabel = new Label("NINTENDONT", style);
-        Label clickStartLabel = new Label("¡Haz click para comenzar!", new Label.LabelStyle(font, Color.RED));
+        Label clickStartLabel = new Label("¡Haz click para comenzar!", new Label.LabelStyle(font, Color.WHITE));
+        clickStartLabel.setFontScale(1.5f);
 
         // Alphas
         imgUcab.getColor().a = 0;
@@ -125,9 +126,10 @@ public class IntroScreen implements Screen {
 
         Table textTable = new Table();
         textTable.setFillParent(true);
+        textTable.bottom().pad(150);
         textTable.add(titleLabel).padBottom(10).row();
         textTable.add(authorLabel).padBottom(80).row();
-        textTable.add(clickStartLabel);
+        textTable.add(clickStartLabel).bottom();
 
         stage.addActor(imgBackground);
         stage.addActor(imgUcab);

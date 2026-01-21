@@ -2,7 +2,10 @@ package nintendont.amongspirits.ui.menu;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -21,6 +24,10 @@ public class MenuOverlay extends Table{
 
     public MenuOverlay (Skin skin, MenuUI menu){
         this.skin = skin;
+        this.skin = new Skin();
+        this.skin.add("serif", new BitmapFont());
+        this.skin.addRegions(new TextureAtlas(Gdx.files.internal("skin/default_skin.atlas")));
+        this.skin.load(Gdx.files.internal("skin/default_skin.json"));
         this.menu = menu;
     }
 

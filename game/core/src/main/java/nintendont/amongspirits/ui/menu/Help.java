@@ -16,14 +16,13 @@ public class Help extends MenuOverlay {
         super(skin, menu);
 
         this.setFillParent(true);
-        this.setBackground(skin.newDrawable(new TextureRegionDrawable(new Texture(new Pixmap(Gdx.files.internal("textures/menu/arceus.png"))))));
+        this.setBackground(skin.newDrawable(new TextureRegionDrawable(new Texture(new Pixmap(Gdx.files.internal("textures/menu/arceus_notitle.png"))))));
 
-        Label title = new Label("MENU DE AYUDA", skin);
+        Label title = new Label("AYUDA", skin);
         title.setFontScale(2.5f);
 
         Table titleTable = new Table();
 
-        titleTable.setBackground(skin.newDrawable("white", Color.BLACK));
         titleTable.add(title).pad(10, 50, 20, 50);
 
         // Sub Menus
@@ -45,7 +44,7 @@ public class Help extends MenuOverlay {
 
 
 
-        TextButton btnIntro = createButton("Introduccion al Mundo", ()-> menu.setMenu("Introduccion"));
+        TextButton btnIntro = createButton("Introduccion", ()-> menu.setMenu("Introduccion"));
         TextButton btnInv = createButton("Inventario", () -> menu.setMenu("Inventario"));
         TextButton btnBattle = createButton("Batalla", () -> menu.setMenu("Battle"));
         TextButton btnCodex = createButton("Codex", () -> menu.setMenu("Codex"));
@@ -55,12 +54,12 @@ public class Help extends MenuOverlay {
         this.center();
         this.add(titleTable).padBottom(50).row();
 
-        this.add(btnIntro).width(400).height(60).padBottom(10).row();
-        this.add(btnInv).width(400).height(60).padBottom(10).row();
-        this.add(btnBattle).width(400).height(60).padBottom(10).row();
-        this.add(btnCodex).width(400).height(60).padBottom(10).row();
-        this.add(btnExtra).width(400).height(60).padBottom(10).row();
+        this.add(btnIntro).width(150).height(50).padBottom(10).row();
+        this.add(btnInv).width(150).height(50).padBottom(10).row();
+        this.add(btnBattle).width(150).height(50).padBottom(10).row();
+        this.add(btnCodex).width(150).height(50).padBottom(10).row();
+        this.add(btnExtra).width(150).height(50).padBottom(10).row();
 
-        this.add(btnBack).width(200).height(50).padTop(40).row();
+        this.add(btnBack).width(100).height(50).padTop(40).row();
     }
 }

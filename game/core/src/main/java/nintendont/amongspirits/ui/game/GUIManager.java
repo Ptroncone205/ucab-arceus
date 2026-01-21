@@ -184,7 +184,7 @@ public class GUIManager implements Disposable{
                 toggleMenu("pasture");
                 return true;
             case Input.Keys.C:
-                Actor cmenu = tables.get("codex").findActor("codex_menu");
+                codexUI.updatec();
                 toggleMenu("codex");
                 return true;
             default:

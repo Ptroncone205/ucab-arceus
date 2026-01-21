@@ -22,8 +22,7 @@ public class CodexMainUI extends MenuTable {
         
     }
     
-    @Override
-    public void update() {
+    public void updatec() {
         this.clear();
         CodexEntrySummary summary = new CodexEntrySummary(manager, codex.getForms().get(0));
         CodexEntryMenu menu = new CodexEntryMenu(manager, codex);
