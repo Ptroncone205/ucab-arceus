@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import nintendont.amongspirits.data.codex.SpiritMove;
+import nintendont.amongspirits.screens.BattleScreen;
 import java.util.ArrayList;
 
 public class AttackMenu extends Table{
@@ -16,6 +17,9 @@ public class AttackMenu extends Table{
         TextButton back = new TextButton("VOLVER", style);
         back.addListener(new ClickListener(){
             @Override public void clicked(InputEvent event, float x, float y){
+                if (listener instanceof BattleScreen) {
+                    ((BattleScreen)listener).getGame().playSound("music and sounds/sounds/button_sel.mp3");
+                }
                 listener.onBackSelected();
             }
         });
@@ -29,6 +33,9 @@ public class AttackMenu extends Table{
                 TextButton btn = new TextButton(move.getName(), style);
                 btn.addListener(new ClickListener(){
                     @Override public void clicked(InputEvent event, float x, float y){
+                        if (listener instanceof BattleScreen) {
+                            ((BattleScreen)listener).getGame().playSound("music and sounds/sounds/button_sel.mp3");
+                        }
                         listener.onAttackSelected(move.getName());
                     }
                 });
