@@ -171,7 +171,7 @@ public class SpiritSpawner {
         // map bounds
         float minX = -126, maxX = 92;
         float minZ = -137, maxZ = 101;
-        float maxY = 50;
+        float maxY = 10;
 
         float radius = 50; // radio de patrulalje
 

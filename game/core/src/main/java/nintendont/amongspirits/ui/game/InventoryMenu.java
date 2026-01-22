@@ -113,6 +113,7 @@ public class InventoryMenu extends MenuTable{
                     itemA.decrease();
                     invState = InvState.NONE;
                     update();
+                    InventoryMenu.this.update();
                     return;
                 }
                 super.onClick(index);
