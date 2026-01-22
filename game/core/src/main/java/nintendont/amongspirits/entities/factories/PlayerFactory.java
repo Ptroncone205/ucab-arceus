@@ -11,6 +11,7 @@ import nintendont.amongspirits.data.satchel.Satchel;
 import nintendont.amongspirits.managers.SaveManager;
 
 public class PlayerFactory {
+    private final Vector3 initialPosition = new Vector3(28.804615f,-9.616931f,-111.636635f);
     private final SaveManager saveManager;
 
     public PlayerFactory(SaveManager saveManager) {
@@ -20,7 +21,7 @@ public class PlayerFactory {
     public Player createPlayer(String playerName) {
         Satchel inventory = new Satchel();
         Codex codex = new FakeCodexLoader().load();
-        return new Player(playerName, new Vector3(0,15,0), inventory, codex);
+        return new Player(playerName, initialPosition.cpy(), inventory, codex);
     }
 
     public Player loadPlayerFromSaveData(String playerName) {
@@ -33,7 +34,7 @@ public class PlayerFactory {
             Team team = new Team(data.team);
             Pasture pasture = new Pasture(data.pasture);
 
-            Player player = new Player(data.name, new Vector3(0,15,0), inventory, codex);
+            Player player = new Player(data.name, initialPosition.cpy(), inventory, codex);
             player.setTeam(team);
             player.setPasture(pasture);
             return player;

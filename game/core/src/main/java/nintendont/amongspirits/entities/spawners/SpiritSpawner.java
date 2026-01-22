@@ -20,11 +20,8 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import nintendont.amongspirits.data.assets.GameAssets;
 import nintendont.amongspirits.data.codex.Codex;
-import nintendont.amongspirits.data.codex.CodexCommons;
 import nintendont.amongspirits.data.codex.SpiritForm;
 import nintendont.amongspirits.data.spirits.Spirit;
-import nintendont.amongspirits.data.spirits.SpiritElement;
-import nintendont.amongspirits.data.spirits.SpiritGenders;
 import nintendont.amongspirits.entities.components.*;
 import nintendont.amongspirits.physics.MotionState;
 import nintendont.amongspirits.physics.PhysicsLayers;
@@ -56,37 +53,37 @@ public class SpiritSpawner {
 
     public Entity spawnPhoenix(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get(GameAssets.PHOENIX_SCENE);
-        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.PHOENIX_ID));
+        Spirit spirit = generateSpirit(codex.getFormById(Codex.PHOENIX_ID));
         return spawnSpirit(spirit, modelAsset, "Take 001", 2f, spawnPoint, patrolPoints, 1f, new Vector3(0, 0, 0));
     }
 
     public Entity spawnLion(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get(GameAssets.LION_SCENE);
-        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.LION_ID));
+        Spirit spirit = generateSpirit(codex.getFormById(Codex.LION_ID));
         return spawnSpirit(spirit, modelAsset, null, 2f, spawnPoint, patrolPoints, 1f, null);
     }
 
     public Entity spawnDeer(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get(GameAssets.DEER_SCENE);
-        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.DEER_ID));
+        Spirit spirit = generateSpirit(codex.getFormById(Codex.DEER_ID));
         return spawnSpirit(spirit, modelAsset, "Armature|walk", 2.5f, spawnPoint, patrolPoints, 1f, null);
     }
 
     public Entity spawnWolf(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get(GameAssets.WOLF_SCENE);
-        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.WOLF_ID));
+        Spirit spirit = generateSpirit(codex.getFormById(Codex.WOLF_ID));
         return spawnSpirit(spirit, modelAsset, "Take 001", 2.5f, spawnPoint, patrolPoints, 1f, null);
     }
 
     public Entity spawnBunny(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get(GameAssets.BUNNY_SCENE);
-        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.BUNNY_ID));
+        Spirit spirit = generateSpirit(codex.getFormById(Codex.BUNNY_ID));
         return spawnSpirit(spirit, modelAsset, "Take 001", 0.05f, spawnPoint, patrolPoints, 1f, null);
     }
 
     public Entity spawnFox(Vector3 spawnPoint, Vector3[] patrolPoints) {
         SceneAsset modelAsset = assetManager.get(GameAssets.FOX_SCENE);
-        Spirit spirit = generateSpirit(codex.getFormById(CodexCommons.FOX_ID));
+        Spirit spirit = generateSpirit(codex.getFormById(Codex.FOX_ID));
         return spawnSpirit(spirit, modelAsset, "redfox|red_fox_walk_fwd_01", .75f, spawnPoint, patrolPoints, 1f, null);
     }
 

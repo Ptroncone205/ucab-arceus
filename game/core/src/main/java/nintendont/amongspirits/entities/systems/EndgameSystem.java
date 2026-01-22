@@ -3,7 +3,11 @@ package nintendont.amongspirits.entities.systems;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Vector3;
+import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
+import net.mgsx.gltf.scene3d.scene.SceneManager;
 import nintendont.amongspirits.entities.Player;
 import nintendont.amongspirits.entities.spawners.SpiritSpawner;
 import nintendont.amongspirits.ui.game.GUIManager;
@@ -12,17 +16,23 @@ public class EndgameSystem extends EntitySystem {
     private final Player player;
     private final SpiritSpawner spiritSpawner;
     private final GUIManager guiManager;
+    private final SceneManager sceneManager;
     private boolean phoenixSpawned;
 
-    public EndgameSystem(Player player, SpiritSpawner spiritSpawner, GUIManager guiManager) {
+    public EndgameSystem(Player player, SpiritSpawner spiritSpawner, GUIManager guiManager, SceneManager sceneManager) {
         this.player = player;
         this.spiritSpawner = spiritSpawner;
         this.guiManager = guiManager;
+        this.sceneManager = sceneManager;
     }
 
     @Override
     public void update(float delta) {
         if (player.getCodex().isComplete()) {
+            if (!player.getCodex().isPhoenixDefeated()) {
+                sceneManager.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 1, 0, 0, 1));
+            }
+
             if (!phoenixSpawned) {
                 spiritSpawner.spawnPhoenix(new Vector3(68.99219f,4.0298457f,7.298912f), new Vector3[]{
                     new Vector3(68.99219f,4.0298457f,7.298912f),

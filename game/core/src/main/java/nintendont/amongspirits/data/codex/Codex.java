@@ -4,6 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Codex {
+    public static final int DEER_ID = 1;
+    public static final int WOLF_ID = 2;
+    public static final int BUNNY_ID = 3;
+    public static final int FOX_ID = 4;
+    public static final int LION_ID = 5;
+    public static final int PHOENIX_ID = 6;
+
     private ArrayList<SpiritForm> forms;
     private boolean complete;
 
@@ -36,5 +43,9 @@ public class Codex {
 
     public void setComplete(boolean complete) {
         this.complete = complete;
+    }
+
+    public boolean isPhoenixDefeated() {
+        return getFormById(Codex.PHOENIX_ID).getResearchLevel() == 10;
     }
 }
