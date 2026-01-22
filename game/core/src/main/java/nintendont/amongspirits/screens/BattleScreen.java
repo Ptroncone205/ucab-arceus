@@ -226,6 +226,11 @@ public class BattleScreen implements Screen, MenuListener {
         else Timer.schedule(new Timer.Task(){
             @Override
             public void run(){
+                for (int i = 0; i < enemy.getTeam().getMembers().size(); i++) {
+                    if (!enemy.getTeam().getMembers().get(i).isFainted()) {
+                        switchEnemySpirit(i);
+                    }
+                }
                 startEnemyTurn();
             }}, 1f);
     }
@@ -372,6 +377,10 @@ public class BattleScreen implements Screen, MenuListener {
 
     public void switchSpirit(int idx) {
         playerActiveIndex = idx; setupBattleUI(); startEnemyTurn();
+    }
+
+    public void switchEnemySpirit(int idx) {
+        enemyActiveIndex = idx; setupBattleUI();
     }
 
     public Image getPlayerImage() {

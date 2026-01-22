@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 
+import com.badlogic.gdx.utils.Timer;
 import com.github.czyzby.websocket.WebSocket;
 import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
 import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
@@ -226,37 +227,12 @@ public class GameScreen implements Screen{
 
         playerSpawner.spawnPlayer(player.getPosition());
 
-		spiritSpawner.randomSpawner();
-
-        // spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
-        //     new Vector3(30.155998f,-5.723038f,17.230192f),
-        //     new Vector3(1.6152792f,-6.701237f,35.62867f),
-        //     new Vector3(-17.962223f,-7.386892f,12.141544f),
-        // });
-        // spiritSpawner.spawnDeer(new Vector3(-8.658541f,-7.1790175f,-83.79534f), new Vector3[] {
-        //     new Vector3(-8.658541f,-7.1790175f,-83.79534f),
-        //     new Vector3(-67.99276f,-3.6083195f,-91.609474f),
-        //     new Vector3(-124.330864f,-6.713242f,-110.35451f),
-        //     new Vector3(-125.90662f,-3.1293454f,-41.220222f),
-        //     new Vector3(-124.330864f,-6.713242f,-110.35451f),
-        //     new Vector3(-67.99276f,-3.6083195f,-91.609474f),
-        // });
-        // spiritSpawner.spawnWolf(new Vector3(-118.479904f,-13.676473f,16.55237f), new Vector3[] {
-        //     new Vector3(-118.479904f,-13.676473f,16.55237f),
-        //     new Vector3(-56.469837f,-10.573059f,26.624063f),
-        //     new Vector3(-103.06346f,-13.143304f,114.45455f),
-        // });
-        // spiritSpawner.spawnBunny(new Vector3(28.545568f,100,-50.88826f), new Vector3[] {
-        //     new Vector3(28.545568f,-11.491491f,-50.88826f),
-        //     new Vector3(28.737074f,-11.382355f,-89.65038f),
-        //     new Vector3(79.27631f,-11.176129f,-73.44786f),
-        // });
-        // spiritSpawner.spawnFox(new Vector3(42.199657f,-6.9087963f,65.2783f), new Vector3[] {
-        //     new Vector3(42.199657f,-6.9087963f,65.2783f),
-        //     new Vector3(12.966826f,-9.829789f,101.345924f),
-        //     new Vector3(-13.61148f,-4.642546f,90.47211f),
-        //     new Vector3(22.177233f,-7.333871f,62.20569f),
-        // });
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                spiritSpawner.randomSpawner();
+            }
+        }, 1f);
     }
 
 	private void buildTerrain() {
