@@ -166,7 +166,6 @@ public class GameScreen implements Screen{
 		// setup light
 		light = new DirectionalLightEx();
 		light.direction.set(1, -3, 1).nor();
-		light.color.set(Color.WHITE);
 		sceneManager.environment.add(light);
 
 		// setup quick IBL (image based lighting)
@@ -181,7 +180,7 @@ public class GameScreen implements Screen{
 		// This texture is provided by the library, no need to have it in your assets.
 		brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
 
-		sceneManager.setAmbientLight(1f);
+		sceneManager.setAmbientLight(0.7f);
 		sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
 		sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap));
 		sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap));
@@ -225,7 +224,7 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new ItemSystem(player, camera, guiManager, multiplexer, socket));
         ecsEngine.addSystem(new YumenjiangSystem(multiplexer, player, yumenjianSpawner, camera, guiManager));
         ecsEngine.addSystem(new MultiplayerSystem(game, socket, player, playerSpawner, itemSpawner));
-        ecsEngine.addSystem(new EndgameSystem(player, spiritSpawner, guiManager));
+        ecsEngine.addSystem(new EndgameSystem(player, spiritSpawner, guiManager, sceneManager));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
         playerSpawner.spawnPlayer(new Vector3(28.804615f,-9.616931f,-111.636635f));

@@ -159,7 +159,7 @@ public class BattleScreen implements Screen, MenuListener {
         btnRun.addListener(new ClickListener(){
             @Override public void clicked(InputEvent e, float x, float y) {
                 game.playSound("music and sounds/sounds/button_sel.mp3");
-                game.setScreen(game.gameScreen);
+                game.setScreen(new GameScreen(game, assets, player));
             }
         });
         tableB.add(btnFight).size(btnW, btnH).pad(2);

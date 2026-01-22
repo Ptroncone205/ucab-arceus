@@ -73,7 +73,7 @@ public class CatchableSystem extends IteratingSystem {
 
         SpiritTagComponent spiritTag = entity.getComponent(SpiritTagComponent.class);
         if (spiritTag != null) {
-            if (spiritTag.spirit.getForm().getId() == CodexCommons.PHOENIX_ID && spiritTag.spirit.getForm().getTasks().stream().noneMatch(t -> t.getCurrentCount() > 0)) {
+            if (spiritTag.spirit.getForm().getId() == Codex.PHOENIX_ID && spiritTag.spirit.getForm().getTasks().stream().noneMatch(t -> t.getCurrentCount() > 0)) {
                 return;
             }
 

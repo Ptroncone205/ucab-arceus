@@ -8,7 +8,7 @@ public class FakeCodexLoader extends CodexLoader {
         Codex codex = new Codex();
 
         SpiritForm deer = new SpiritForm(
-            CodexCommons.DEER_ID,
+            Codex.DEER_ID,
             "Deer",
             "Forest spirit guide",
             "Crowned with branches, it steps through silver mist, guiding lost travelers back to the safety of ancient forest trails.",
@@ -18,7 +18,7 @@ public class FakeCodexLoader extends CodexLoader {
             BattleSpiritAssets.MALE_DEER,
             BattleSpiritAssets.FEMALE_DEER);
         SpiritForm wolf = new SpiritForm(
-            CodexCommons.WOLF_ID,
+            Codex.WOLF_ID,
             "Wolf",
             "Moon-howling guardian",
             "A shadow with yellow eyes, it sings to the pale moon and guards the snowy mountain passes from those who carry hate.",
@@ -28,7 +28,7 @@ public class FakeCodexLoader extends CodexLoader {
             BattleSpiritAssets.MALE_WOLF,
             BattleSpiritAssets.FEMALE_WOLF);
         SpiritForm bunny = new SpiritForm(
-            CodexCommons.BUNNY_ID,
+            Codex.BUNNY_ID,
             "Bunny",
             "Meadow luck bringer",
             "Small and soft, it hides luck within its twitching nose and burrows deep to whisper secrets to the roots of the world.",
@@ -38,7 +38,7 @@ public class FakeCodexLoader extends CodexLoader {
             BattleSpiritAssets.MALE_BUNNY,
             BattleSpiritAssets.FEMALE_BUNNY);
         SpiritForm fox = new SpiritForm(
-            CodexCommons.FOX_ID,
+            Codex.FOX_ID,
             "Fox",
             "Cunning fire tail",
             "With a tail of flickering flame, it weaves through the tall grass, outsmarting dark spirits with a clever, toothy grin.",
@@ -48,7 +48,7 @@ public class FakeCodexLoader extends CodexLoader {
             BattleSpiritAssets.MALE_FOX,
             BattleSpiritAssets.FEMALE_FOX);
         SpiritForm lion = new SpiritForm(
-            CodexCommons.LION_ID,
+            Codex.LION_ID,
             "Lion",
             "Golden sun monarch",
             "Wearing a mane of sunlight, the king of the plains roars a command that makes the stars tremble and the golden grass bow.",
@@ -58,7 +58,7 @@ public class FakeCodexLoader extends CodexLoader {
             BattleSpiritAssets.MALE_LION,
             BattleSpiritAssets.FEMALE_LION);
         SpiritForm phoenix = new SpiritForm(
-            CodexCommons.PHOENIX_ID,
+            Codex.PHOENIX_ID,
             "Phoenix",
             "Eternal flame sentinel",
             "The celestial sentinel of the South, embodying the eternal element of fire. Its shimmering crimson wings bring omens of peace, prosperity, and the sun’s rebirth.",

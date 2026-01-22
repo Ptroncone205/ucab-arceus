@@ -13,11 +13,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import nintendont.amongspirits.data.codex.Codex;
-import nintendont.amongspirits.data.codex.CodexCommons;
 import nintendont.amongspirits.data.codex.SpiritForm;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class CodexEntryMenu extends Table {
     private int selectedIndex = 0;
@@ -37,7 +35,7 @@ public class CodexEntryMenu extends Table {
 
         int index = 0;
         for (SpiritForm form : codex.getForms()) {
-            if (form.getId() == CodexCommons.PHOENIX_ID && !codex.isComplete()) {
+            if (form.getId() == Codex.PHOENIX_ID && !codex.isComplete()) {
                 continue;
             }
 
