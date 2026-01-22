@@ -5,7 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -39,6 +41,8 @@ public class BattleScreen implements Screen, MenuListener {
     private boolean shouldGoBackToGame = false;
 
     private Image healthBarPlayer, healthBarEnemy;
+    private Image playerImage;
+    private Image enemyImage;
     private BitmapFont font;
     private TextButton.TextButtonStyle styleRed, styleBlue, styleGreen, styleYellow;
 
@@ -47,13 +51,11 @@ public class BattleScreen implements Screen, MenuListener {
         this.player = player;
         this.enemy = enemy;
         this.playerActiveIndex = initialPlayerActiveIndex;
-
-        Gdx.input.setCursorCatched(false);
-
         this.assets = assets;
 
         batch = new SpriteBatch();
         stage = new Stage();
+        Gdx.input.setCursorCatched(false);
         Gdx.input.setInputProcessor(stage);
         font = new BitmapFont();
 
@@ -92,10 +94,18 @@ public class BattleScreen implements Screen, MenuListener {
         playerGroup.add(new Label(playerInvocation.getFullName(), new Label.LabelStyle(font, Color.CYAN))).row();
         playerGroup.add(healthBarPlayer).size(220, 22).padTop(5).row();
 
-        Image playerImage = new Image(assets.get(playerInvocation.getBattleAsset()));
+        playerImage = new Image(assets.get(playerInvocation.getBattleAsset()));
         playerImage.setScaling(Scaling.contain);
-        playerGroup.add(playerImage).size(350);
+        playerImage.setOrigin(Align.center);
 
+        playerImage.setScale(0);
+        game.playSound("music and sounds/sounds/change.mp3");
+        playerImage.addAction(Actions.sequence(
+            Actions.scaleTo(1, 1, 0.5f, Interpolation.bounceOut),
+            Actions.run(() -> applyIdleAnimation(playerImage))
+        ));
+
+        playerGroup.add(playerImage).size(350).padBottom(20);
         gameLayer.add(playerGroup).expand().bottom().left().padLeft(60);
 
         // ENEMIGO
@@ -105,34 +115,149 @@ public class BattleScreen implements Screen, MenuListener {
 
         TextureRegion enemyTextureRegion = new TextureRegion(assets.get(enemyInvocation.getBattleAsset()));
         enemyTextureRegion.flip(true, false);
-        Image enemyImage = new Image(enemyTextureRegion);
+        enemyImage = new Image(enemyTextureRegion);
         enemyImage.setScaling(Scaling.contain);
+        enemyImage.setOrigin(Align.center);
+
+        // Entrada enemigo
+        enemyImage.setScale(0);
+        enemyImage.addAction(Actions.sequence(
+            Actions.scaleTo(1, 1, 0.5f, Interpolation.bounceOut),
+            Actions.run(() -> applyIdleAnimation(enemyImage))
+        ));
+
         enemyGroup.add(new Label(enemyInvocation.getFullName(), new Label.LabelStyle(font, Color.RED))).row();
         enemyGroup.add(healthBarEnemy).size(220, 22).padBottom(5).row();
-        enemyGroup.add(enemyImage).size(350);
+        enemyGroup.add(enemyImage).size(350).padBottom(20);
 
         gameLayer.add(enemyGroup).expandX().right().padTop(300).padRight(60).row();
-
         mainStack.add(gameLayer.padBottom(550));
 
+        // PANEL UI
         Table uiLayer = new Table();
-        float panelHeight = 190;
         Table bottomPanel = new Table();
         bottomPanel.setBackground(getColoredDrawable(1, 1, new Color(0, 0, 0, 0.85f)));
 
         messageLabel = new Label("¿Qué hará " + playerInvocation.getFullName() + "?", new Label.LabelStyle(font, Color.WHITE));
         messageLabel.setWrap(true);
         messageLabel.setAlignment(Align.center);
-        bottomPanel.add(messageLabel).width(Gdx.graphics.getWidth() * 0.5f).height(panelHeight).pad(20);
+        bottomPanel.add(messageLabel).width(Gdx.graphics.getWidth() * 0.5f).height(190).pad(20);
 
         tableB = new Table();
-        setupMainButtons(panelHeight);
-        bottomPanel.add(tableB.padRight(10)).width(Gdx.graphics.getWidth() * 0.5f).height(panelHeight);
+        setupMainButtons(190);
+        bottomPanel.add(tableB.padRight(10)).width(Gdx.graphics.getWidth() * 0.5f).height(190);
 
         uiLayer.add(bottomPanel).expand().bottom().fillX();
         mainStack.add(uiLayer);
 
         updateHealth();
+    }
+
+    private void applyIdleAnimation(Image image) {
+        image.addAction(Actions.forever(Actions.sequence(
+            Actions.scaleTo(1.01f, 0.99f, 2.0f, Interpolation.sine),
+            Actions.scaleTo(1f, 1f, 2.0f, Interpolation.sine)
+        )));
+    }
+
+    public void playHealAnimation(Image targetActor) {
+        if (targetActor == null) return;
+        targetActor.addAction(Actions.sequence(
+            Actions.color(Color.GREEN, 0.15f),
+            Actions.moveBy(0, 25, 0.1f, Interpolation.exp5Out),
+            Actions.moveBy(0, -25, 0.15f, Interpolation.bounceOut),
+            Actions.color(Color.WHITE, 0.15f)
+        ));
+    }
+
+    private void playDamageAnimation(Image targetActor) {
+        if (targetActor == null) return;
+        targetActor.addAction(Actions.sequence(
+            Actions.color(Color.RED, 0.1f),
+            Actions.moveBy(15, 0, 0.05f),
+            Actions.moveBy(-30, 0, 0.05f),
+            Actions.moveBy(15, 0, 0.05f),
+            Actions.color(Color.WHITE, 0.1f)
+        ));
+    }
+
+    private void playFaintAnimation(Image targetActor) {
+        if (targetActor == null) return;
+        targetActor.clearActions();
+        targetActor.addAction(Actions.parallel(
+            Actions.moveBy(0, -200, 0.6f, Interpolation.exp5In),
+            Actions.fadeOut(0.5f)
+        ));
+    }
+
+    public void applyDamage(Invocation target, int damage, boolean isPlayerReceiving) {
+        target.takeDamage(damage);
+        updateHealth();
+
+        Image targetActor = isPlayerReceiving ? playerImage : enemyImage;
+
+        if (target.isFainted()){
+            game.playSound("music and sounds/sounds/fainted.mp3");
+            playFaintAnimation(targetActor);
+        } else {
+            playDamageAnimation(targetActor);
+        }
+    }
+
+    public void updateHealth(){
+        healthBarPlayer.setDrawable(createBarDrawable(getPlayerActiveInvocation().getHealthRatio()));
+        healthBarEnemy.setDrawable(createBarDrawable(getEnemyActiveInvocation().getHealthRatio()));
+    }
+
+    @Override
+    public void onAttackSelected(String attackName) {
+        Invocation playerInv = getPlayerActiveInvocation();
+        Invocation enemyInv = getEnemyActiveInvocation();
+        SpiritMove move = playerInv.getMoves().stream().filter(m -> m.getName().equals(attackName)).findFirst().orElse(null);
+
+        if (move != null) {
+            messageLabel.setText("¡" + playerInv.getFullName() + " usó " + attackName + "!");
+            applyDamage(enemyInv, move.getBasePower(), false);
+        }
+
+        checkEndgame();
+
+        if (!enemyInv.isFainted()) startEnemyTurn();
+        else Timer.schedule(new Timer.Task(){
+            @Override
+            public void run(){
+                startEnemyTurn();
+            }}, 1f);
+    }
+
+    public void startEnemyTurn() {
+        tableB.clearChildren();
+        Timer.schedule(new Timer.Task(){
+            @Override public void run(){
+                Invocation pInv = getPlayerActiveInvocation();
+                Invocation eInv = getEnemyActiveInvocation();
+
+                if (eInv.isFainted()){
+                    messageLabel.setText("¡El enemigo ha sido derrotado!");
+                } else {
+                    SpiritMove move = eInv.getRandomMove();
+                    messageLabel.setText("¡" + eInv.getFullName() + " usó " + move.getName() + "!");
+                    applyDamage(pInv, move.getBasePower(), true);
+
+                    Timer.schedule(new Timer.Task(){
+                        @Override public void run(){
+                            if (pInv.isFainted() && player.getTeam().isAnyMemberActive()){
+                                stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, true, assets));
+                            } else {
+                                messageLabel.setText("¿Qué hará " + pInv.getFullName() + "?");
+                                setupMainButtons(190);
+                            }
+                            checkEndgame();
+                        }
+                    }, 1.5f);
+                }
+            }
+        }, 1.5f);
     }
 
     public void setupMainButtons(float panelH){
@@ -147,25 +272,30 @@ public class BattleScreen implements Screen, MenuListener {
         TextButton btnRun = new TextButton("HUIR", styleYellow);
 
         btnFight.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y) {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
+                game.playSound("music and sounds/sounds/button_sel.mp3");
                 onFightSelected();
             }});
 
         btnBag.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y) {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
                 game.playSound("music and sounds/sounds/button_sel.mp3");
-            tableB.clearChildren();
-            tableB.add(new BagMenu(styleBlue, BattleScreen.this, player.getSatchel().getItems())).fill();
-        }});
+                tableB.clearChildren();
+                tableB.add(new BagMenu(styleBlue, BattleScreen.this, player.getSatchel().getItems())).fill();
+            }});
 
         btnTeam.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y) {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
                 game.playSound("music and sounds/sounds/button_sel.mp3");
-            stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, false, assets));
-        }});
+                stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, false, assets));
+            }});
 
         btnRun.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent e, float x, float y) {
+            @Override
+            public void clicked(InputEvent e, float x, float y) {
                 game.playSound("music and sounds/sounds/button_sel.mp3");
                 game.setScreen(new GameScreen(game, assets, player));
             }
@@ -176,135 +306,28 @@ public class BattleScreen implements Screen, MenuListener {
         tableB.add(btnRun).size(btnW, btnH).pad(2);
     }
 
-    @Override
-    public void onAttackSelected(String attackName) {
-        game.playSound("music and sounds/sounds/button_sel.mp3");
-        Invocation playerInvocation = getPlayerActiveInvocation();
-        Invocation enemyInvocation = getEnemyActiveInvocation();
-        SpiritMove moveUsed = playerInvocation.getMoves().stream().filter(m -> m.getName().equals(attackName)).findFirst().orElse(null);
-
-        if (moveUsed != null) {
-            int damageToGive = moveUsed.getBasePower();
-            enemyInvocation.takeDamage(damageToGive);
-            game.playSound("music and sounds/sounds/button_sel.mp3");
-            messageLabel.setText("¡" + enemyInvocation.getFullName() + " usó " + attackName + "!");
-        }
-
-        if (enemyInvocation.isFainted()) {
-            for (int i = 0; i < enemy.getTeam().getMembers().size(); i++) {
-                if (enemy.getTeam().getMembers().get(i).isActive()) {
-                    enemyActiveIndex = i;
-                }
-            }
-        }
-        checkEndgame();
-        updateHealth();
-        startEnemyTurn();
-    }
-
-    public void startEnemyTurn() {
-        tableB.clearChildren();
-        Timer.schedule(new Timer.Task(){
-            @Override public void run(){
-                Invocation playerInvocation = getPlayerActiveInvocation();
-                Invocation enemyInvocation = getEnemyActiveInvocation();
-
-                if (enemyInvocation.isFainted()){
-                    messageLabel.setText("¡El enemigo ha sido derrotado!");
-                } else {
-                    SpiritMove move = enemyInvocation.getRandomMove();
-                    playerInvocation.takeDamage(move.getBasePower());
-
-                    messageLabel.setText("¡El enemigo contraataca!");
-                    updateHealth();
-                    Timer.schedule(new Timer.Task(){
-                        @Override
-                        public void run(){
-                            if (playerInvocation.isFainted() && player.getTeam().isAnyMemberActive()){
-                                stage.addActor(new SpiritsMenu(styleGreen, BattleScreen.this, true, assets));
-                            }else{
-                                messageLabel.setText("¿Qué hará " + playerInvocation.getFullName() + "?");
-                                setupMainButtons(190);
-                            }
-                            checkEndgame();
-                        }
-                    }, 1.5f);
-                }
-            }
-        }, 1.5f);
-    }
-
-    public void updateHealth(){
-        healthBarPlayer.setDrawable(createBarDrawable(getPlayerActiveInvocation().getHealthRatio()));
-        healthBarEnemy.setDrawable(createBarDrawable(getEnemyActiveInvocation().getHealthRatio()));
-    }
-
     private void checkEndgame() {
-        if (player.getTeam().areAllMembersDefeated()) {
-            messageLabel.setText("El jugador ha perdido!");
-            game.playSound("music and sounds/sounds/defeat.mp3");
+        if (player.getTeam().areAllMembersDefeated() || enemy.getTeam().areAllMembersDefeated()) {
+            game.stopMusic();
+            messageLabel.setText(player.getTeam().areAllMembersDefeated() ? "¡Has perdido!" : "¡Victoria!");
+            game.playSound(player.getTeam().areAllMembersDefeated() ? "music and sounds/sounds/defeat.mp3" : "music and sounds/sounds/win.mp3");
             tableB.clearChildren();
-
-            ItemStack itemStack = player.getSatchel().getRandomItem();
-            itemStack.decrease();
-
-            requestGoBackToGameAfter();
-        } else if (enemy.getTeam().areAllMembersDefeated()) {
-            messageLabel.setText("El jugador ha ganado!");
-            game.playSound("music and sounds/sounds/win.mp3");
-            tableB.clearChildren();
-
-            if (enemy.isWild()) {
-                for (Invocation invocation : enemy.getTeam().getMembers()) {
-                    SpiritForm spiritForm = invocation.getSpirit().getForm();
-                    spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.DEFEAT));
-                }
-            } else {
-                for (Invocation invocation : player.getTeam().getMembers()) {
-                    SpiritForm spiritForm = invocation.getSpirit().getForm();
-                    spiritForm.validateTask(new ResearchTaskAction(ResearchTaskActionType.WIN));
-                }
-            }
-
-            requestGoBackToGameAfter();
+            Timer.schedule(new Timer.Task(){ @Override public void run(){ shouldGoBackToGame = true; }}, 3f);
         }
-    }
-
-    private void requestGoBackToGameAfter() {
-        Timer.schedule(new Timer.Task(){
-            @Override
-            public void run(){
-                shouldGoBackToGame = true;
-            }
-        }, 3f);
-    }
-
-    private Invocation getPlayerActiveInvocation() {
-        return player.getTeam().getMembers().get(playerActiveIndex);
-    }
-
-    private Invocation getEnemyActiveInvocation() {
-        return enemy.getTeam().getMembers().get(enemyActiveIndex);
-    }
-
-    public Main getGame() {
-        return game;
     }
 
     private TextureRegionDrawable createBarDrawable(float percent){
-        int w = 200, h = 20;
-        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+        Pixmap p = new Pixmap(200, 20, Pixmap.Format.RGBA8888);
         p.setColor(Color.BLACK); p.fill();
-        Color colorVida = percent < 0.2f ? Color.RED : (percent < 0.5f ? Color.YELLOW : Color.GREEN);
-        p.setColor(colorVida);
-        p.fillRectangle(0, 0, (int)(w * Math.max(0, percent)), h);
+        p.setColor(percent < 0.2f ? Color.RED : (percent < 0.5f ? Color.YELLOW : Color.GREEN));
+        p.fillRectangle(0, 0, (int)(200 * Math.max(0, percent)), 20);
         TextureRegionDrawable d = new TextureRegionDrawable(new TextureRegion(new Texture(p)));
         p.dispose();
         return d;
     }
 
     public TextureRegionDrawable getColoredDrawable(int w, int h, Color c) {
-        Pixmap p = new Pixmap(w > 0 ? w : 1, h, Pixmap.Format.RGBA8888);
+        Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
         p.setColor(c); p.fill();
         TextureRegionDrawable d = new TextureRegionDrawable(new TextureRegion(new Texture(p)));
         p.dispose();
@@ -313,50 +336,54 @@ public class BattleScreen implements Screen, MenuListener {
 
     private TextButton.TextButtonStyle createButtonStyle(Color c) {
         TextButton.TextButtonStyle s = new TextButton.TextButtonStyle();
-        s.up = getColoredDrawable(1, 1, c);
-        s.font = font;
-        return s;
+        s.up = getColoredDrawable(1, 1, c); s.font = font; return s;
     }
 
-    public Table getTableB(){
-        return tableB;
+    public Invocation getPlayerActiveInvocation() {
+        return player.getTeam().getMembers().get(playerActiveIndex);
     }
 
-    public Stage getStage(){
+    public Invocation getEnemyActiveInvocation() {
+        return enemy.getTeam().getMembers().get(enemyActiveIndex);
+    }
+
+    public Main getGame() {
+        return game;
+    }
+    public Stage getStage() {
         return stage;
     }
 
-    public int getPlayerActiveIndex(){
-        return playerActiveIndex;
-    }
-
-    public Player getPlayer(){
+    public Player getPlayer() {
         return player;
     }
 
-    public void switchSpirit(int idx){
-        playerActiveIndex = idx; setupBattleUI(); startEnemyTurn();
+    public int getPlayerActiveIndex() {
+        return playerActiveIndex;
     }
 
-    @Override
-    public void onBackSelected(){
-        game.playSound("music and sounds/sounds/button_sel.mp3");
+    public void onBackSelected() {
         setupMainButtons(190);
     }
 
-    @Override
-    public void onFightSelected(){
-        game.playSound("music and sounds/sounds/button_sel.mp3");
-        tableB.clearChildren();
-        tableB.add(new AttackMenu(styleRed, this, getPlayerActiveInvocation().getMoves())).fill();
+    public void onFightSelected() {
+        tableB.clearChildren(); tableB.add(new AttackMenu(styleRed, this, getPlayerActiveInvocation().getMoves())).fill();
     }
 
-    @Override
-    public void render(float delta){
-        if (shouldGoBackToGame){
-            goBackToGame();
-        }
+    public void switchSpirit(int idx) {
+        playerActiveIndex = idx; setupBattleUI(); startEnemyTurn();
+    }
 
+    public Image getPlayerImage() {
+        return playerImage;
+    }
+
+    public Image getEnemyImage() {
+        return enemyImage;
+    }
+
+    @Override public void render(float delta){
+        if (shouldGoBackToGame) game.setScreen(new GameScreen(game, assets, player));
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         bgSprite.draw(batch);
@@ -368,36 +395,10 @@ public class BattleScreen implements Screen, MenuListener {
         batch.end();
     }
 
-    private void goBackToGame() {
-        game.setScreen(new GameScreen(game, assets, player));
-    }
-
-    @Override
-    public void show() {
-
-    }
-
-    @Override
-    public void resize(int width, int height) {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-    }
+    @Override public void show() { Gdx.input.setCursorCatched(false); }
+    @Override public void resize(int width, int height) {}
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
+    @Override public void dispose() {}
 }
