@@ -107,7 +107,7 @@ public class InventoryMenu extends MenuTable{
         this.teamTable = new TeamMenu(skin, gui, assets){
             @Override
             public void onClick(int index){
-                if (invState != InvState.NONE){
+                if (invState != InvState.NONE && itemA.getItem() instanceof ConsumableItem){
                     selectedIndex = index;
                     ((ConsumableItem)itemA.getItem()).getEffect().apply(getSelSpirit());
                     itemA.decrease();

@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -16,6 +17,9 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
 import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
+
+import net.mgsx.gltf.scene3d.attributes.PBRColorAttribute;
+import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import nintendont.amongspirits.data.assets.GameAssets;
@@ -95,12 +99,11 @@ public class SpiritSpawner {
 
         ModelComponent model = engine.createComponent(ModelComponent.class);
         model.gltfScene = new Scene(modelAsset.scene);
-        Random rand = new Random();
-        Color color =new Color(rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f),1);
-        GlowAttribute glow = new GlowAttribute(color, 1f);
         
         for( Material mat: model.gltfScene.modelInstance.materials){
-            if (!model.gltfScene.modelInstance.materials.get(0).has(GlowAttribute.Glow)) {mat.copy().set(glow);} else break;
+            mat.remove(PBRColorAttribute.BaseColorFactor);
+            mat.remove(PBRTextureAttribute.BaseColorTexture);
+            mat.remove(TextureAttribute.Diffuse);
         }
 
 

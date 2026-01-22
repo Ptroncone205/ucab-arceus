@@ -20,7 +20,7 @@ public class GlowShader extends DefaultShader {
         config.vertexShader = null; 
         config.fragmentShader = Gdx.files.internal("shaders/glow.frag.glsl").readString();
         config.numBones = 80;
-        config.ignoreUnimplemented = false;
+        config.ignoreUnimplemented = true;
         config.defaultCullFace = GL20.GL_BACK;
         return config;
     }
