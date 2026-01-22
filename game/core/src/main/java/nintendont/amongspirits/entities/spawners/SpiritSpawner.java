@@ -99,8 +99,10 @@ public class SpiritSpawner {
 
         ModelComponent model = engine.createComponent(ModelComponent.class);
         model.gltfScene = new Scene(modelAsset.scene);
-        
+
+
         for( Material mat: model.gltfScene.modelInstance.materials){
+            if (spiritData.getForm().getId() == Codex.PHOENIX_ID) break;
             mat.remove(PBRColorAttribute.BaseColorFactor);
             mat.remove(PBRTextureAttribute.BaseColorTexture);
             mat.remove(TextureAttribute.Diffuse);

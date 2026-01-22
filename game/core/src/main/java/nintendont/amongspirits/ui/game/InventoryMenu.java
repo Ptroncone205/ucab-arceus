@@ -81,7 +81,7 @@ public class InventoryMenu extends MenuTable{
         header.add(new Label("E: Recetas", skin)).left().pad(15);
         header.add(title).expandX().center().pad(15);
         header.add(new Label("Q: Team", skin)).right().pad(15);
-  
+
         this.add(header).growX().height(60).top();
         this.row();
 
@@ -112,6 +112,7 @@ public class InventoryMenu extends MenuTable{
                     ((ConsumableItem)itemA.getItem()).getEffect().apply(getSelSpirit());
                     itemA.decrease();
                     invState = InvState.NONE;
+                    InventoryMenu.this.update();
                     update();
                     InventoryMenu.this.update();
                     return;
@@ -119,6 +120,7 @@ public class InventoryMenu extends MenuTable{
                 super.onClick(index);
             }
         };
+
         Table team = new Table();
         team.center().top().pad(20);
         team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.2f));
@@ -304,7 +306,7 @@ public class InventoryMenu extends MenuTable{
                 invState = InvState.NONE;
             }
         }
-        
+
     }
 
     @Override

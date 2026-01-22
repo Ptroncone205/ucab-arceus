@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -28,6 +30,10 @@ public class PauseMenu extends MenuTable {
     public PauseMenu(Skin skin, GUIManager gui) {
         super(gui);
         this.skin = skin;
+        this.skin = new Skin();
+        this.skin.add("serif", new BitmapFont());
+        this.skin.addRegions(new TextureAtlas(Gdx.files.internal("skin/default_skin.atlas")));
+        this.skin.load(Gdx.files.internal("skin/default_skin.json"));
 
         this.setFillParent(true);
 
@@ -38,6 +44,9 @@ public class PauseMenu extends MenuTable {
 
     private void create() {
         // Title
+        Label.LabelStyle s = new Label.LabelStyle();
+        s.font = new BitmapFont();
+        skin.add("default", s);
         Label title = new Label("PAUSED", skin);
         title.setFontScale(2f);
 
