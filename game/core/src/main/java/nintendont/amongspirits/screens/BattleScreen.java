@@ -316,6 +316,22 @@ public class BattleScreen implements Screen, MenuListener {
             game.stopMusic();
             messageLabel.setText(player.getTeam().areAllMembersDefeated() ? "¡Has perdido!" : "¡Victoria!");
             game.playSound(player.getTeam().areAllMembersDefeated() ? "music and sounds/sounds/defeat.mp3" : "music and sounds/sounds/win.mp3");
+            if (player.getTeam().areAllMembersDefeated()) {
+                for (Invocation i : player.getTeam().getMembers()) {
+                    i.heal(i.getMaxHP());
+                }
+            }
+            if (enemy.getTeam().areAllMembersDefeated()) {
+                if (enemy.isWild()) {
+                    for (Invocation i : enemy.getTeam().getMembers()) {
+                        i.getSpirit().getForm().validateTask(new ResearchTaskAction(ResearchTaskActionType.DEFEAT));
+                    }
+                } else {
+                    for (Invocation i : player.getTeam().getMembers()) {
+                        i.getSpirit().getForm().validateTask(new ResearchTaskAction(ResearchTaskActionType.WIN));
+                    }
+                }
+            }
             tableB.clearChildren();
             Timer.schedule(new Timer.Task(){ @Override public void run(){ shouldGoBackToGame = true; }}, 3f);
         }

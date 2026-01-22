@@ -70,6 +70,8 @@ public class Invocation {
         return stats.getHP().isEmpty();
     }
 
+
+
     public boolean isActive() {
         return stats.getHP().getCurrent() > 0;
     }
