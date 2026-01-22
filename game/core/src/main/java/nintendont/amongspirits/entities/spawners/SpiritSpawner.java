@@ -8,6 +8,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -98,10 +99,13 @@ public class SpiritSpawner {
         ModelComponent model = engine.createComponent(ModelComponent.class);
         model.gltfScene = new Scene(modelAsset.scene);
         Random rand = new Random();
-        GlowAttribute glow = new GlowAttribute(new Color(rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f),1), 1f);
+        Color color =new Color(rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f), rand.nextFloat(0.5f,0.8f),1);
+        GlowAttribute glow = new GlowAttribute(color, 1f);
+        
         for( Material mat: model.gltfScene.modelInstance.materials){
-            mat.set(glow);
+            if (!model.gltfScene.modelInstance.materials.get(0).has(GlowAttribute.Glow)) {mat.copy().set(glow);} else break;
         }
+
 
 
         TransformComponent transform = engine.createComponent(TransformComponent.class);
@@ -161,5 +165,67 @@ public class SpiritSpawner {
 
         engine.addEntity(entity);
         return entity;
+    }
+
+    public void randomSpawner(){
+        // map bounds
+        float minX = -126, maxX = 92;
+        float minZ = -137, maxZ = 101;
+        float maxY = 50;
+
+        float radius = 50; // radio de patrulalje
+
+        int ammout = 5; // 5 de cada
+
+        Vector3 pos;
+        Vector3[] patrolPoints;
+        for (int i = 0; i < ammout; i++){
+            pos = getPos(minX, maxX, minZ, maxZ, maxY);
+            patrolPoints = getPatrolPoints(pos, radius, maxY);
+            spawnBunny(pos, patrolPoints);
+        }
+        for (int i = 0; i < ammout; i++){
+            pos = getPos(minX, maxX, minZ, maxZ, maxY);
+            patrolPoints = getPatrolPoints(pos, radius, maxY);
+            spawnDeer(pos, patrolPoints);
+        }
+        for (int i = 0; i < ammout; i++){
+            pos = getPos(minX, maxX, minZ, maxZ, maxY);
+            patrolPoints = getPatrolPoints(pos, radius, maxY);
+            spawnFox(pos, patrolPoints);
+        }
+        for (int i = 0; i < ammout; i++){
+            pos = getPos(minX, maxX, minZ, maxZ, maxY);
+            patrolPoints = getPatrolPoints(pos, radius, maxY);
+            spawnLion(pos, patrolPoints);
+        }
+        for (int i = 0; i < ammout; i++){
+            pos = getPos(minX, maxX, minZ, maxZ, maxY);
+            patrolPoints = getPatrolPoints(pos, radius, maxY);
+            spawnWolf(pos, patrolPoints);
+        }
+
+    }
+
+    private Vector3 getPos(float minX, float maxX, float minZ, float maxZ, float maxY){
+        return new Vector3(MathUtils.random.nextFloat(minX, maxX),maxY, MathUtils.random.nextFloat(minZ, maxZ));
+    }
+
+    private Vector3[] getPatrolPoints(Vector3 pos, float radius, float maxY){
+        int patrol = MathUtils.random.nextInt(3,5);
+        Vector3[] patrolPoints = new Vector3[patrol];
+        for (int j = 0; j < patrol; j++){
+
+            float angle = MathUtils.random.nextFloat(0,360f);
+            float distance = MathUtils.random.nextFloat(10,radius);
+
+            float posX = MathUtils.cosDeg(angle) * distance;
+            float posZ = MathUtils.sinDeg(angle) * distance;
+
+            Vector3 point = new Vector3(pos.x + posX, maxY, pos.z + posZ);
+
+            patrolPoints[j] = point;
+        }
+        return patrolPoints;
     }
 }

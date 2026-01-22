@@ -38,6 +38,7 @@ public class SpiritSystem extends IteratingSystem {
             rigidbody.bulletBody.activate(true);
             Vector3 next = spirit.patrolPoints[spirit.currentTarget];
             Vector3 diff = next.cpy().sub(rigidbody.bulletBody.getWorldTransform().getTranslation(new Vector3()));
+            diff.y = 0;
             Vector3 direction = diff.cpy().nor();
 
             Matrix4 transformMatrix = rigidbody.bulletBody.getWorldTransform();
