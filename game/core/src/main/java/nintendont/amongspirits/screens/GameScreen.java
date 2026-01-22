@@ -87,7 +87,6 @@ public class GameScreen implements Screen{
 
 	// terrain
 	private HeightMapTerrain terrain;
-	// private HeightMM terrain;
 	private Scene terrainScene;
 
 	// physics
@@ -101,7 +100,6 @@ public class GameScreen implements Screen{
 
 	MyContactListener cl;
 	private Texture catchMode;
-	private Texture challengeMode;
 	private Texture noPkmn;
 
     public GameScreen(Main game, AssetManager assets, Player player) {
@@ -127,41 +125,12 @@ public class GameScreen implements Screen{
 
 		physicsWorld = context.createPhysicsWorld();
 
-		multiplexer = new InputMultiplexer();
-		Gdx.input.setInputProcessor(multiplexer);
-
 		// text
 		batch = context.spriteBatch;
 		font = new BitmapFont();
 
-		crafting = new CraftManager(game.getItems());
-
-		guiManager = new GUIManager(assets, batch, crafting, player, player.getCodex());
-
-        ((PauseMenu)guiManager.getMenu("pause")).setSaveListener(new BtnEventListener() {
-			@Override
-			public void onSaveRequest(){
-                game.getSaveManager().saveGame(player);
-			}
-			@Override
-			public void onQuitRequest(){
-				game.quitGame();
-			}
-		});
-
         catchMode = assets.get(GameAssets.POKEBALL);
         noPkmn = assets.get(GameAssets.NO_POKEBALL);
-
-		multiplexer.addProcessor(guiManager.stage);
-		multiplexer.addProcessor(new InputAdapter(){
-            @Override
-            public boolean keyDown(int key){
-                return guiManager.handleInput(key);
-            }
-        });
-
-		playerController = new PlayerController(player, camera);
-		multiplexer.addProcessor(playerController);
 
 		// setup light
 		light = new DirectionalLightEx();
@@ -169,15 +138,12 @@ public class GameScreen implements Screen{
 		sceneManager.environment.add(light);
 
 		// setup quick IBL (image based lighting)
-		// Texture skyTex = new Texture(Gdx.files.internal("textures/skyPan.png"));
-
 		IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
 		environmentCubemap = iblBuilder.buildEnvMap(1024);
 		diffuseCubemap = iblBuilder.buildIrradianceMap(256);
 		specularCubemap = iblBuilder.buildRadianceMap(10);
 		iblBuilder.dispose();
 
-		// This texture is provided by the library, no need to have it in your assets.
 		brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
 
 		sceneManager.setAmbientLight(0.7f);
@@ -197,6 +163,37 @@ public class GameScreen implements Screen{
         // Setup WebSocket connection
         MultiplayerConfig multiplayerConfig =  new MultiplayerConfigLoader().loadFromPropsFile();
         WebSocket socket = new MultiplayerWSFactory().createWebSocket(multiplayerConfig, "world");
+
+        // Setup managers
+        playerController = new PlayerController(player, camera);
+        crafting = new CraftManager(game.getItems());
+        guiManager = new GUIManager(assets, batch, crafting, player, player.getCodex());
+        ((PauseMenu)guiManager.getMenu("pause")).setSaveListener(new BtnEventListener() {
+            @Override
+            public void onSaveRequest(){
+                game.getSaveManager().saveGame(player);
+            }
+            @Override
+            public void onQuitRequest(){
+                if (socket.isOpen()) {
+                    socket.close();
+                }
+                game.quitGame();
+            }
+        });
+
+        // Setup input
+        multiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(multiplexer);
+
+        multiplexer.addProcessor(playerController);
+        multiplexer.addProcessor(guiManager.stage);
+        multiplexer.addProcessor(new InputAdapter(){
+            @Override
+            public boolean keyDown(int key){
+                return guiManager.handleInput(key);
+            }
+        });
 
         // Setup ECS engine
         ecsEngine = new Engine();
@@ -227,7 +224,7 @@ public class GameScreen implements Screen{
         ecsEngine.addSystem(new EndgameSystem(player, spiritSpawner, guiManager, sceneManager));
         ecsEngine.addSystem(new SceneManagerSystem(sceneManager));
 
-        playerSpawner.spawnPlayer(new Vector3(28.804615f,-9.616931f,-111.636635f));
+        playerSpawner.spawnPlayer(player.getPosition());
 
         spiritSpawner.spawnLion(new Vector3(30.155998f,-5.723038f,17.230192f), new Vector3[] {
             new Vector3(30.155998f,-5.723038f,17.230192f),

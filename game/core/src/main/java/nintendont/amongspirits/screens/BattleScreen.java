@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
 import nintendont.amongspirits.Main;
+import nintendont.amongspirits.data.assets.GameAssets;
 import nintendont.amongspirits.data.codex.*;
 import nintendont.amongspirits.data.spirits.*;
 import nintendont.amongspirits.entities.Enemy;
@@ -27,6 +28,7 @@ public class BattleScreen implements Screen, MenuListener {
     private Table tableB;
     private SpriteBatch batch;
     private Sprite bgSprite;
+    private Sprite priestSprite;
     private Label messageLabel;
 
     private Main game;
@@ -62,8 +64,12 @@ public class BattleScreen implements Screen, MenuListener {
         styleYellow = createButtonStyle(Color.YELLOW);
 
         // Sprites
-        bgSprite = new Sprite(new Texture(Gdx.files.internal("fightbg.png")));
+        bgSprite = new Sprite(assets.get(GameAssets.FIGHT_BACKGROUND));
         bgSprite.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        Texture priestTexture = assets.get(GameAssets.PRIEST);
+        priestSprite = new Sprite(priestTexture);
+        priestSprite.setSize(priestTexture.getWidth()/6f, priestTexture.getHeight()/6f);
 
         game.playMusic("music and sounds/music/wild-battle.mp3", true);
         setupBattleUI();
@@ -97,7 +103,9 @@ public class BattleScreen implements Screen, MenuListener {
         Table enemyGroup = new Table();
         healthBarEnemy = new Image();
 
-        Image enemyImage = new Image((Texture)assets.get(enemyInvocation.getBattleAsset()));
+        TextureRegion enemyTextureRegion = new TextureRegion(assets.get(enemyInvocation.getBattleAsset()));
+        enemyTextureRegion.flip(true, false);
+        Image enemyImage = new Image(enemyTextureRegion);
         enemyImage.setScaling(Scaling.contain);
         enemyGroup.add(new Label(enemyInvocation.getFullName(), new Label.LabelStyle(font, Color.RED))).row();
         enemyGroup.add(healthBarEnemy).size(220, 22).padBottom(5).row();
@@ -350,8 +358,14 @@ public class BattleScreen implements Screen, MenuListener {
         }
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin(); bgSprite.draw(batch); batch.end();
-        stage.act(); stage.draw();
+        batch.begin();
+        bgSprite.draw(batch);
+        batch.end();
+        stage.act();
+        stage.draw();
+        batch.begin();
+        priestSprite.draw(batch);
+        batch.end();
     }
 
     private void goBackToGame() {

@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 
 public class GameAssets {
+    public static final AssetDescriptor<Texture> FIGHT_BACKGROUND = new AssetDescriptor<>("sprites/backgrounds/fightbg.png", Texture.class);
+    public static final AssetDescriptor<Texture> PRIEST = new AssetDescriptor<>("sprites/priest.png", Texture.class);
     public static final AssetDescriptor<Texture> ORAN_BERRY = new AssetDescriptor<>("textures/oranberry.png", Texture.class);
     public static final AssetDescriptor<Texture> POKEBALL = new AssetDescriptor<>("textures/pokeball.png", Texture.class);
     public static final AssetDescriptor<Texture> NO_POKEBALL = new AssetDescriptor<>("textures/pokeball2.png", Texture.class);

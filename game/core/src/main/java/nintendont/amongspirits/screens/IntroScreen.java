@@ -39,6 +39,8 @@ public class IntroScreen implements Screen {
         this.assets = assets;
 
         AssetUtils.loadGLTF(assets, "models/mc/lukitm501.gltf");
+        assets.load(GameAssets.FIGHT_BACKGROUND);
+        assets.load(GameAssets.PRIEST);
         assets.load(GameAssets.ORAN_BERRY);
         assets.load(GameAssets.POKEBALL);
         assets.load(GameAssets.NO_POKEBALL);
