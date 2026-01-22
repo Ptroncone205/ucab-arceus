@@ -119,6 +119,7 @@ public class InventoryMenu extends MenuTable{
                 super.onClick(index);
             }
         };
+
         Table team = new Table();
         team.center().top().pad(20);
         team.setBackground(skin.newDrawable("white", 0, 0, 0, 0.2f));
